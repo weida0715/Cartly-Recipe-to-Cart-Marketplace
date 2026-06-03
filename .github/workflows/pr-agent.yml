@@ -1,0 +1,42 @@
+name: Qodo PR Agent
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: write
+
+jobs:
+  pr_agent:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run Qodo PR Agent
+        uses: qodo-ai/pr-agent@main
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          # =========================
+          # 🤖 Gemini configuration
+          # =========================
+          config.model: "gemini/gemini-1.5-flash"
+
+          GOOGLE_AI_STUDIO.GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+          # =========================
+          # 🧠 Auto features
+          # =========================
+          github_action_config.auto_review: "true"
+          github_action_config.auto_describe: "true"
+          github_action_config.auto_improve: "true"
+
+          # =========================
+          # 🧾 Behavior control
+          # =========================
+          github_action_config.publish_output_as_comment: "true"
+          github_action_config.output_reuse_existing_comment: "true"
+          github_action_config.auto_trigger_mode: "once_per_pr"
