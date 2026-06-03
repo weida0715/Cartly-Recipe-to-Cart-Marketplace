@@ -2,7 +2,7 @@ name: Qodo PR Agent
 
 on:
   pull_request:
-    types: [opened, reopened, ready_for_review]
+    types: [opened, reopened, synchronize, ready_for_review]
 
 permissions:
   issues: write
@@ -21,36 +21,35 @@ jobs:
           echo "Key prefix: ${GEMINI_API_KEY:0:4}"
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+      - name: Test Gemini key directly
+        run: |
+          curl -sS -i "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent" \
+            -H "Content-Type: application/json" \
+            -H "x-goog-api-key: $GEMINI_API_KEY" \
+            -d '{"contents":[{"parts":[{"text":"hello"}]}]}'
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
       - name: Run Qodo PR Agent
         uses: qodo-ai/pr-agent@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-          # Gemini model
           CONFIG__MODEL: "gemini/gemini-1.5-flash"
-
-          # Force no OpenAI fallback
           CONFIG__FALLBACK_MODELS: '["gemini/gemini-1.5-flash"]'
 
-          # Gemini API key for PR-Agent/Qodo
           GOOGLE_AI_STUDIO__GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-
-          # Extra aliases for LiteLLM / Google SDK compatibility
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GOOGLE_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
-          # Make sure it does not try Vertex ADC
           GOOGLE_GENAI_USE_VERTEXAI: "false"
 
-          # Auto features
           GITHUB_ACTION_CONFIG__AUTO_REVIEW: "true"
           GITHUB_ACTION_CONFIG__AUTO_DESCRIBE: "true"
           GITHUB_ACTION_CONFIG__AUTO_IMPROVE: "true"
-
-          # Behavior control
           GITHUB_ACTION_CONFIG__PUBLISH_OUTPUT_AS_COMMENT: "true"
           GITHUB_ACTION_CONFIG__OUTPUT_REUSE_EXISTING_COMMENT: "true"
           GITHUB_ACTION_CONFIG__AUTO_TRIGGER_MODE: "once_per_pr"
 
-          # Debug
           CONFIG__VERBOSITY_LEVEL: "2"
