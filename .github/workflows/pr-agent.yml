@@ -15,22 +15,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check Gemini key prefix safely
-        run: |
-          echo "Key length: ${#GEMINI_API_KEY}"
-          echo "Key prefix: ${GEMINI_API_KEY:0:4}"
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-
-      - name: Test Gemini key directly
-        run: |
-          curl -sS -i "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent" \
-            -H "Content-Type: application/json" \
-            -H "x-goog-api-key: $GEMINI_API_KEY" \
-            -d '{"contents":[{"parts":[{"text":"hello"}]}]}'
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-
       - name: Run Qodo PR Agent
         uses: qodo-ai/pr-agent@main
         env:
