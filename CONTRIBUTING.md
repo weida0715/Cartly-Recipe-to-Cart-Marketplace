@@ -721,7 +721,7 @@ Open the file, remove conflict markers, and keep the correct final code.
 Then:
 
 ```bash
-git add frontend/app/login/page.tsx
+git add src/app/views/auth/login.php
 git commit -m "fix(merge): resolve login page conflict" \
   -m "Merge latest main into login page branch and resolve conflicting page changes." \
   -m "Refs #12"
