@@ -713,7 +713,7 @@ git merge origin/main
 If Git reports:
 
 ```text
-CONFLICT (content): Merge conflict in frontend/app/login/page.tsx
+CONFLICT (content): Merge conflict in src/app/views/auth/login.php
 ```
 
 Open the file, remove conflict markers, and keep the correct final code.
