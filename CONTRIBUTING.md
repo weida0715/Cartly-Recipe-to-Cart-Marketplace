@@ -352,8 +352,8 @@ What problem does this solve?
 
 ## Related Files
 
-- `frontend/...`
-- `backend/...`
+- src/app/views/...
+- src/app/controllers/...
 
 ## Notes
 
@@ -567,11 +567,7 @@ git status
 Open conflicted files and fix the conflict markers:
 
 ```text
-<<<<<<< HEAD
-Your branch changes
-=======
 Main branch changes
->>>>>>> origin/main
 ```
 
 After fixing:
@@ -714,7 +710,7 @@ git merge origin/main
 If Git reports:
 
 ```text
-CONFLICT (content): Merge conflict in frontend/app/login/page.tsx
+CONFLICT (content): Merge conflict in src/app/views/auth/login.php
 ```
 
 Open the file, remove conflict markers, and keep the correct final code.
@@ -722,7 +718,7 @@ Open the file, remove conflict markers, and keep the correct final code.
 Then:
 
 ```bash
-git add frontend/app/login/page.tsx
+git add src/app/views/auth/login.php
 git commit -m "fix(merge): resolve login page conflict" \
   -m "Merge latest main into login page branch and resolve conflicting page changes." \
   -m "Refs #12"
