@@ -1,0 +1,69 @@
+name: RFC (Request for Comments)
+description: Propose a significant design or architectural change
+title: "RFC-XXX: <short description>"
+labels: ["rfc"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Short description of the proposal
+      placeholder: Explain the RFC in 2–5 lines
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation / Problem Statement
+      description: Why is this change needed?
+      placeholder: What problem are we solving?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Solution
+      description: Detailed explanation of the solution
+      placeholder: Describe the approach
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Other approaches you evaluated
+    validations:
+      required: false
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact Analysis
+      description: Effects on system, performance, users, codebase
+    validations:
+      required: false
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks & Trade-offs
+    validations:
+      required: false
+
+  - type: textarea
+    id: questions
+    attributes:
+      label: Open Questions
+    validations:
+      required: false
+
+  - type: textarea
+    id: plan
+    attributes:
+      label: Implementation Plan
+      description: High-level steps for execution
+    validations:
+      required: false
