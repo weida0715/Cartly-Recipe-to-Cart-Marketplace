@@ -1,0 +1,85 @@
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# =========================
+# Environment Variables
+# =========================
+.env
+.env.local
+.env.*.local
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+error_log
+access_log
+
+# =========================
+# Dependency folders (if added later)
+# =========================
+node_modules/
+vendor/
+
+# =========================
+# PHP / XAMPP specific
+# =========================
+/xampp/
+/htdocs/.htaccess.bak
+
+# Ignore local config overrides
+config/local.php
+config/database.local.php
+
+# =========================
+# Uploads (user-generated content)
+# =========================
+uploads/*
+!uploads/.gitkeep
+
+# =========================
+# Cache / runtime files
+# =========================
+cache/
+tmp/
+temp/
+
+# =========================
+# Database dumps
+# =========================
+*.sql
+*.sqlite
+*.db
+
+# Allow schema file if you want versioned DB structure
+!database/schema.sql
+
+# =========================
+# Build / compiled assets (if added later)
+# =========================
+dist/
+build/
+
+# =========================
+# Backup files
+# =========================
+*.bak
+*.swp
+*.swo
+
+# =========================
+# Mac system files inside repo
+# =========================
+._*
