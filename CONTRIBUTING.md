@@ -352,7 +352,8 @@ What problem does this solve?
 
 ## Related Files
 
-- src/app/views/...\n- src/app/controllers/...
+- src/app/views/...
+- src/app/controllers/...
 
 ## Notes
 
