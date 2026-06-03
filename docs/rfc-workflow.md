@@ -90,7 +90,7 @@ The rfc label will be applied automatically by the template.
 ## Approval Rules
 
 An RFC is considered approved when:
-- At least 1–2 core maintainers approve (or your defined team leads)
+- At least 1–2 core maintainers approve
 - No unresolved critical objections remain
 
 ---
