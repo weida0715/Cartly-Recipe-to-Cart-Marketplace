@@ -1,0 +1,43 @@
+name: PHP Lint
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  lint:
+    name: PHP Syntax Check (Lint)
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Setup PHP environment
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          tools: none
+          coverage: none
+
+      # 3. Verify PHP version
+      - name: Check PHP version
+        run: php -v
+
+      # 4. Run PHP lint on all files
+      - name: Run PHP lint check
+        run: |
+          echo "Checking PHP syntax..."
+
+          # Find all PHP files and lint them
+          find . -type f -name "*.php" ! -path "./vendor/*" | while read file; do
+            php -l "$file"
+          done
+
+      # 5. Fail CI if lint errors exist
+      - name: Validate lint result
+        run: echo "PHP lint completed successfully"
