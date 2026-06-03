@@ -55,6 +55,7 @@ uploads/*
 cache/
 tmp/
 temp/
+.phpunit.result.cache
 
 # =========================
 # Database dumps
