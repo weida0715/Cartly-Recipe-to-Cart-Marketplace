@@ -27,7 +27,8 @@ jobs:
           config.fallback_models: '["gemini/gemini-1.5-flash"]'
 
           # Correct PR-Agent/Qodo Gemini key location
-          GOOGLE_AI_STUDIO.GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_AI_STUDIO_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
           # Auto features
           github_action_config.auto_review: "true"
