@@ -352,8 +352,7 @@ What problem does this solve?
 
 ## Related Files
 
-- `frontend/...`
-- `backend/...`
+- src/app/views/...\n- src/app/controllers/...
 
 ## Notes
 
