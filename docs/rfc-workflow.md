@@ -1,5 +1,17 @@
 # RFC Workflow
 
+## Purpose
+
+The RFC process ensures that important architectural and design decisions are:
+- Discussed before implementation
+- Documented clearly
+- Reviewed collaboratively
+- Agreed upon by maintainers
+
+This reduces rework and prevents conflicting designs.
+
+---
+
 ## When to use RFCs
 
 Use an RFC when proposing:
@@ -21,6 +33,43 @@ Do NOT use RFCs for:
 
 All RFC issues must include: rfc
 
+---
+
+## How to Submit an RFC
+
+1. Create a new GitHub Issue
+2. Select template: **RFC (Request for Comments)**
+3. Fill in all required sections:
+   - Summary
+   - Motivation
+   - Proposed Solution
+   - Alternatives
+   - Impact
+   - Risks
+   - Implementation Plan
+
+4. Add label: rfc
+
+---
+
+## RFC Lifecycle
+
+### 1. Draft
+- RFC is submitted
+- Open for discussion
+
+### 2. Review
+- Maintainers and contributors comment
+- Revisions may be requested
+
+### 3. Decision
+- Accepted → can proceed to implementation
+- Rejected → archived
+- Needs revision → updated and re-reviewed
+
+### 4. Implementation
+- Linked PRs reference RFC issue
+- Implementation follows approved design
 
 ---
 
