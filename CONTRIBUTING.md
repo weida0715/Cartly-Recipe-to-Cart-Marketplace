@@ -567,7 +567,11 @@ git status
 Open conflicted files and fix the conflict markers:
 
 ```text
+<<<<<<< HEAD
+Your branch changes
+=======
 Main branch changes
+>>>>>>> origin/main
 ```
 
 After fixing:
