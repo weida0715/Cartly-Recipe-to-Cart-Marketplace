@@ -9,10 +9,11 @@ Unlike traditional grocery platforms where users manually search for ingredients
 * Selects optimal merchant listings
 * Generates a ready-to-checkout shopping cart
 
+---
+
 ## Key Features
 
 ### Customer
-
 * Browse products and recipes
 * Generate carts from recipes
 * Manage shopping carts and orders
@@ -20,18 +21,18 @@ Unlike traditional grocery platforms where users manually search for ingredients
 * Save favorite recipes
 
 ### Merchant
-
 * Manage stores and inventory
 * Process customer orders
 * Create vouchers
 * Monitor store performance
 
 ### Administrator
-
 * Approve merchants
 * Manage categories and users
 * Moderate content
 * Monitor platform activity
+
+---
 
 ## Core Innovation
 
@@ -46,6 +47,8 @@ Unlike traditional grocery platforms where users manually search for ingredients
 
 The engine uses deterministic ranking rules to ensure identical inputs always produce identical cart outputs.
 
+---
+
 ## Technology Stack
 
 * Frontend: HTML, CSS, JavaScript
@@ -53,6 +56,8 @@ The engine uses deterministic ranking rules to ensure identical inputs always pr
 * Database: MySQL
 * Architecture: MVC
 * Development Environment: XAMPP
+
+---
 
 ## Project Structure
 
@@ -70,7 +75,9 @@ src/
 ├── config/
 ├── database/
 └── uploads/
-```
+````
+
+---
 
 ## Getting Started
 
@@ -80,6 +87,8 @@ src/
 * MySQL
 * XAMPP
 
+---
+
 ### Installation
 
 ```bash
@@ -87,19 +96,93 @@ git clone <repository-url>
 cd cartly
 ```
 
-Configure:
+Configure database:
 
 ```text
 config/database.php
 ```
 
-Import:
+Import database schema:
 
 ```text
 database/cartly.sql
 ```
 
 Start Apache and MySQL using XAMPP.
+
+---
+
+## 🧪 Testing Setup & Execution
+
+Cartly uses **PHPUnit** for unit and feature testing.
+
+---
+
+### 1. Install Testing Dependencies
+
+Run Composer install:
+
+```bash
+composer install
+```
+
+If PHPUnit is not installed:
+
+```bash
+composer require --dev phpunit/phpunit
+```
+
+---
+
+### 2. Project Testing Structure
+
+```text
+tests/
+├── Unit/
+├── Feature/
+└── ExampleTest.php
+```
+
+---
+
+### 3. Run Tests
+
+Execute all tests:
+
+```bash
+vendor/bin/phpunit
+```
+
+---
+
+### 4. Example Test
+
+```php
+use PHPUnit\Framework\TestCase;
+
+class ExampleTest extends TestCase
+{
+    public function test_project_is_working()
+    {
+        $this->assertTrue(true);
+    }
+}
+```
+
+---
+
+### 5. Important Notes
+
+* `.phpunit.result.cache` is auto-generated and ignored by Git
+* Tests should focus on:
+
+  * Recipe-to-Cart Engine logic
+  * Cart calculations
+  * Product matching rules
+  * Authentication logic
+* All tests must pass before submitting a pull request
+
+---
 
 ## Documentation
 
@@ -113,6 +196,8 @@ docs/
 ├── security.md
 └── roadmap.md
 ```
+
+---
 
 ## License
 
