@@ -453,19 +453,19 @@ Use this structure for PRs:
 
 ## Checklist
 
-- [x] I have linked the issue using "Closes #<issue_number>"
-- [x] I have reviewed all file changes
-- [x] No unrelated changes are included
-- [x] All tests have been run locally
-- [x] All tests pass successfully
-- [x] Lint checks have been run
-- [x] Code follows project formatting rules
-- [x] Gemini Code Assist review has been requested
-- [x] AI review comments have been addressed
-- [x] Documentation has been updated (if applicable)
-- [x] README has been updated (if applicable)
-- [x] CHANGELOG has been updated (if applicable)
-- [x] Reviewer has been assigned
+- [ ] I have linked the issue using "Closes #<issue_number>"
+- [ ] I have reviewed all file changes
+- [ ] No unrelated changes are included
+- [ ] All tests have been run locally
+- [ ] All tests pass successfully
+- [ ] Lint checks have been run
+- [ ] Code follows project formatting rules
+- [ ] Gemini Code Assist review has been requested
+- [ ] AI review comments have been addressed
+- [ ] Documentation has been updated (if applicable)
+- [ ] README has been updated (if applicable)
+- [ ] CHANGELOG has been updated (if applicable)
+- [ ] Reviewer has been assigned
 ```
 
 ---
