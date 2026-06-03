@@ -13,3 +13,7 @@ All notable changes to this project will be documented in this file.
 - Create initial testing framework structure
 - Document project structure and development conventions
 - Add changelog and version tracking system
+
+## [0.1.1] - 3rd June 2026
+
+- Create pull request template with required review checklist
