@@ -24,7 +24,7 @@ jobs:
 
       - name: Test Gemini key directly
         run: |
-          curl -sS -i "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent" \
+          curl -sS -i "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent" \
             -H "Content-Type: application/json" \
             -H "x-goog-api-key: $GEMINI_API_KEY" \
             -d '{"contents":[{"parts":[{"text":"hello"}]}]}'
@@ -36,8 +36,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-          CONFIG__MODEL: "gemini/gemini-1.5-flash"
-          CONFIG__FALLBACK_MODELS: '["gemini/gemini-1.5-flash"]'
+          CONFIG__MODEL: "gemini/gemini-2.5-flash"
+          CONFIG__FALLBACK_MODELS: '["gemini/gemini-2.5-flash"]'
 
           GOOGLE_AI_STUDIO__GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
