@@ -26,3 +26,15 @@ All notable changes to this project will be documented in this file.
 - Document commit message conventions (e.g. Conventional Commits)
 - Add coding standards (naming, structure, formatting rules)
 - Define issue templates (bug, feature, improvement)
+
+## [1.0.0] - 11th June 2026
+- Front controller, router, autoloader, base Controller/Model, AuthHelper, CSRF, Flash, Validator.
+- Full 16-table MySQL schema + seed (`src/database/`).
+- Auth (login, register, forgot password, logout) with role-aware redirects.
+- Customer marketplace: product index, detail, search/filter, cart with stepper.
+- Recipe module: create, edit, show, save.
+- Deterministic Recipe-to-Cart engine with merchant grouping and edge-case warnings.
+- Checkout, parent + merchant orders, simulated payment, stock deduction, voucher application.
+- Merchant portal: dashboard, products, orders, vouchers, store profile.
+- Admin portal: dashboard, user/merchant/category/report management.
+- PHPUnit tests for the Recipe-to-Cart engine.
