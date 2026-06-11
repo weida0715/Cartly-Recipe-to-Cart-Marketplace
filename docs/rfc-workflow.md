@@ -39,16 +39,17 @@ All RFC issues must include: rfc
 
 1. Create a new GitHub Issue
 2. Select template: **RFC (Request for Comments)**
-3. Fill in all required sections:
-   - Summary
-   - Motivation
-   - Proposed Solution
-   - Alternatives
-   - Impact
-   - Risks
-   - Implementation Plan
+3. Fill in the template sections (some are optional but highly recommended):
+   - Summary (Required)
+   - Motivation / Problem Statement (Required)
+   - Proposed Solution (Required)
+   - Alternatives Considered (Optional)
+   - Impact Analysis (Optional)
+   - Risks & Trade-offs (Optional)
+   - Open Questions (Optional)
+   - Implementation Plan (Optional)
 
-4. Add label: rfc
+The rfc label will be applied automatically by the template.
 
 ---
 
@@ -89,7 +90,7 @@ All RFC issues must include: rfc
 ## Approval Rules
 
 An RFC is considered approved when:
-- At least 1–2 core maintainers approve (or your defined team leads)
+- At least 1–2 core maintainers approve
 - No unresolved critical objections remain
 
 ---
