@@ -6,6 +6,7 @@ use App\Helpers\Controller;
 use App\Helpers\AuthHelper;
 use App\Helpers\Flash;
 use App\Models\Report;
+use App\Models\Review;
 
 class ReportController extends Controller
 {
@@ -24,6 +25,22 @@ class ReportController extends Controller
 
         (new Report())->createForUser((int) AuthHelper::id(), $targetType, $targetId, $reason);
         Flash::set('success', 'Report submitted for admin review.');
+
+        if ($targetType === 'review') {
+            $review = (new Review())->find($targetId);
+            if ($review) {
+                if (!empty($review['product_id'])) {
+                    $this->redirect('/products/' . $review['product_id']);
+                }
+
+                if (!empty($review['recipe_id'])) {
+                    $this->redirect('/recipes/' . $review['recipe_id']);
+                }
+            }
+
+            $this->redirect('/');
+        }
+
         $this->redirect($targetType === 'recipe' ? '/recipes/' . $targetId : '/products/' . $targetId);
     }
 }
