@@ -64,6 +64,12 @@ class RecipeController extends Controller
     {
         AuthHelper::requireLogin();
         $this->requireCsrf();
+        $title = trim((string) $this->input('recipe_title', ''));
+        if ($title === '') {
+            Flash::set('error', 'Recipe title is required.');
+            $this->redirect('/recipes/create');
+        }
+
         $r = new Recipe();
         try {
             $image = FileUploadHelper::image('image', 'recipes');
@@ -74,7 +80,7 @@ class RecipeController extends Controller
 
         $id = $r->insert([
             'user_id' => (int) AuthHelper::id(),
-            'recipe_title' => trim((string) $this->input('recipe_title', '')),
+            'recipe_title' => $title,
             'description' => (string) $this->input('description', ''),
             'instructions' => (string) $this->input('instructions', ''),
             'base_servings' => max(1, (int) $this->input('base_servings', 1)),
