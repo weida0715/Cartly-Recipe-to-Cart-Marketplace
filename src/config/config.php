@@ -5,13 +5,9 @@ if (!defined('APP_NAME')) {
     define('APP_NAME', 'Cartly');
 }
 
-// Auto-detect base URL (works under XAMPP at /cartly/src/public)
 if (!defined('BASE_URL')) {
-    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
     $scriptDir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/');
-    // define('BASE_URL', $scheme . '://' . $host . $scriptDir);
-    define('BASE_URL', '');
+    define('BASE_URL', $scriptDir === '/' ? '' : $scriptDir);
 }
 
 if (!defined('ASSET_URL')) {
