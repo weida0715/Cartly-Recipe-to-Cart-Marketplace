@@ -15,19 +15,148 @@ stores, categories, and reports.
 The `archive/` folder contains the original React/shadcn design prototype.
 It is reference-only and is NOT part of the runtime project.
 
-## Setup (XAMPP)
+## Project setup
 
-1. Copy this project into `xampp/htdocs/cartly`.
-2. Start Apache + MySQL.
-3. In phpMyAdmin, import:
-   - `src/database/schema.sql`
-   - `src/database/seed.sql`
-4. Optional spec layout copies are also available at:
-   - `src/database/migrations/001_cartly_schema.sql`
-   - `src/database/seeders/001_cartly_seed.sql`
-5. Visit <http://localhost/cartly/src/public/>.
+Cartly is a plain PHP MVC application backed by MySQL/MariaDB. You can run it
+with XAMPP/MAMP/WAMP or with PHP's built-in development server. Linux users can
+run the app directly with the `php` command.
 
-DB credentials default to `root` with no password — change in `src/config/database.php`.
+### 1. Install system requirements
+
+Install these tools before setting up the project:
+
+- PHP 8.1+ with the `pdo_mysql`, `mbstring`, `fileinfo`, and `session` extensions
+- MySQL 5.7+ or MariaDB 10.4+
+- Composer
+- Git
+- Node.js 18+ only if you want to run the optional preview stub
+
+#### Windows
+
+Recommended beginner setup:
+
+1. Install [XAMPP](https://www.apachefriends.org/) for Apache, PHP, and MySQL.
+2. Install [Composer](https://getcomposer.org/download/).
+3. Install [Git for Windows](https://git-scm.com/download/win).
+4. Optional: install [Node.js LTS](https://nodejs.org/).
+
+If you use XAMPP, ensure PHP is available in your terminal by adding the XAMPP
+PHP folder, for example `C:\xampp\php`, to your `PATH`.
+
+#### macOS
+
+Using Homebrew:
+
+```bash
+brew install php composer mysql git node
+brew services start mysql
+```
+
+Alternatively, install MAMP and Composer separately if you prefer a bundled GUI
+environment.
+
+#### Linux
+
+On Ubuntu/Debian-based systems:
+
+```bash
+sudo apt update
+sudo apt install php php-cli php-mysql php-mbstring php-xml php-curl php-zip php-gd mysql-server composer git nodejs npm
+sudo systemctl enable --now mysql
+```
+
+On Fedora-based systems:
+
+```bash
+sudo dnf install php php-cli php-pdo php-mysqlnd php-mbstring php-xml php-curl php-zip php-gd mysql-server composer git nodejs npm
+sudo systemctl enable --now mysqld
+```
+
+### 2. Clone the project
+
+```bash
+git clone https://github.com/weida0715/Cartly-Recipe-to-Cart-Marketplace.git
+cd Cartly-Recipe-to-Cart-Marketplace
+```
+
+For XAMPP/WAMP/MAMP, you may instead place the project folder inside your web
+root, for example `xampp/htdocs/cartly` on Windows.
+
+### 3. Install PHP dependencies
+
+```bash
+composer install
+```
+
+Composer installs development dependencies such as PHPUnit into `vendor/`.
+
+### 4. Create and seed the database
+
+Create a database named `cartly`, then import the schema and seed data.
+
+Using the MySQL CLI:
+
+```bash
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS cartly CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p cartly < src/database/schema.sql
+mysql -u root -p cartly < src/database/seed.sql
+```
+
+If your local MySQL root user has no password, omit `-p`:
+
+```bash
+mysql -u root -e "CREATE DATABASE IF NOT EXISTS cartly CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root cartly < src/database/schema.sql
+mysql -u root cartly < src/database/seed.sql
+```
+
+You can also import the same files with phpMyAdmin:
+
+1. Create a database named `cartly`.
+2. Import `src/database/schema.sql`.
+3. Import `src/database/seed.sql`.
+
+Optional spec-layout copies are also available at:
+
+- `src/database/migrations/001_cartly_schema.sql`
+- `src/database/seeders/001_cartly_seed.sql`
+
+### 5. Configure database credentials
+
+Edit `src/config/database.php` to match your local MySQL/MariaDB user:
+
+```php
+define('DB_HOST', '127.0.0.1');
+define('DB_PORT', '3306');
+define('DB_NAME', 'cartly');
+define('DB_USER', 'cartly_user');
+define('DB_PASS', 'cartly_password');
+```
+
+For a default XAMPP install, this is often:
+
+```php
+define('DB_USER', 'root');
+define('DB_PASS', '');
+```
+
+### 6. Run the application
+
+#### Option A: PHP built-in server — works on Windows, macOS, and Linux
+
+From the project root, run:
+
+```bash
+php -S localhost:8000 -t src/public
+```
+
+Then open <http://localhost:8000>.
+
+#### Option B: XAMPP/WAMP/MAMP
+
+1. Put the project in your web root, for example `xampp/htdocs/cartly`.
+2. Start Apache and MySQL.
+3. Open <http://localhost/cartly/src/public/>.
 
 ## Default logins
 
@@ -91,9 +220,3 @@ vendor/bin/phpunit
 ```
 
 Current automated coverage focuses on `tests/RecipeCartEngineTest.php`.
-
-## Lovable preview
-
-The Lovable in-browser preview cannot execute PHP. A placeholder page is
-served on the preview port via `scripts/preview-stub.js` so the dev harness
-stays healthy. Run the project locally under XAMPP to use it.
