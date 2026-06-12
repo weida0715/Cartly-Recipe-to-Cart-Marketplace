@@ -26,7 +26,7 @@ src/
 ├── public/          # Entry point (index.php, exposed assets)
 ├── app/             # Core application logic
 ├── config/          # Configuration files (DB, app settings)
-├── database/        # SQL schema and migrations (if any)
+├── database/        # SQL schema, migrations, and seeders
 ├── uploads/         # User-generated files (images, media)
 ├── tests/           # PHPUnit test cases
 ├── docs/            # Project documentation
@@ -43,8 +43,12 @@ app/
 ├── controllers/     # Handles HTTP requests and responses
 ├── models/          # Database entities and business logic
 ├── views/           # UI templates (HTML/PHP views)
+├── helpers/         # Reusable utility functions
 └── helpers/         # Reusable utility functions
 ```
+
+Current helper set includes `AuthHelper`, `Csrf`, `Flash`, `Validator`,
+`FileUploadHelper`, `Controller`, `Model`, and `Router`.
 
 ---
 
@@ -84,7 +88,7 @@ Stores runtime user-generated files:
 
 * product images
 * recipe images
-* user avatars
+* customer/merchant-uploaded images
 
 Structure:
 
@@ -102,6 +106,10 @@ Files in this directory are NOT tracked by Git.
 ## Tests (`tests/`)
 
 Uses PHPUnit for testing core logic.
+
+Current coverage includes deterministic Recipe-to-Cart rules in
+`tests/RecipeCartEngineTest.php`. Additional auth, voucher, checkout, and role
+guard tests are still pending to fully match the spec.
 
 Structure:
 
@@ -258,6 +266,15 @@ It must:
 * Be deterministic (same input → same output)
 * Be independent of UI layer
 * Be testable via PHPUnit
+
+### Related implementation notes
+
+- The engine ranks products by package count, excess quantity, cost, rating,
+  and product ID as a tie-breaker.
+- Merchant/store grouping prefers merchants already used in the preview.
+- Checkout persists order snapshots so later product changes do not alter past
+  orders.
+
 * Not depend on controllers or views
 
 ---

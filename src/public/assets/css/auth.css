@@ -1,0 +1,6 @@
+.auth-shell{min-height:70vh;display:flex;align-items:center;justify-content:center;padding:24px 0}
+.auth-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:32px;width:100%;max-width:420px}
+.auth-card h1{margin:0 0 6px;text-align:center;font-size:1.5rem}
+.auth-card .sub{text-align:center;color:var(--muted);margin-bottom:20px;font-size:.9rem}
+.auth-card .help{font-size:.85rem;color:var(--muted);text-align:center;margin-top:14px}
+.demo-badges{display:flex;gap:8px;justify-content:center;margin-top:6px}

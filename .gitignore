@@ -60,9 +60,6 @@ temp/
 # =========================
 # Database dumps
 # =========================
-*.sql
-*.sqlite
-*.db
 
 # Allow schema file if you want versioned DB structure
 !database/schema.sql
