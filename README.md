@@ -12,9 +12,6 @@ stores, categories, and reports.
 - Plain HTML + CSS + vanilla JS
 - PHPUnit for tests
 
-The `archive/` folder contains the original React/shadcn design prototype.
-It is reference-only and is NOT part of the runtime project.
-
 ## Project setup
 
 Cartly is a plain PHP MVC application backed by MySQL/MariaDB. You can run it
@@ -29,7 +26,6 @@ Install these tools before setting up the project:
 - MySQL 5.7+ or MariaDB 10.4+
 - Composer
 - Git
-- Node.js 18+ only if you want to run the optional preview stub
 
 #### Windows
 
@@ -38,7 +34,6 @@ Recommended beginner setup:
 1. Install [XAMPP](https://www.apachefriends.org/) for Apache, PHP, and MySQL.
 2. Install [Composer](https://getcomposer.org/download/).
 3. Install [Git for Windows](https://git-scm.com/download/win).
-4. Optional: install [Node.js LTS](https://nodejs.org/).
 
 If you use XAMPP, ensure PHP is available in your terminal by adding the XAMPP
 PHP folder, for example `C:\xampp\php`, to your `PATH`.
@@ -48,7 +43,7 @@ PHP folder, for example `C:\xampp\php`, to your `PATH`.
 Using Homebrew:
 
 ```bash
-brew install php composer mysql git node
+brew install php composer mysql git
 brew services start mysql
 ```
 
@@ -61,14 +56,14 @@ On Ubuntu/Debian-based systems:
 
 ```bash
 sudo apt update
-sudo apt install php php-cli php-mysql php-mbstring php-xml php-curl php-zip php-gd mysql-server composer git nodejs npm
+sudo apt install php php-cli php-mysql php-mbstring php-xml php-curl php-zip php-gd mysql-server composer git
 sudo systemctl enable --now mysql
 ```
 
 On Fedora-based systems:
 
 ```bash
-sudo dnf install php php-cli php-pdo php-mysqlnd php-mbstring php-xml php-curl php-zip php-gd mysql-server composer git nodejs npm
+sudo dnf install php php-cli php-pdo php-mysqlnd php-mbstring php-xml php-curl php-zip php-gd mysql-server composer git
 sudo systemctl enable --now mysqld
 ```
 
@@ -193,7 +188,6 @@ src/
 ├── public/uploads/    Publicly served user-uploaded images
 └── uploads/           Legacy upload directory, not used for new uploads
 tests/                 PHPUnit suite (RecipeCartEngineTest)
-archive/               Original React/shadcn design prototype (reference)
 ```
 
 ## Recipe-to-Cart engine
