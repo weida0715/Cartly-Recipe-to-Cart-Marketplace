@@ -17,7 +17,8 @@ class RecipeCartEngine
         private Recipe $recipes = new Recipe(),
         private RecipeIngredient $ingredients = new RecipeIngredient(),
         private Product $products = new Product()
-    ) {}
+    ) {
+    }
 
     /**
      * @return array{items: array<int, array>, warnings: array<int, string>, recipe: array|null}
@@ -65,7 +66,8 @@ class RecipeCartEngine
                 }
                 $pkgQty = max(0.01, (float) $p['package_quantity']);
                 $required = (int) ceil($scaledQty / $pkgQty);
-                if ($required < 1) $required = 1;
+                if ($required < 1)
+                    $required = 1;
 
                 if ((int) $p['stock_quantity'] < $required) {
                     $warnings[] = "Insufficient stock at {$p['store_name']} for {$ri['ingredient_name']}.";
@@ -73,12 +75,12 @@ class RecipeCartEngine
                 }
 
                 $excess = ($required * $pkgQty) - $scaledQty;
-                $cost   = $required * (float) $p['price'];
+                $cost = $required * (float) $p['price'];
                 $ranked[] = [
-                    'p'        => $p,
+                    'p' => $p,
                     'required' => $required,
-                    'excess'   => $excess,
-                    'cost'     => $cost,
+                    'excess' => $excess,
+                    'cost' => $cost,
                 ];
             }
 
@@ -92,13 +94,18 @@ class RecipeCartEngine
             usort($ranked, function ($a, $b) use ($usedStores) {
                 $aIn = isset($usedStores[(int) $a['p']['store_id']]) ? 0 : 1;
                 $bIn = isset($usedStores[(int) $b['p']['store_id']]) ? 0 : 1;
-                if ($aIn !== $bIn) return $aIn <=> $bIn;
-                if ($a['required'] !== $b['required']) return $a['required'] <=> $b['required'];
-                if ($a['excess']   !== $b['excess'])   return $a['excess']   <=> $b['excess'];
-                if ($a['cost']     !== $b['cost'])     return $a['cost']     <=> $b['cost'];
+                if (($cmp = $aIn <=> $bIn) !== 0)
+                    return $cmp;
+                if (($cmp = $a['required'] <=> $b['required']) !== 0)
+                    return $cmp;
+                if (($cmp = $a['excess'] <=> $b['excess']) !== 0)
+                    return $cmp;
+                if (($cmp = $a['cost'] <=> $b['cost']) !== 0)
+                    return $cmp;
                 $ar = (float) ($a['p']['rating'] ?? 0);
                 $br = (float) ($b['p']['rating'] ?? 0);
-                if ($ar !== $br) return $br <=> $ar;
+                if (($cmp = $br <=> $ar) !== 0)
+                    return $cmp;
                 return (int) $a['p']['product_id'] <=> (int) $b['p']['product_id'];
             });
 
@@ -106,12 +113,12 @@ class RecipeCartEngine
             $usedStores[(int) $best['p']['store_id']] = true;
             $items[] = [
                 'recipe_ingredient_id' => (int) $ri['recipe_ingredient_id'],
-                'ingredient_name'      => $ri['ingredient_name'],
-                'scaled_quantity'      => round($scaledQty, 2),
-                'unit'                 => $ri['unit'],
-                'product'              => $best['p'],
-                'required_packages'    => $best['required'],
-                'line_total'           => round($best['cost'], 2),
+                'ingredient_name' => $ri['ingredient_name'],
+                'scaled_quantity' => round($scaledQty, 2),
+                'unit' => $ri['unit'],
+                'product' => $best['p'],
+                'required_packages' => $best['required'],
+                'line_total' => round($best['cost'], 2),
             ];
         }
 
