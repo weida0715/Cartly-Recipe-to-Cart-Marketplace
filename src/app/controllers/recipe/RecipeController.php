@@ -136,8 +136,14 @@ class RecipeController extends Controller
             echo 'Forbidden';
             return;
         }
+        $title = trim((string) $this->input('recipe_title', ''));
+        if ($title === '') {
+            Flash::set('error', 'Recipe title is required.');
+            $this->redirect('/recipes/' . $id . '/edit');
+        }
+
         $data = [
-            'recipe_title' => trim((string) $this->input('recipe_title', '')),
+            'recipe_title' => $title,
             'description' => (string) $this->input('description', ''),
             'instructions' => (string) $this->input('instructions', ''),
             'base_servings' => max(1, (int) $this->input('base_servings', 1)),
