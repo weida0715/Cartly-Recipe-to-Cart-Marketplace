@@ -38,3 +38,9 @@ All notable changes to this project will be documented in this file.
 - Merchant portal: dashboard, products, orders, vouchers, store profile.
 - Admin portal: dashboard, user/merchant/category/report management.
 - PHPUnit tests for the Recipe-to-Cart engine.
+
+## [1.0.1] - 13th June 2026
+- Deleted `scripts/preview-stub.js`
+- Deleted `package.json` because it only contained the preview stub `dev` script
+- Removed Lovable/preview-specific text from `README.md`
+- Kept `archive/lovable/` and all other archive assets intact

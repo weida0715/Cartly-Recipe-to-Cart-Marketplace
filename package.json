@@ -1,9 +1,0 @@
-{
-  "name": "cartly-php",
-  "private": true,
-  "version": "0.1.0",
-  "description": "Cartly PHP MVC project. Run locally under XAMPP. See src/database/README.md.",
-  "scripts": {
-    "dev": "node scripts/preview-stub.js"
-  }
-}
