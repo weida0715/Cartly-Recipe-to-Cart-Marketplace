@@ -26,14 +26,19 @@ class MerchantStoreController extends Controller
         $uid = (int) AuthHelper::id();
         $store = (new Store())->byUser($uid);
         $data = [
-            'store_name'        => trim((string) $this->input('store_name', '')),
+            'store_name' => trim((string) $this->input('store_name', '')),
             'store_description' => (string) $this->input('store_description', ''),
-            'contact_email'     => (string) $this->input('contact_email', ''),
-            'contact_phone'     => (string) $this->input('contact_phone', ''),
-            'store_address'     => (string) $this->input('store_address', ''),
-            'opening_time'      => $this->input('opening_time') ?: null,
-            'closing_time'      => $this->input('closing_time') ?: null,
+            'contact_email' => trim((string) $this->input('contact_email', '')),
+            'contact_phone' => trim((string) $this->input('contact_phone', '')),
+            'store_address' => trim((string) $this->input('store_address', '')),
+            'opening_time' => $this->input('opening_time') ?: null,
+            'closing_time' => $this->input('closing_time') ?: null,
         ];
+        if ($data['store_name'] === '' || $data['contact_email'] === '' || $data['store_address'] === '') {
+            Flash::set('error', 'Store name, contact email, and address are required.');
+            $this->redirect('/merchant/store');
+        }
+
         $sm = new Store();
         if ($store) {
             $sm->update((int) $store['store_id'], $data);
