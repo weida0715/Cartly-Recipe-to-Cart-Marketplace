@@ -43,4 +43,4 @@ All notable changes to this project will be documented in this file.
 - Deleted `scripts/preview-stub.js`
 - Deleted `package.json` because it only contained the preview stub `dev` script
 - Removed Lovable/preview-specific text from `README.md`
-- Kept `archive/lovable/` and all other archive assets intact, per your instruction
+- Kept `archive/lovable/` and all other archive assets intact
