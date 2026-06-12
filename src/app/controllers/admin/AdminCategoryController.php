@@ -14,7 +14,7 @@ class AdminCategoryController extends Controller
         AuthHelper::requireRole('admin');
         $this->view('admin/categories', [
             'title' => 'Categories',
-            'cats'  => (new Category())->all('category_name'),
+            'cats' => (new Category())->all('category_name'),
         ], 'layout/admin-layout');
     }
 
@@ -22,10 +22,16 @@ class AdminCategoryController extends Controller
     {
         AuthHelper::requireRole('admin');
         $this->requireCsrf();
+        $name = trim((string) $this->input('category_name', ''));
+        if ($name === '') {
+            Flash::set('error', 'Category name is required.');
+            $this->redirect('/admin/categories');
+        }
+
         (new Category())->insert([
-            'category_name' => trim((string) $this->input('category_name', '')),
+            'category_name' => $name,
             'category_icon' => (string) $this->input('category_icon', ''),
-            'status'        => 'active',
+            'status' => 'active',
         ]);
         Flash::set('success', 'Category added.');
         $this->redirect('/admin/categories');
