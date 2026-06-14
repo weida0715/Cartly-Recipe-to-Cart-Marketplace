@@ -5,24 +5,24 @@
   <form method="post" action="<?= BASE_URL ?>/merchant/vouchers">
     <?= Csrf::field() ?>
     <div class="form-grid">
-      <div class="form-row"><label>Code</label><input name="voucher_code" required></div>
+      <div class="form-row"><label>Code</label><input name="voucher_code" maxlength="50" required></div>
       <div class="form-row">
         <label>Type</label>
         <select name="discount_type">
-          <option>fixed</option>
-          <option>percentage</option>
+          <option value="fixed">fixed</option>
+          <option value="percentage">percentage</option>
         </select>
       </div>
     </div>
     <div class="form-grid">
-      <div class="form-row"><label>Value</label><input type="number" step="0.01" name="discount_value" required></div>
-      <div class="form-row"><label>Min spend</label><input type="number" step="0.01" name="minimum_spend" value="0">
+      <div class="form-row"><label>Value</label><input type="number" step="0.01" min="0.01" name="discount_value" required></div>
+      <div class="form-row"><label>Min spend</label><input type="number" step="0.01" min="0" name="minimum_spend" value="0">
       </div>
     </div>
     <div class="form-grid">
       <div class="form-row"><label>Start</label><input type="date" name="start_date"></div>
       <div class="form-row"><label>End</label><input type="date" name="end_date"></div>
-      <div class="form-row"><label>Usage limit (0 = unlimited)</label><input type="number" name="usage_limit" value="0">
+      <div class="form-row"><label>Usage limit (0 = unlimited)</label><input type="number" min="0" name="usage_limit" value="0">
       </div>
     </div>
     <button class="btn btn-primary">Create</button>
