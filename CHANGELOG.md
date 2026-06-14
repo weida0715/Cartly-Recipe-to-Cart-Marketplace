@@ -50,3 +50,7 @@ All notable changes to this project will be documented in this file.
 - Added voucher date-range validation and duplicate-code handling through the store-scoped database constraint.
 - Changed voucher codes to be unique per store and added migration `002_store_scoped_voucher_codes.sql`.
 - Ignored local proposal files with `Proposal/` in `.gitignore`.
+
+## [1.0.3] - 14th June 2026
+- Added a homepage promotional banner that highlights a recipe-to-cart offer.
+- Added responsive custom CSS for the promotional campaign section.
