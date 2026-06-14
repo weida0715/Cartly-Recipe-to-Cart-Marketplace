@@ -28,15 +28,53 @@ class MerchantVoucherController extends Controller
         AuthHelper::requireRole('merchant');
         $this->requireCsrf();
         $store = (new Store())->byUser((int) AuthHelper::id());
-        (new Voucher())->insert([
+
+        $code = strtoupper(trim((string) $this->input('voucher_code', '')));
+        $discountType = (string) $this->input('discount_type', 'fixed');
+        $discountValue = (float) $this->input('discount_value', 0);
+        $minSpend = (float) $this->input('minimum_spend', 0);
+        $usageLimit = (int) $this->input('usage_limit', 0);
+
+        if ($code === '') {
+            Flash::set('error', 'Voucher code is required.');
+            $this->redirect('/merchant/vouchers');
+        }
+
+        if ($discountValue <= 0) {
+            Flash::set('error', 'Discount value must be greater than zero.');
+            $this->redirect('/merchant/vouchers');
+        }
+
+        if ($discountType === 'percentage' && $discountValue > 100) {
+            Flash::set('error', 'Percentage discount cannot exceed 100%.');
+            $this->redirect('/merchant/vouchers');
+        }
+
+        if ($minSpend < 0) {
+            Flash::set('error', 'Minimum spend cannot be negative.');
+            $this->redirect('/merchant/vouchers');
+        }
+
+        if ($usageLimit < 0) {
+            Flash::set('error', 'Usage limit cannot be negative.');
+            $this->redirect('/merchant/vouchers');
+        }
+
+        $voucherModel = new Voucher();
+        if ($voucherModel->where('voucher_code', $code)) {
+            Flash::set('error', 'Voucher code already exists.');
+            $this->redirect('/merchant/vouchers');
+        }
+
+        $voucherModel->insert([
             'store_id' => (int) $store['store_id'],
-            'voucher_code' => strtoupper(trim((string) $this->input('voucher_code'))),
-            'discount_type' => (string) $this->input('discount_type', 'fixed'),
-            'discount_value' => (float) $this->input('discount_value', 0),
-            'minimum_spend' => (float) $this->input('minimum_spend', 0),
+            'voucher_code' => $code,
+            'discount_type' => $discountType,
+            'discount_value' => $discountValue,
+            'minimum_spend' => $minSpend,
             'start_date' => $this->input('start_date') ?: null,
             'end_date' => $this->input('end_date') ?: null,
-            'usage_limit' => (int) $this->input('usage_limit', 0),
+            'usage_limit' => $usageLimit,
             'status' => 'active',
         ]);
         Flash::set('success', 'Voucher created.');
