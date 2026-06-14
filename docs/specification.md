@@ -730,7 +730,7 @@ The system must implement the following tables:
 | ---------------- | ----------------------------------- | -------------------- | ----------------------------- |
 | `voucher_id`     | INT AUTO_INCREMENT                  | PK                   | Unique voucher ID             |
 | `store_id`       | INT                                 | FK → stores.store_id | Store offering voucher        |
-| `voucher_code`   | VARCHAR(50)                         | UNIQUE               | Voucher code                  |
+| `voucher_code`   | VARCHAR(50)                         | UNIQUE with store_id | Store-scoped voucher code     |
 | `discount_type`  | ENUM('fixed','percentage')          |                      | Discount type                 |
 | `discount_value` | DECIMAL(10,2)                       |                      | Discount amount or percentage |
 | `minimum_spend`  | DECIMAL(10,2)                       |                      | Minimum spend                 |

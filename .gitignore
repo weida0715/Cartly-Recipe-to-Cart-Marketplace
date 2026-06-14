@@ -81,3 +81,8 @@ build/
 # Mac system files inside repo
 # =========================
 ._*
+
+# =========================
+# local files that should not be committed (for reference only)
+# =========================
+Proposal/

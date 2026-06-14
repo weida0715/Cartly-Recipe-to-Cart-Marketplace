@@ -10,6 +10,10 @@
    - `migrations/001_cartly_schema.sql`
    - `seeders/001_cartly_seed.sql`
 
+If the database was already imported before voucher codes became store-scoped,
+run `migrations/002_store_scoped_voucher_codes.sql` once instead of recreating
+the database.
+
 CLI alternative:
 
 ```bash
