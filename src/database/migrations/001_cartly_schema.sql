@@ -138,7 +138,7 @@ CREATE TABLE cart_items (
 CREATE TABLE vouchers (
   voucher_id     INT AUTO_INCREMENT PRIMARY KEY,
   store_id       INT NOT NULL,
-  voucher_code   VARCHAR(50) UNIQUE NOT NULL,
+  voucher_code   VARCHAR(50) NOT NULL,
   discount_type  ENUM('fixed','percentage') NOT NULL,
   discount_value DECIMAL(10,2) NOT NULL,
   minimum_spend  DECIMAL(10,2) DEFAULT 0,
@@ -147,6 +147,7 @@ CREATE TABLE vouchers (
   usage_limit    INT DEFAULT 0,
   used_count     INT DEFAULT 0,
   status         ENUM('active','inactive','expired') NOT NULL DEFAULT 'active',
+  UNIQUE KEY uniq_store_voucher_code (store_id, voucher_code),
   FOREIGN KEY (store_id) REFERENCES stores(store_id) ON DELETE CASCADE
 );
 CREATE TABLE orders (

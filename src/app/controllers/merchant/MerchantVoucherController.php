@@ -38,6 +38,8 @@ class MerchantVoucherController extends Controller
         $discountValue = (float) $this->input('discount_value', 0);
         $minimumSpend = (float) $this->input('minimum_spend', 0);
         $usageLimit = (int) $this->input('usage_limit', 0);
+        $startDate = $this->input('start_date') ?: null;
+        $endDate = $this->input('end_date') ?: null;
 
         if ($code === '') {
             Flash::set('error', 'Voucher code is required.');
@@ -69,10 +71,17 @@ class MerchantVoucherController extends Controller
             $this->redirect('/merchant/vouchers');
         }
 
-        $voucher = new Voucher();
-        if ($voucher->where('voucher_code', $code)) {
-            Flash::set('error', 'Voucher code already exists.');
+        if ($startDate !== null && $endDate !== null && $startDate > $endDate) {
+            Flash::set('error', 'End date must be after or equal to start date.');
             $this->redirect('/merchant/vouchers');
+        }
+
+        $voucher = new Voucher();
+        foreach ($voucher->byStore((int) $store['store_id']) as $existingVoucher) {
+            if ($existingVoucher['voucher_code'] === $code) {
+                Flash::set('error', 'Voucher code already exists.');
+                $this->redirect('/merchant/vouchers');
+            }
         }
 
         $voucher->insert([
@@ -81,8 +90,8 @@ class MerchantVoucherController extends Controller
             'discount_type' => $discountType,
             'discount_value' => $discountValue,
             'minimum_spend' => $minimumSpend,
-            'start_date' => $this->input('start_date') ?: null,
-            'end_date' => $this->input('end_date') ?: null,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
             'usage_limit' => $usageLimit,
             'status' => 'active',
         ]);
