@@ -71,30 +71,39 @@ class MerchantVoucherController extends Controller
             $this->redirect('/merchant/vouchers');
         }
 
-        if ($startDate !== null && $endDate !== null && $startDate > $endDate) {
+        try {
+            $startDateTime = $startDate !== null ? new \DateTimeImmutable((string) $startDate) : null;
+            $endDateTime = $endDate !== null ? new \DateTimeImmutable((string) $endDate) : null;
+        } catch (\Exception $e) {
+            Flash::set('error', 'Voucher dates are invalid.');
+            $this->redirect('/merchant/vouchers');
+        }
+
+        if ($startDateTime !== null && $endDateTime !== null && $startDateTime > $endDateTime) {
             Flash::set('error', 'End date must be after or equal to start date.');
             $this->redirect('/merchant/vouchers');
         }
 
         $voucher = new Voucher();
-        foreach ($voucher->byStore((int) $store['store_id']) as $existingVoucher) {
-            if ($existingVoucher['voucher_code'] === $code) {
-                Flash::set('error', 'Voucher code already exists.');
+        try {
+            $voucher->insert([
+                'store_id' => (int) $store['store_id'],
+                'voucher_code' => $code,
+                'discount_type' => $discountType,
+                'discount_value' => $discountValue,
+                'minimum_spend' => $minimumSpend,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'usage_limit' => $usageLimit,
+                'status' => 'active',
+            ]);
+        } catch (\PDOException $e) {
+            if ((string) $e->getCode() === '23000') {
+                Flash::set('error', 'Voucher code already exists for this store.');
                 $this->redirect('/merchant/vouchers');
             }
+            throw $e;
         }
-
-        $voucher->insert([
-            'store_id' => (int) $store['store_id'],
-            'voucher_code' => $code,
-            'discount_type' => $discountType,
-            'discount_value' => $discountValue,
-            'minimum_spend' => $minimumSpend,
-            'start_date' => $startDate,
-            'end_date' => $endDate,
-            'usage_limit' => $usageLimit,
-            'status' => 'active',
-        ]);
         Flash::set('success', 'Voucher created.');
         $this->redirect('/merchant/vouchers');
     }
