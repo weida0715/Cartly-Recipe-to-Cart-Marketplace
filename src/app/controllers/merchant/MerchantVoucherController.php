@@ -104,22 +104,80 @@ class MerchantVoucherController extends Controller
         AuthHelper::requireRole('merchant');
         $this->requireCsrf();
         $store = (new Store())->byUser((int) AuthHelper::id());
-        $voucher = new Voucher();
-        $row = $voucher->find((int) $id);
-        if (!$row || !$store || (int) $row['store_id'] !== (int) $store['store_id']) {
+        if (!$store) {
+            Flash::set('error', 'Store not found.');
+            $this->redirect('/merchant/vouchers');
+        }
+
+        $voucherModel = new Voucher();
+        $row = $voucherModel->find((int) $id);
+        if (!$row || (int) $row['store_id'] !== (int) $store['store_id']) {
             http_response_code(403);
             echo 'Forbidden';
             return;
         }
 
-        $voucher->update((int) $id, [
-            'voucher_code' => strtoupper(trim((string) $this->input('voucher_code'))),
-            'discount_type' => (string) $this->input('discount_type', 'fixed'),
-            'discount_value' => (float) $this->input('discount_value', 0),
-            'minimum_spend' => (float) $this->input('minimum_spend', 0),
-            'start_date' => $this->input('start_date') ?: null,
-            'end_date' => $this->input('end_date') ?: null,
-            'usage_limit' => (int) $this->input('usage_limit', 0),
+        $code = strtoupper(trim((string) $this->input('voucher_code', '')));
+        $discountType = (string) $this->input('discount_type', 'fixed');
+        $discountValue = (float) $this->input('discount_value', 0);
+        $minSpend = (float) $this->input('minimum_spend', 0);
+        $usageLimit = (int) $this->input('usage_limit', 0);
+        $startDate = $this->input('start_date') ?: null;
+        $endDate = $this->input('end_date') ?: null;
+
+        if ($code === '') {
+            Flash::set('error', 'Voucher code is required.');
+            $this->redirect('/merchant/vouchers');
+        }
+
+        if (!in_array($discountType, ['fixed', 'percentage'], true)) {
+            Flash::set('error', 'Invalid discount type.');
+            $this->redirect('/merchant/vouchers');
+        }
+
+        if ($discountValue <= 0) {
+            Flash::set('error', 'Discount value must be greater than zero.');
+            $this->redirect('/merchant/vouchers');
+        }
+
+        if ($discountType === 'percentage' && $discountValue > 100) {
+            Flash::set('error', 'Percentage discount cannot exceed 100%.');
+            $this->redirect('/merchant/vouchers');
+        }
+
+        if ($minSpend < 0) {
+            Flash::set('error', 'Minimum spend cannot be negative.');
+            $this->redirect('/merchant/vouchers');
+        }
+
+        if ($usageLimit < 0) {
+            Flash::set('error', 'Usage limit cannot be negative.');
+            $this->redirect('/merchant/vouchers');
+        }
+
+        if ($startDate && $endDate && strtotime((string) $endDate) < strtotime((string) $startDate)) {
+            Flash::set('error', 'End date cannot be before start date.');
+            $this->redirect('/merchant/vouchers');
+        }
+
+        foreach ($voucherModel->where('voucher_code', $code) as $existing) {
+            if (
+                (int) $existing['store_id'] === (int) $store['store_id']
+                && (int) $existing['voucher_id'] !== (int) $id
+            ) {
+                Flash::set('error', 'Voucher code already exists for your store.');
+                $this->redirect('/merchant/vouchers');
+            }
+        }
+
+        $voucherModel->update((int) $id, [
+            'voucher_code' => $code,
+            'discount_type' => $discountType,
+            'discount_value' => $discountValue,
+            'minimum_spend' => $minSpend,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'usage_limit' => $usageLimit,
             'status' => (string) $this->input('status', 'active'),
         ]);
         Flash::set('success', 'Voucher updated.');
