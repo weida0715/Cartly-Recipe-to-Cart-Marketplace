@@ -28,15 +28,26 @@ class MerchantVoucherController extends Controller
         AuthHelper::requireRole('merchant');
         $this->requireCsrf();
         $store = (new Store())->byUser((int) AuthHelper::id());
+        if (!$store) {
+            Flash::set('error', 'Store not found.');
+            $this->redirect('/merchant/vouchers');
+        }
 
         $code = strtoupper(trim((string) $this->input('voucher_code', '')));
         $discountType = (string) $this->input('discount_type', 'fixed');
         $discountValue = (float) $this->input('discount_value', 0);
         $minSpend = (float) $this->input('minimum_spend', 0);
         $usageLimit = (int) $this->input('usage_limit', 0);
+        $startDate = $this->input('start_date') ?: null;
+        $endDate = $this->input('end_date') ?: null;
 
         if ($code === '') {
             Flash::set('error', 'Voucher code is required.');
+            $this->redirect('/merchant/vouchers');
+        }
+
+        if (!in_array($discountType, ['fixed', 'percentage'], true)) {
+            Flash::set('error', 'Invalid discount type.');
             $this->redirect('/merchant/vouchers');
         }
 
@@ -60,10 +71,17 @@ class MerchantVoucherController extends Controller
             $this->redirect('/merchant/vouchers');
         }
 
-        $voucherModel = new Voucher();
-        if ($voucherModel->where('voucher_code', $code)) {
-            Flash::set('error', 'Voucher code already exists.');
+        if ($startDate && $endDate && strtotime((string) $endDate) < strtotime((string) $startDate)) {
+            Flash::set('error', 'End date cannot be before start date.');
             $this->redirect('/merchant/vouchers');
+        }
+
+        $voucherModel = new Voucher();
+        foreach ($voucherModel->where('voucher_code', $code) as $existing) {
+            if ((int) $existing['store_id'] === (int) $store['store_id']) {
+                Flash::set('error', 'Voucher code already exists for your store.');
+                $this->redirect('/merchant/vouchers');
+            }
         }
 
         $voucherModel->insert([
@@ -72,8 +90,8 @@ class MerchantVoucherController extends Controller
             'discount_type' => $discountType,
             'discount_value' => $discountValue,
             'minimum_spend' => $minSpend,
-            'start_date' => $this->input('start_date') ?: null,
-            'end_date' => $this->input('end_date') ?: null,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
             'usage_limit' => $usageLimit,
             'status' => 'active',
         ]);
