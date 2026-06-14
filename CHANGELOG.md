@@ -44,3 +44,9 @@ All notable changes to this project will be documented in this file.
 - Deleted `package.json` because it only contained the preview stub `dev` script
 - Removed Lovable/preview-specific text from `README.md`
 - Kept `archive/lovable/` and all other archive assets intact
+
+## [1.0.2] - 14th June 2026
+- Added server-side validation for merchant voucher creation inputs.
+- Added voucher date-range validation and duplicate-code handling through the store-scoped database constraint.
+- Changed voucher codes to be unique per store and added migration `002_store_scoped_voucher_codes.sql`.
+- Ignored local proposal files with `Proposal/` in `.gitignore`.
