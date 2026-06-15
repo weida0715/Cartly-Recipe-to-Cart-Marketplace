@@ -80,8 +80,8 @@ use App\Helpers\AuthHelper; ?>
         </form>
         <form method="post" action="<?= BASE_URL ?>/recipes/<?= (int) $recipe['recipe_id'] ?>/save" class="mt-2">
           <?= Csrf::field() ?>
-          <button class="btn btn-outline btn-block" type="submit" aria-pressed="<?= !empty($isSaved) ? 'true' : 'false' ?>">
-            <?= !empty($isSaved) ? 'Unsave recipe' : 'Save recipe' ?>
+          <button class="btn btn-outline btn-block" type="submit">
+            <?= $isSaved ? 'Unsave recipe' : 'Save recipe' ?>
           </button>
         </form>
         <?php if ((int) $recipe['user_id'] === (int) AuthHelper::id()): ?>
