@@ -21,14 +21,14 @@ class Recipe extends Model
                 WHERE r.status='active'";
         $params = [];
         if ($search !== '') {
-            $baseSql .= " AND (r.recipe_title LIKE :q_title OR r.description LIKE :q_description)";
-            $like = '%' . $search . '%';
+            $baseSql .= " AND (r.recipe_title LIKE :q_title ESCAPE '\\\\' OR r.description LIKE :q_description ESCAPE '\\\\')";
+            $like = $this->containsLikePattern($search);
             $params[':q_title'] = $like;
             $params[':q_description'] = $like;
         }
         if ($cuisine !== '') {
-            $baseSql .= " AND r.cuisine_type LIKE :cuisine";
-            $params[':cuisine'] = '%' . $cuisine . '%';
+            $baseSql .= " AND r.cuisine_type LIKE :cuisine ESCAPE '\\\\'";
+            $params[':cuisine'] = $this->containsLikePattern($cuisine);
         }
         if ($difficulty !== '') {
             $baseSql .= " AND r.difficulty = :difficulty";
@@ -74,8 +74,8 @@ class Recipe extends Model
                 WHERE r.status='active'";
         $p = [];
         if ($search !== '') {
-            $sql .= " AND (r.recipe_title LIKE :q_title OR r.description LIKE :q_description)";
-            $like = '%' . $search . '%';
+            $sql .= " AND (r.recipe_title LIKE :q_title ESCAPE '\\\\' OR r.description LIKE :q_description ESCAPE '\\\\')";
+            $like = $this->containsLikePattern($search);
             $p[':q_title'] = $like;
             $p[':q_description'] = $like;
         }
@@ -86,5 +86,11 @@ class Recipe extends Model
     public function byUser(int $userId): array
     {
         return $this->where('user_id', $userId, 'created_at DESC');
+    }
+
+    private function containsLikePattern(string $value): string
+    {
+        $escaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
+        return '%' . $escaped . '%';
     }
 }
