@@ -83,6 +83,6 @@ build/
 ._*
 
 # =========================
-# Local files that doesn't need to be pushed
+# local files that should not be committed (for reference only)
 # =========================
 Proposal/

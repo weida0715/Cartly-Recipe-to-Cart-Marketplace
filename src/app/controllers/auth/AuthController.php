@@ -129,7 +129,7 @@ class AuthController extends Controller
 
     public function forgotForm(): void
     {
-        $this->view('auth/forgot-password', ['title' => 'Forgot Password · Cartly'], null);
+        $this->view('auth/forgot-password', ['title' => 'Forgot Password - Cartly'], null);
     }
 
     public function forgot(): void
@@ -147,22 +147,36 @@ class AuthController extends Controller
             $token = bin2hex(random_bytes(32));
             $expiresAt = date('Y-m-d H:i:s', time() + 3600);
             $userModel->storeResetToken((int) $user['user_id'], $token, $expiresAt);
+            $resetUrl = $this->canDisplayResetLink()
+                ? BASE_URL . '/auth/reset-password?token=' . rawurlencode($token)
+                : null;
 
             $this->view('auth/forgot-password', [
-                'title' => 'Forgot Password Â· Cartly',
+                'title' => 'Forgot Password - Cartly',
                 'emailSent' => true,
-                'resetUrl' => BASE_URL . '/auth/reset-password?token=' . rawurlencode($token),
-                'expiresAt' => $expiresAt,
+                'resetUrl' => $resetUrl,
+                'expiresAt' => $resetUrl ? $expiresAt : null,
             ], null);
             return;
         }
 
         $this->view('auth/forgot-password', [
-            'title' => 'Forgot Password Â· Cartly',
+            'title' => 'Forgot Password - Cartly',
             'emailSent' => true,
             'resetUrl' => null,
             'expiresAt' => null,
         ], null);
+    }
+
+    private function canDisplayResetLink(): bool
+    {
+        $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
+        $host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+        $host = explode(':', $host, 2)[0];
+
+        return in_array($remoteAddr, ['127.0.0.1', '::1'], true)
+            || in_array($host, ['localhost', '127.0.0.1', '::1'], true)
+            || substr($host, -5) === '.test';
     }
 
     public function resetForm(): void
