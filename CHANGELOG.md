@@ -44,3 +44,7 @@ All notable changes to this project will be documented in this file.
 - Deleted `package.json` because it only contained the preview stub `dev` script
 - Removed Lovable/preview-specific text from `README.md`
 - Kept `archive/lovable/` and all other archive assets intact
+
+## [1.0.2] - 15th June 2026
+- Improved the forgot-password flow so active users receive a usable local reset link.
+- Added backend email validation and clearer reset-password form autocomplete/labels.

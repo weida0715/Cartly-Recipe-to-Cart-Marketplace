@@ -81,3 +81,8 @@ build/
 # Mac system files inside repo
 # =========================
 ._*
+
+# =========================
+# Local files that doesn't need to be pushed
+# =========================
+Proposal/

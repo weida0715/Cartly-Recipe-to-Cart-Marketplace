@@ -136,18 +136,33 @@ class AuthController extends Controller
     {
         $this->requireCsrf();
         $email = trim((string) $this->input('email', ''));
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            Flash::set('error', 'Please enter a valid email.');
+            $this->redirect('/auth/forgot-password');
+        }
+
         $userModel = new User();
         $user = $userModel->findByEmail($email);
         if ($user && $user['status'] === 'active') {
             $token = bin2hex(random_bytes(32));
-            $userModel->storeResetToken((int) $user['user_id'], $token, date('Y-m-d H:i:s', time() + 3600));
-            $_SESSION['reset_token'] = $token;
-            Flash::set('success', 'Redirecting to password reset in 3 seconds...');
-            $this->redirect('/auth/forgot-password?token=' . $token);
+            $expiresAt = date('Y-m-d H:i:s', time() + 3600);
+            $userModel->storeResetToken((int) $user['user_id'], $token, $expiresAt);
+
+            $this->view('auth/forgot-password', [
+                'title' => 'Forgot Password Â· Cartly',
+                'emailSent' => true,
+                'resetUrl' => BASE_URL . '/auth/reset-password?token=' . rawurlencode($token),
+                'expiresAt' => $expiresAt,
+            ], null);
+            return;
         }
 
-        Flash::set('success', 'If the email exists, a reset link has been sent.');
-        $this->redirect('/auth/login');
+        $this->view('auth/forgot-password', [
+            'title' => 'Forgot Password Â· Cartly',
+            'emailSent' => true,
+            'resetUrl' => null,
+            'expiresAt' => null,
+        ], null);
     }
 
     public function resetForm(): void
@@ -180,6 +195,7 @@ class AuthController extends Controller
         }
 
         $userModel->updatePassword((int) $user['user_id'], $password);
+        unset($_SESSION['reset_token']);
         Flash::set('success', 'Password reset successfully. Please login.');
         $this->redirect('/auth/login');
     }
