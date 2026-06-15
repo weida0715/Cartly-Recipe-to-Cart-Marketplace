@@ -66,3 +66,7 @@ All notable changes to this project will be documented in this file.
 ## [1.0.6] - 15th June 2026
 - Fixed marketplace product search by using distinct prepared-statement placeholders for each searchable column.
 - Improved the marketplace search input so clearing it resets filtered results immediately.
+
+## [1.0.7] - 15th June 2026
+- Fixed recipe search by using distinct prepared-statement placeholders for recipe title and description.
+- Kept the recipe search box scoped to recipe text, kept cuisine as a separate filter, and reset results when either clear button is used.

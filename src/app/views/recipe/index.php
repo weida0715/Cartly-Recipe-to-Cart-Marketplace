@@ -1,7 +1,7 @@
 <h2>Discover recipes</h2>
-<form class="filters" method="get" action="<?= BASE_URL ?>/recipes">
-  <input class="input" type="text" name="q" value="<?= htmlspecialchars($q) ?>" placeholder="Search by name, cuisine…">
-  <input class="input" type="text" name="cuisine" value="<?= htmlspecialchars($cuisine ?? '') ?>" placeholder="Cuisine">
+<form class="filters" method="get" action="<?= BASE_URL ?>/recipes" data-search-reset>
+  <input class="input" id="recipe-search" type="search" name="q" value="<?= htmlspecialchars($q) ?>" placeholder="Search recipes by title or description..." autocomplete="off" data-search-reset-input>
+  <input class="input" id="recipe-cuisine" type="search" name="cuisine" value="<?= htmlspecialchars($cuisine ?? '') ?>" placeholder="Cuisine" autocomplete="off" data-search-reset-input>
   <select class="input" name="difficulty">
     <option value="">All difficulty</option>
     <?php foreach (['easy', 'medium', 'hard'] as $difficultyOption): ?>
@@ -26,7 +26,7 @@
       </option>
     <?php endforeach; ?>
   </select>
-  <button class="btn btn-primary">Search</button>
+  <button class="btn btn-primary" type="submit">Search</button>
   <a class="btn btn-accent" href="<?= BASE_URL ?>/recipes/create">+ New recipe</a>
 </form>
 
