@@ -54,3 +54,7 @@ All notable changes to this project will be documented in this file.
 ## [1.0.3] - 14th June 2026
 - Added a homepage promotional banner that highlights a recipe-to-cart offer.
 - Added responsive custom CSS for the promotional campaign section.
+
+## [1.0.4] - 15th June 2026
+- Added a grouped footer across shared customer, merchant, admin, auth, and error page layouts.
+- Added responsive custom CSS for footer link columns and footer metadata.
