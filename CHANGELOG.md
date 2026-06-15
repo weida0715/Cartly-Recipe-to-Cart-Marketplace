@@ -45,6 +45,20 @@ All notable changes to this project will be documented in this file.
 - Removed Lovable/preview-specific text from `README.md`
 - Kept `archive/lovable/` and all other archive assets intact
 
-## [1.0.2] - 15th June 2026
+## [1.0.2] - 14th June 2026
+- Added server-side validation for merchant voucher creation inputs.
+- Added voucher date-range validation and duplicate-code handling through the store-scoped database constraint.
+- Changed voucher codes to be unique per store and added migration `002_store_scoped_voucher_codes.sql`.
+- Ignored local proposal files with `Proposal/` in `.gitignore`.
+
+## [1.0.3] - 14th June 2026
+- Added a homepage promotional banner that highlights a recipe-to-cart offer.
+- Added responsive custom CSS for the promotional campaign section.
+
+## [1.0.4] - 15th June 2026
+- Added a grouped footer across shared customer, merchant, admin, auth, and error page layouts.
+- Added responsive custom CSS for footer link columns and footer metadata.
+
+## [1.0.5] - 15th June 2026
 - Improved the forgot-password flow so active users receive a usable local reset link.
 - Added backend email validation and clearer reset-password form autocomplete/labels.
