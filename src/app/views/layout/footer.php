@@ -34,7 +34,7 @@
     </nav>
 
     <div class="footer-bottom">
-      <p>&copy; <?= (int) date('Y') ?> Cartly. All rights reserved.</p>
+      <p>&copy; <?= date('Y') ?> Cartly. All rights reserved.</p>
       <p>Built for recipe planning, local shopping, and smarter carts.</p>
     </div>
   </div>
