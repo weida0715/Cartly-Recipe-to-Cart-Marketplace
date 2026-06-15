@@ -129,25 +129,54 @@ class AuthController extends Controller
 
     public function forgotForm(): void
     {
-        $this->view('auth/forgot-password', ['title' => 'Forgot Password · Cartly'], null);
+        $this->view('auth/forgot-password', ['title' => 'Forgot Password - Cartly'], null);
     }
 
     public function forgot(): void
     {
         $this->requireCsrf();
         $email = trim((string) $this->input('email', ''));
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            Flash::set('error', 'Please enter a valid email.');
+            $this->redirect('/auth/forgot-password');
+        }
+
         $userModel = new User();
         $user = $userModel->findByEmail($email);
         if ($user && $user['status'] === 'active') {
             $token = bin2hex(random_bytes(32));
-            $userModel->storeResetToken((int) $user['user_id'], $token, date('Y-m-d H:i:s', time() + 3600));
-            $_SESSION['reset_token'] = $token;
-            Flash::set('success', 'Redirecting to password reset in 3 seconds...');
-            $this->redirect('/auth/forgot-password?token=' . $token);
+            $expiresAt = date('Y-m-d H:i:s', time() + 3600);
+            $userModel->storeResetToken((int) $user['user_id'], $token, $expiresAt);
+            $resetUrl = $this->canDisplayResetLink()
+                ? BASE_URL . '/auth/reset-password?token=' . rawurlencode($token)
+                : null;
+
+            $this->view('auth/forgot-password', [
+                'title' => 'Forgot Password - Cartly',
+                'emailSent' => true,
+                'resetUrl' => $resetUrl,
+                'expiresAt' => $resetUrl ? $expiresAt : null,
+            ], null);
+            return;
         }
 
-        Flash::set('success', 'If the email exists, a reset link has been sent.');
-        $this->redirect('/auth/login');
+        $this->view('auth/forgot-password', [
+            'title' => 'Forgot Password - Cartly',
+            'emailSent' => true,
+            'resetUrl' => null,
+            'expiresAt' => null,
+        ], null);
+    }
+
+    private function canDisplayResetLink(): bool
+    {
+        $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
+        $host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+        $host = explode(':', $host, 2)[0];
+
+        return in_array($remoteAddr, ['127.0.0.1', '::1'], true)
+            || in_array($host, ['localhost', '127.0.0.1', '::1'], true)
+            || substr($host, -5) === '.test';
     }
 
     public function resetForm(): void
@@ -180,6 +209,7 @@ class AuthController extends Controller
         }
 
         $userModel->updatePassword((int) $user['user_id'], $password);
+        unset($_SESSION['reset_token']);
         Flash::set('success', 'Password reset successfully. Please login.');
         $this->redirect('/auth/login');
     }

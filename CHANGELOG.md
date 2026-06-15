@@ -58,3 +58,7 @@ All notable changes to this project will be documented in this file.
 ## [1.0.4] - 15th June 2026
 - Added a grouped footer across shared customer, merchant, admin, auth, and error page layouts.
 - Added responsive custom CSS for footer link columns and footer metadata.
+
+## [1.0.5] - 15th June 2026
+- Improved the forgot-password flow so local/test environments can display a usable reset link without exposing it in production.
+- Added backend email validation and clearer reset-password form autocomplete/labels.
