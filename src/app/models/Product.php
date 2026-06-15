@@ -23,8 +23,11 @@ class Product extends Model
                 WHERE p.status='active' AND s.store_status='approved'";
         $params = [];
         if ($search !== '') {
-            $baseSql .= " AND (p.product_name LIKE :q OR p.description LIKE :q OR i.ingredient_name LIKE :q)";
-            $params[':q'] = '%' . $search . '%';
+            $baseSql .= " AND (p.product_name LIKE :q_name OR p.description LIKE :q_description OR i.ingredient_name LIKE :q_ingredient)";
+            $like = '%' . $search . '%';
+            $params[':q_name'] = $like;
+            $params[':q_description'] = $like;
+            $params[':q_ingredient'] = $like;
         }
         if ($categoryId) {
             $baseSql .= " AND p.category_id = :cid";
@@ -74,8 +77,11 @@ class Product extends Model
                 WHERE p.status='active' AND s.store_status='approved'";
         $params = [];
         if ($search !== '') {
-            $sql .= " AND (p.product_name LIKE :q OR p.description LIKE :q OR i.ingredient_name LIKE :q)";
-            $params[':q'] = '%' . $search . '%';
+            $sql .= " AND (p.product_name LIKE :q_name OR p.description LIKE :q_description OR i.ingredient_name LIKE :q_ingredient)";
+            $like = '%' . $search . '%';
+            $params[':q_name'] = $like;
+            $params[':q_description'] = $like;
+            $params[':q_ingredient'] = $like;
         }
         if ($categoryId) {
             $sql .= " AND p.category_id = :cid";

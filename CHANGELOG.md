@@ -62,3 +62,7 @@ All notable changes to this project will be documented in this file.
 ## [1.0.5] - 15th June 2026
 - Improved the forgot-password flow so local/test environments can display a usable reset link without exposing it in production.
 - Added backend email validation and clearer reset-password form autocomplete/labels.
+
+## [1.0.6] - 15th June 2026
+- Fixed marketplace product search by using distinct prepared-statement placeholders for each searchable column.
+- Improved the marketplace search input so clearing it resets filtered results immediately.
