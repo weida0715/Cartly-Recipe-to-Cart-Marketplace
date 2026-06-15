@@ -1,7 +1,7 @@
 <h2>Marketplace</h2>
-<form class="filters" method="get" action="<?= BASE_URL ?>/products">
-  <input class="input" type="text" name="q" value="<?= htmlspecialchars($q) ?>"
-    placeholder="Search products or ingredients…">
+<form class="filters" method="get" action="<?= BASE_URL ?>/products" data-search-reset>
+  <input class="input" id="product-search" type="search" name="q" value="<?= htmlspecialchars($q) ?>"
+    placeholder="Search products or ingredients..." autocomplete="off" data-search-reset-input>
   <select class="input" name="cid">
     <option value="">All categories</option>
     <?php foreach ($cats as $c): ?>
@@ -26,7 +26,7 @@
       </option>
     <?php endforeach; ?>
   </select>
-  <button class="btn btn-primary">Filter</button>
+  <button class="btn btn-primary" type="submit">Search</button>
 </form>
 
 <?php if (!$products): ?>

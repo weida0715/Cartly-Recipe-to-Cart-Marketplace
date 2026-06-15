@@ -27,4 +27,19 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   });
+
+  // Reset filtered marketplace results when a search input is cleared.
+  document.querySelectorAll('form[data-search-reset]').forEach(form => {
+    const input = form.querySelector('[data-search-reset-input]');
+    if (!input) return;
+
+    let hadSearchValue = input.value.trim() !== '';
+    input.addEventListener('input', () => {
+      const hasSearchValue = input.value.trim() !== '';
+      if (hadSearchValue && !hasSearchValue) {
+        form.submit();
+      }
+      hadSearchValue = hasSearchValue;
+    });
+  });
 });
