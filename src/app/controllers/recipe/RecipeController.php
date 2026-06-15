@@ -48,6 +48,9 @@ class RecipeController extends Controller
             'recipe' => $recipe,
             'ingredients' => (new RecipeIngredient())->detailed((int) $id),
             'reviews' => (new Review())->forRecipe((int) $id),
+            'isSaved' => AuthHelper::check()
+                ? (new SavedRecipe())->isSaved((int) AuthHelper::id(), (int) $id)
+                : false,
         ]);
     }
 

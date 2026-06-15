@@ -8,6 +8,16 @@ class SavedRecipe extends Model
     protected string $table = 'saved_recipes';
     protected string $primaryKey = 'saved_id';
 
+    public function isSaved(int $userId, int $recipeId): bool
+    {
+        $rows = $this->query(
+            'SELECT saved_id FROM saved_recipes WHERE user_id = :u AND recipe_id = :r LIMIT 1',
+            [':u' => $userId, ':r' => $recipeId]
+        );
+
+        return !empty($rows);
+    }
+
     public function toggle(int $userId, int $recipeId): string
     {
         $stmt = $this->db()->prepare('SELECT saved_id FROM saved_recipes WHERE user_id=:u AND recipe_id=:r');
