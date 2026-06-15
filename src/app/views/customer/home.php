@@ -5,6 +5,21 @@
   <a class="btn btn-outline" href="<?= BASE_URL ?>/products">Shop Marketplace</a>
 </section>
 
+<section class="promo-banner" aria-labelledby="promo-banner-title">
+  <div class="promo-banner-content">
+    <p class="promo-eyebrow">Limited weekend offer</p>
+    <h2 id="promo-banner-title">Save more when recipes become a cart</h2>
+    <p>
+      Build a recipe cart today and apply merchant vouchers at checkout for fresh ingredients from approved local
+      stores.
+    </p>
+  </div>
+  <div class="promo-banner-actions">
+    <a class="btn btn-accent" href="<?= BASE_URL ?>/recipes">Start with Recipes</a>
+    <a class="btn btn-outline" href="<?= BASE_URL ?>/products">Shop Deals</a>
+  </div>
+</section>
+
 <?php if (!empty($cats)): ?>
   <section class="mb-3">
     <h2>Categories</h2>
