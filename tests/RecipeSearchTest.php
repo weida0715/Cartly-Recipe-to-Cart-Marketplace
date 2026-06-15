@@ -57,4 +57,28 @@ class RecipeSearchTest extends TestCase
         $this->assertSame('%soup%', $recipe->lastQuery['params'][':q_title']);
         $this->assertSame('%soup%', $recipe->lastQuery['params'][':q_description']);
     }
+
+    public function test_paginated_cuisine_filter_uses_partial_cuisine_match(): void
+    {
+        $recipe = new class extends Recipe {
+            public array $queries = [];
+
+            public function query(string $sql, array $params = []): array
+            {
+                $this->queries[] = ['sql' => $sql, 'params' => $params];
+                if (str_contains($sql, 'COUNT(*)')) {
+                    return [['cnt' => 0]];
+                }
+                return [];
+            }
+        };
+
+        $recipe->paginateActive('', 'malay');
+
+        $this->assertCount(2, $recipe->queries);
+        foreach ($recipe->queries as $query) {
+            $this->assertStringContainsString('r.cuisine_type LIKE :cuisine', $query['sql']);
+            $this->assertSame('%malay%', $query['params'][':cuisine']);
+        }
+    }
 }

@@ -27,8 +27,8 @@ class Recipe extends Model
             $params[':q_description'] = $like;
         }
         if ($cuisine !== '') {
-            $baseSql .= " AND r.cuisine_type = :cuisine";
-            $params[':cuisine'] = $cuisine;
+            $baseSql .= " AND r.cuisine_type LIKE :cuisine";
+            $params[':cuisine'] = '%' . $cuisine . '%';
         }
         if ($difficulty !== '') {
             $baseSql .= " AND r.difficulty = :difficulty";
