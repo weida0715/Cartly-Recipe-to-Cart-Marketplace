@@ -31,14 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Reset filtered listing results when a search input is cleared.
   document.querySelectorAll('form[data-search-reset]').forEach(form => {
     form.querySelectorAll('[data-search-reset-input]').forEach(input => {
-      let hadSearchValue = input.value.trim() !== '';
-
-      input.addEventListener('input', () => {
-        const hasSearchValue = input.value.trim() !== '';
-        if (hadSearchValue && !hasSearchValue) {
+      input.addEventListener('search', () => {
+        if (input.value === '') {
           form.submit();
         }
-        hadSearchValue = hasSearchValue;
       });
     });
   });
