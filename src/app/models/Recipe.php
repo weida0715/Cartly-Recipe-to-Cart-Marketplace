@@ -21,8 +21,10 @@ class Recipe extends Model
                 WHERE r.status='active'";
         $params = [];
         if ($search !== '') {
-            $baseSql .= " AND (r.recipe_title LIKE :q OR r.description LIKE :q OR r.cuisine_type LIKE :q)";
-            $params[':q'] = '%' . $search . '%';
+            $baseSql .= " AND (r.recipe_title LIKE :q_title OR r.description LIKE :q_description)";
+            $like = '%' . $search . '%';
+            $params[':q_title'] = $like;
+            $params[':q_description'] = $like;
         }
         if ($cuisine !== '') {
             $baseSql .= " AND r.cuisine_type = :cuisine";
@@ -72,8 +74,10 @@ class Recipe extends Model
                 WHERE r.status='active'";
         $p = [];
         if ($search !== '') {
-            $sql .= " AND (r.recipe_title LIKE :q OR r.description LIKE :q OR r.cuisine_type LIKE :q)";
-            $p[':q'] = '%' . $search . '%';
+            $sql .= " AND (r.recipe_title LIKE :q_title OR r.description LIKE :q_description)";
+            $like = '%' . $search . '%';
+            $p[':q_title'] = $like;
+            $p[':q_description'] = $like;
         }
         $sql .= " ORDER BY r.created_at DESC";
         return $this->query($sql, $p);
