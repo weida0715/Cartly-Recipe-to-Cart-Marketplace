@@ -74,3 +74,7 @@ All notable changes to this project will be documented in this file.
 ## [1.0.8] - 15th June 2026
 - Changed the recipe cuisine filter to support partial cuisine matches.
 - Updated the recipe cuisine filter placeholder so it is clear that the field filters cuisine.
+
+## [1.0.9] - 15th June 2026
+- Added saved-state detection to recipe detail pages.
+- Updated the recipe save button to show Save recipe or Unsave recipe based on the current user's saved state.
