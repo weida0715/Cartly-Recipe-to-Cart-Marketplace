@@ -520,8 +520,3 @@
     text-align: left;
   }
 }
-@media (max-width: 560px) {
-  .hero h1 {
-    font-size: 1.65rem;
-  }
-}
