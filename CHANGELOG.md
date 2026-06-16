@@ -85,3 +85,10 @@ All notable changes to this project will be documented in this file.
 - Improved responsive styling for category tiles, filters, marketplace cards, dashboard sidebars, and auth pages using custom CSS only.
 - Fixed the PHP deprecation warning in `Validator::required()` by explicitly marking the optional label parameter as nullable.
 - Hardened homepage recipe metadata output and required-field validation against nullable values and array inputs.
+
+## [1.0.11] - 16th June 2026
+- Added versioned stock seed images for categories, seeded ingredient/product thumbnails, and seeded recipes.
+- Added `src/database/seed_assets.php` to copy stock image sources into `src/public/uploads/seeded/` for repeatable XAMPP reseeding.
+- Updated seed SQL files so category, product, and recipe records reference seeded image paths.
+- Updated recipe listing cards to render seeded recipe images instead of the fallback placeholder.
+- Documented the image generation prompts and the extra seed asset copy step.
