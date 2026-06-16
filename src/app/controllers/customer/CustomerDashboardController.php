@@ -10,6 +10,7 @@ use App\Models\SavedRecipe;
 use App\Models\User;
 use App\Models\Store;
 use App\Helpers\Flash;
+use App\Helpers\Validator;
 
 class CustomerDashboardController extends Controller
 {
@@ -54,8 +55,12 @@ class CustomerDashboardController extends Controller
             'email' => trim((string) $this->input('email', '')),
             'phone' => trim((string) $this->input('phone', '')),
         ];
-        if ($data['username'] === '' || $data['full_name'] === '' || !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            Flash::set('error', 'Username, full name, and valid email are required.');
+        $v = new Validator($data);
+        $v->required('username')->required('full_name', 'Full name')
+            ->required('email')->email('email')
+            ->phone('phone');
+        if ($v->fails()) {
+            Flash::set('error', reset($v->errors));
             $this->redirect('/profile');
         }
         $userModel = new User();
@@ -113,8 +118,13 @@ class CustomerDashboardController extends Controller
             'rating' => 0,
         ];
 
-        if ($data['store_name'] === '' || $data['contact_email'] === '' || $data['store_address'] === '') {
-            Flash::set('error', 'Store name, email, and address are required.');
+        $v = new Validator($data);
+        $v->required('store_name', 'Store name')
+            ->required('contact_email', 'Email')->email('contact_email')
+            ->required('contact_phone', 'Contact phone')->phone('contact_phone', 'Contact phone')
+            ->required('store_address', 'Address');
+        if ($v->fails()) {
+            Flash::set('error', reset($v->errors));
             $this->redirect('/dashboard');
         }
 

@@ -14,7 +14,7 @@
         <?= \App\Helpers\Csrf::field() ?>
         <div class="form-row"><label>Store name</label><input name="store_name" required></div>
         <div class="form-row"><label>Contact email</label><input type="email" name="contact_email" required></div>
-        <div class="form-row"><label>Contact phone</label><input name="contact_phone" required></div>
+        <div class="form-row"><label>Contact phone</label><input name="contact_phone" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="20" required></div>
         <div class="form-row"><label>Store address</label><textarea name="store_address" required></textarea></div>
         <div class="form-row"><label>Description</label><textarea name="store_description"></textarea></div>
         <div class="form-grid">
