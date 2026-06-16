@@ -5,6 +5,7 @@ namespace App\Controllers\Merchant;
 use App\Helpers\Controller;
 use App\Helpers\AuthHelper;
 use App\Helpers\Flash;
+use App\Helpers\Validator;
 use App\Models\Store;
 
 class MerchantStoreController extends Controller
@@ -34,8 +35,13 @@ class MerchantStoreController extends Controller
             'opening_time' => $this->input('opening_time') ?: null,
             'closing_time' => $this->input('closing_time') ?: null,
         ];
-        if ($data['store_name'] === '' || $data['contact_email'] === '' || $data['store_address'] === '') {
-            Flash::set('error', 'Store name, contact email, and address are required.');
+        $v = new Validator($data);
+        $v->required('store_name', 'Store name')
+            ->required('contact_email', 'Contact email')->email('contact_email')
+            ->phone('contact_phone', 'Contact phone')
+            ->required('store_address', 'Address');
+        if ($v->fails()) {
+            Flash::set('error', reset($v->errors));
             $this->redirect('/merchant/store');
         }
 
