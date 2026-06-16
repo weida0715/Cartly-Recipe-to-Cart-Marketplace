@@ -84,6 +84,7 @@ class AuthController extends Controller
         $v = new Validator($data);
         $v->required('username')->required('full_name', 'Full name')
             ->required('email')->email('email')
+            ->phone('phone')
             ->required('password')->min('password', 6)
             ->matches('password', 'confirm', 'Passwords do not match.');
         if ($v->fails()) {

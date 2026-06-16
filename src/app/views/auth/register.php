@@ -18,7 +18,7 @@ use App\Helpers\Csrf;
         <div class="form-row"><label>Full name</label><input name="full_name" required></div>
       </div>
       <div class="form-row"><label>Email</label><input name="email" type="email" required></div>
-      <div class="form-row"><label>Phone</label><input name="phone" type="tel"></div>
+      <div class="form-row"><label>Phone</label><input name="phone" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="20"></div>
       <div class="form-grid">
         <div class="form-row"><label>Password</label><input name="password" type="password" required></div>
         <div class="form-row"><label>Confirm password</label><input name="confirm" type="password" required></div>
