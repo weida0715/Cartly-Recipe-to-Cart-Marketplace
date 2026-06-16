@@ -70,3 +70,8 @@ All notable changes to this project will be documented in this file.
 ## [1.0.7] - 15th June 2026
 - Fixed recipe search by using distinct prepared-statement placeholders for recipe title and description.
 - Kept the recipe search box scoped to recipe text, kept cuisine as a separate filter, and reset results when either clear button is used.
+
+## [1.0.8] - 16th June 2026
+- Added reusable phone validation logic to reject non-numeric phone input.
+- Applied digit-only phone validation to registration, customer profile, merchant request, merchant store profile, and checkout forms.
+- Added numeric-friendly phone input attributes and PHPUnit coverage for the validator rule.
