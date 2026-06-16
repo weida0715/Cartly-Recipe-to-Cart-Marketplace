@@ -10,7 +10,7 @@
   <div class="form-row"><label>Description</label><textarea name="store_description"><?= htmlspecialchars($store['store_description'] ?? '') ?></textarea></div>
   <div class="form-grid">
     <div class="form-row"><label>Contact email</label><input name="contact_email" value="<?= htmlspecialchars($store['contact_email'] ?? '') ?>"></div>
-    <div class="form-row"><label>Contact phone</label><input name="contact_phone" value="<?= htmlspecialchars($store['contact_phone'] ?? '') ?>"></div>
+    <div class="form-row"><label>Contact phone</label><input name="contact_phone" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="20" value="<?= htmlspecialchars($store['contact_phone'] ?? '') ?>"></div>
   </div>
   <div class="form-row"><label>Address</label><textarea name="store_address"><?= htmlspecialchars($store['store_address'] ?? '') ?></textarea></div>
   <div class="form-grid">
