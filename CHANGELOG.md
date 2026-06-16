@@ -84,3 +84,4 @@ All notable changes to this project will be documented in this file.
 - Improved the shared Cartly visual system with stronger navigation treatment, clearer focus states, richer shadows, polished buttons, cleaner forms, and refined tables.
 - Improved responsive styling for category tiles, filters, marketplace cards, dashboard sidebars, and auth pages using custom CSS only.
 - Fixed the PHP deprecation warning in `Validator::required()` by explicitly marking the optional label parameter as nullable.
+- Hardened homepage recipe metadata output and required-field validation against nullable values and array inputs.

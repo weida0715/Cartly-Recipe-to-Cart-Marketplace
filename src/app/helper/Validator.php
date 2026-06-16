@@ -16,7 +16,12 @@ class Validator
     public function required(string $field, ?string $label = null): self
     {
         $label = $label ?: $field;
-        if (!isset($this->data[$field]) || trim((string) $this->data[$field]) === '') {
+        if (
+            !isset($this->data[$field])
+            || (is_array($this->data[$field])
+                ? empty($this->data[$field])
+                : trim((string) $this->data[$field]) === '')
+        ) {
             $this->errors[$field] = "{$label} is required.";
         }
         return $this;

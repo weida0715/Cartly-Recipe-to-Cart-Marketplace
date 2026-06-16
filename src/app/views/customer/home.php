@@ -109,7 +109,7 @@
         <div class="body">
           <h3><?= htmlspecialchars($r['recipe_title']) ?></h3>
           <div class="text-muted">
-            <?= htmlspecialchars($r['cuisine_type']) ?> &middot; <?= htmlspecialchars($r['difficulty']) ?>
+            <?= htmlspecialchars($r['cuisine_type'] ?? '') ?> &middot; <?= htmlspecialchars($r['difficulty'] ?? '') ?>
           </div>
           <a class="btn btn-primary btn-sm mt-1" href="<?= BASE_URL ?>/recipes/<?= (int) $r['recipe_id'] ?>">Open</a>
         </div>
