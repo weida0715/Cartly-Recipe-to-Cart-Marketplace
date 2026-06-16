@@ -43,11 +43,15 @@ class RecipeController extends Controller
             echo 'Recipe not found';
             return;
         }
+        $review = new Review();
         $this->view('recipe/show', [
             'title' => $recipe['recipe_title'] . ' · Cartly',
             'recipe' => $recipe,
             'ingredients' => (new RecipeIngredient())->detailed((int) $id),
-            'reviews' => (new Review())->forRecipe((int) $id),
+            'reviews' => $review->forRecipe((int) $id),
+            'currentUserReview' => AuthHelper::check()
+                ? $review->findForRecipeByUser((int) AuthHelper::id(), (int) $id)
+                : null,
             'isSaved' => AuthHelper::check()
                 ? (new SavedRecipe())->isSaved((int) AuthHelper::id(), (int) $id)
                 : false,
