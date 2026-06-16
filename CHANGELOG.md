@@ -70,3 +70,7 @@ All notable changes to this project will be documented in this file.
 ## [1.0.7] - 15th June 2026
 - Fixed recipe search by using distinct prepared-statement placeholders for recipe title and description.
 - Kept the recipe search box scoped to recipe text, kept cuisine as a separate filter, and reset results when either clear button is used.
+
+## [1.0.8] - 17th June 2026
+- Hid admin accounts from the admin user-management list.
+- Blocked direct admin user-management requests from changing admin account roles or statuses.
