@@ -36,6 +36,15 @@ class Validator
         return $this;
     }
 
+    public function phone(string $field, string $label = 'Phone number'): self
+    {
+        $v = trim((string) ($this->data[$field] ?? ''));
+        if ($v !== '' && !ctype_digit($v)) {
+            $this->errors[$field] = "{$label} must contain digits only.";
+        }
+        return $this;
+    }
+
     public function min(string $field, int $len): self
     {
         $v = (string) ($this->data[$field] ?? '');
