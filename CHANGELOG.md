@@ -78,3 +78,9 @@ All notable changes to this project will be documented in this file.
 ## [1.0.9] - 15th June 2026
 - Added saved-state detection to recipe detail pages.
 - Updated the recipe save button to show Save recipe or Unsave recipe based on the current user's saved state.
+
+## [1.0.10] - 16th June 2026
+- Reworked the homepage with a stronger split hero, recipe-to-cart preview panel, section headings, category tiles, and clearer product/recipe card fallbacks.
+- Improved the shared Cartly visual system with stronger navigation treatment, clearer focus states, richer shadows, polished buttons, cleaner forms, and refined tables.
+- Improved responsive styling for category tiles, filters, marketplace cards, dashboard sidebars, and auth pages using custom CSS only.
+- Fixed the PHP deprecation warning in `Validator::required()` by explicitly marking the optional label parameter as nullable.

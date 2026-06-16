@@ -13,7 +13,7 @@ class Validator
         $this->data = $data;
     }
 
-    public function required(string $field, string $label = null): self
+    public function required(string $field, ?string $label = null): self
     {
         $label = $label ?: $field;
         if (!isset($this->data[$field]) || trim((string) $this->data[$field]) === '') {

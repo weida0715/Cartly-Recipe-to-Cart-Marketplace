@@ -1,14 +1,81 @@
-.portal{display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:start}
-@media(max-width:768px){.portal{grid-template-columns:1fr}}
-.sidebar{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:sticky;top:80px;box-shadow:var(--shadow)}
-.sidebar h3{margin:0 0 12px;color:var(--green-primary)}
-.sidebar.admin h3{color:var(--orange-accent)}
-.sidebar nav{display:flex;flex-direction:column;gap:6px}
-.sidebar nav a{color:var(--text);padding:8px 10px;border-radius:6px}
-.sidebar nav a:hover{background:var(--gray-bg);text-decoration:none}
-.portal-content{min-width:0}
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
-@media(max-width:768px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
-.stat{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
-.stat .num{font-size:1.6rem;font-weight:700;color:var(--green-primary)}
-.stat .label{color:var(--muted);font-size:.85rem}
+.portal {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 768px) {
+  .portal {
+    grid-template-columns: 1fr;
+  }
+}
+.sidebar {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  position: sticky;
+  top: 88px;
+  box-shadow: var(--shadow);
+}
+.sidebar h3 {
+  margin: 0 0 12px;
+  color: var(--green-primary);
+}
+.sidebar.admin h3 {
+  color: var(--orange-accent);
+}
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sidebar nav a {
+  color: var(--text);
+  padding: 9px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+.sidebar nav a:hover {
+  background: var(--surface-soft);
+  color: var(--green-primary-dark);
+  text-decoration: none;
+}
+.portal-content {
+  min-width: 0;
+}
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+@media (max-width: 768px) {
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.stat {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+.stat .num {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--green-primary);
+}
+.stat .label {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+@media (max-width: 520px) {
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: static;
+  }
+}
