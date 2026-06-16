@@ -87,3 +87,7 @@ All notable changes to this project will be documented in this file.
 ## [1.0.11] - 17th June 2026
 - Hid admin accounts from the admin user-management list.
 - Blocked direct admin user-management requests from changing admin account roles or statuses.
+
+## [1.0.12] - 17th June 2026
+- Added report status totals to the content moderation page.
+- Added target details for reported products, recipes, and reviews.
