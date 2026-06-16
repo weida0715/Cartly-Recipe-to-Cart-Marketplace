@@ -11,7 +11,7 @@
     <div class="form-grid">
         <div class="form-row"><label>Email</label><input type="email" name="email"
                 value="<?= htmlspecialchars($user['email'] ?? '') ?>" required></div>
-        <div class="form-row"><label>Phone</label><input name="phone"
+        <div class="form-row"><label>Phone</label><input name="phone" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="20"
                 value="<?= htmlspecialchars($user['phone'] ?? '') ?>"></div>
     </div>
     <h3>Change password</h3>

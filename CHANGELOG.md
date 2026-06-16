@@ -70,7 +70,7 @@ All notable changes to this project will be documented in this file.
 ## [1.0.7] - 15th June 2026
 - Fixed recipe search by using distinct prepared-statement placeholders for recipe title and description.
 - Kept the recipe search box scoped to recipe text, kept cuisine as a separate filter, and reset results when either clear button is used.
-
+- 
 ## [1.0.8] - 15th June 2026
 - Changed the recipe cuisine filter to support partial cuisine matches.
 - Updated the recipe cuisine filter placeholder so it is clear that the field filters cuisine.
@@ -84,3 +84,6 @@ All notable changes to this project will be documented in this file.
 - Improved the shared Cartly visual system with stronger navigation treatment, clearer focus states, richer shadows, polished buttons, cleaner forms, and refined tables.
 - Improved responsive styling for category tiles, filters, marketplace cards, dashboard sidebars, and auth pages using custom CSS only.
 - Fixed the PHP deprecation warning in `Validator::required()` by explicitly marking the optional label parameter as nullable.
+- Added reusable phone validation logic to reject non-numeric phone input.
+- Applied digit-only phone validation to registration, customer profile, merchant request, merchant store profile, and checkout forms.
+- Added numeric-friendly phone input attributes and PHPUnit coverage for the validator rule.
