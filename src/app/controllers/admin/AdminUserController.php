@@ -48,7 +48,7 @@ class AdminUserController extends Controller
         }
 
         $role = (string) $this->input('role', 'customer');
-        if (!in_array($role, ['customer', 'merchant', 'admin'], true)) {
+        if (!in_array($role, ['customer', 'merchant'], true)) {
             Flash::set('error', 'Invalid role.');
             $this->redirect('/admin/users');
         }
