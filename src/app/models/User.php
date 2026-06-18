@@ -11,6 +11,11 @@ class User extends Model
 
     public function allNonAdmins(string $order = 'created_at DESC'): array
     {
+        $allowedOrders = ['created_at DESC', 'created_at ASC'];
+        if ($order !== '' && !in_array($order, $allowedOrders, true)) {
+            $order = 'created_at DESC';
+        }
+
         $sql = 'SELECT * FROM users WHERE role <> :role';
         if ($order !== '') {
             $sql .= " ORDER BY {$order}";
