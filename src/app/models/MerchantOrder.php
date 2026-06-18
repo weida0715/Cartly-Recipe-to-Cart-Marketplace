@@ -7,6 +7,7 @@ class MerchantOrder extends Model
 {
     protected string $table = 'merchant_orders';
     protected string $primaryKey = 'merchant_order_id';
+    public const STATUSES = ['pending', 'accepted', 'preparing', 'completed', 'cancelled'];
 
     public function forStore(int $storeId): array
     {
@@ -30,5 +31,53 @@ class MerchantOrder extends Model
              WHERE mo.order_id = :o",
             [':o' => $orderId]
         );
+    }
+
+    public function updateStatusAndSyncParent(int $merchantOrderId, string $status): bool
+    {
+        $row = $this->find($merchantOrderId);
+        if (!$row || !in_array($status, self::STATUSES, true)) {
+            return false;
+        }
+
+        $db = $this->db();
+        try {
+            $db->beginTransaction();
+            $updated = $this->update($merchantOrderId, ['status' => $status]);
+            if (!$updated) {
+                $db->rollBack();
+                return false;
+            }
+            $this->syncParentStatus((int) $row['order_id']);
+            $db->commit();
+            return true;
+        } catch (\Throwable) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            return false;
+        }
+    }
+
+    private function syncParentStatus(int $orderId): void
+    {
+        $rows = $this->query('SELECT status FROM merchant_orders WHERE order_id = :o', [':o' => $orderId]);
+        $statuses = array_column($rows, 'status');
+        if (!$statuses) {
+            return;
+        }
+
+        $uniqueStatuses = array_unique($statuses);
+        $orderStatus = 'pending';
+        if (count($uniqueStatuses) === 1 && reset($uniqueStatuses) === 'cancelled') {
+            $orderStatus = 'cancelled';
+        } elseif (!array_diff($statuses, ['completed', 'cancelled'])) {
+            $orderStatus = 'completed';
+        } elseif (array_intersect($statuses, ['accepted', 'preparing', 'completed'])) {
+            $orderStatus = 'processing';
+        }
+
+        $stmt = $this->db()->prepare('UPDATE orders SET order_status = :s WHERE order_id = :o');
+        $stmt->execute([':s' => $orderStatus, ':o' => $orderId]);
     }
 }
