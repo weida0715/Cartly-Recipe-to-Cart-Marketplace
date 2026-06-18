@@ -4,13 +4,11 @@ $user = AuthHelper::user();
 $role = AuthHelper::role();
 
 $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
-if (BASE_URL !== '' && ($requestPath === BASE_URL || str_starts_with($requestPath, BASE_URL . '/'))) {
-  $requestPath = substr($requestPath, strlen(BASE_URL)) ?: '/';
+$normalizedBaseUrl = rtrim(BASE_URL, '/');
+if ($normalizedBaseUrl !== '' && ($requestPath === $normalizedBaseUrl || str_starts_with($requestPath, $normalizedBaseUrl . '/'))) {
+  $requestPath = substr($requestPath, strlen($normalizedBaseUrl)) ?: '/';
 }
 $requestPath = '/' . trim($requestPath, '/');
-if ($requestPath !== '/') {
-  $requestPath = rtrim($requestPath, '/');
-}
 
 $isActivePath = static function (string $path, bool $includeChildren = true) use ($requestPath): bool {
   $path = '/' . trim($path, '/');
