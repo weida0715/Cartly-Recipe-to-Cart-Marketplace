@@ -7,6 +7,7 @@ class MerchantOrder extends Model
 {
     protected string $table = 'merchant_orders';
     protected string $primaryKey = 'merchant_order_id';
+    public const STATUSES = ['pending', 'accepted', 'preparing', 'completed', 'cancelled'];
 
     public function forStore(int $storeId): array
     {
@@ -30,5 +31,40 @@ class MerchantOrder extends Model
              WHERE mo.order_id = :o",
             [':o' => $orderId]
         );
+    }
+
+    public function updateStatusAndSyncParent(int $merchantOrderId, string $status): bool
+    {
+        $row = $this->find($merchantOrderId);
+        if (!$row || !in_array($status, self::STATUSES, true)) {
+            return false;
+        }
+
+        $updated = $this->update($merchantOrderId, ['status' => $status]);
+        if ($updated) {
+            $this->syncParentStatus((int) $row['order_id']);
+        }
+        return $updated;
+    }
+
+    private function syncParentStatus(int $orderId): void
+    {
+        $rows = $this->query('SELECT status FROM merchant_orders WHERE order_id = :o', [':o' => $orderId]);
+        $statuses = array_column($rows, 'status');
+        if (!$statuses) {
+            return;
+        }
+
+        $orderStatus = 'pending';
+        if (count(array_unique($statuses)) === 1 && $statuses[0] === 'cancelled') {
+            $orderStatus = 'cancelled';
+        } elseif (count(array_unique($statuses)) === 1 && $statuses[0] === 'completed') {
+            $orderStatus = 'completed';
+        } elseif (array_intersect($statuses, ['accepted', 'preparing', 'completed'])) {
+            $orderStatus = 'processing';
+        }
+
+        $stmt = $this->db()->prepare('UPDATE orders SET order_status = :s WHERE order_id = :o');
+        $stmt->execute([':s' => $orderStatus, ':o' => $orderId]);
     }
 }

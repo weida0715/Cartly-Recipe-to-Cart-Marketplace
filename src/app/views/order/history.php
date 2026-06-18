@@ -11,7 +11,7 @@
           <td><?= htmlspecialchars($o['created_at']) ?></td>
           <td>RM <?= number_format((float)$o['total_amount'], 2) ?></td>
           <td><?= htmlspecialchars($o['payment_status']) ?></td>
-          <td><?= htmlspecialchars($o['order_status']) ?></td>
+          <td><?= htmlspecialchars($o['display_order_status'] ?? $o['order_status']) ?></td>
           <td><a class="btn btn-outline btn-sm" href="<?= BASE_URL ?>/orders/<?= (int)$o['order_id'] ?>">View</a></td>
         </tr>
       <?php endforeach; ?>

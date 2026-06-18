@@ -54,7 +54,7 @@
               <td><a href="<?= BASE_URL ?>/orders/<?= (int) $o['order_id'] ?>">#<?= (int) $o['order_id'] ?></a></td>
               <td><?= htmlspecialchars($o['created_at']) ?></td>
               <td>RM <?= number_format((float) $o['total_amount'], 2) ?></td>
-              <td><span class="badge"><?= htmlspecialchars($o['order_status']) ?></span></td>
+              <td><span class="badge"><?= htmlspecialchars($o['display_order_status'] ?? $o['order_status']) ?></span></td>
             </tr>
           <?php endforeach; ?>
         </tbody>
