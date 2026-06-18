@@ -70,7 +70,7 @@ All notable changes to this project will be documented in this file.
 ## [1.0.7] - 15th June 2026
 - Fixed recipe search by using distinct prepared-statement placeholders for recipe title and description.
 - Kept the recipe search box scoped to recipe text, kept cuisine as a separate filter, and reset results when either clear button is used.
-- 
+
 ## [1.0.8] - 15th June 2026
 - Changed the recipe cuisine filter to support partial cuisine matches.
 - Updated the recipe cuisine filter placeholder so it is clear that the field filters cuisine.
@@ -80,13 +80,18 @@ All notable changes to this project will be documented in this file.
 - Updated the recipe save button to show Save recipe or Unsave recipe based on the current user's saved state.
 
 ## [1.0.10] - 16th June 2026
+- Added reusable phone validation logic to reject non-numeric phone input.
+- Applied digit-only phone validation to registration, customer profile, merchant request, merchant store profile, and checkout forms.
+- Added numeric-friendly phone input attributes and PHPUnit coverage for the validator rule.
+
+## [1.1.0] - 16th June 2026
 - Reworked the homepage with a stronger split hero, recipe-to-cart preview panel, section headings, category tiles, and clearer product/recipe card fallbacks.
 - Improved the shared Cartly visual system with stronger navigation treatment, clearer focus states, richer shadows, polished buttons, cleaner forms, and refined tables.
 - Improved responsive styling for category tiles, filters, marketplace cards, dashboard sidebars, and auth pages using custom CSS only.
 - Fixed the PHP deprecation warning in `Validator::required()` by explicitly marking the optional label parameter as nullable.
 - Hardened homepage recipe metadata output and required-field validation against nullable values and array inputs.
 
-## [1.0.11] - 16th June 2026
+## [1.1.1] - 16th June 2026
 - Added versioned stock seed images for categories, seeded ingredient/product thumbnails, and seeded recipes.
 - Added `src/database/seed_assets.php` to copy stock image sources into `src/public/uploads/seeded/` for repeatable XAMPP reseeding.
 - Updated seed SQL files so category, product, and recipe records reference seeded image paths.
