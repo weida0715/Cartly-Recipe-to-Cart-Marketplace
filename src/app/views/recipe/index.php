@@ -1,7 +1,7 @@
 <h2>Discover recipes</h2>
 <form class="filters" method="get" action="<?= BASE_URL ?>/recipes" data-search-reset>
   <input class="input" id="recipe-search" type="search" name="q" value="<?= htmlspecialchars($q) ?>" placeholder="Search recipes by title or description..." autocomplete="off" data-search-reset-input>
-  <input class="input" id="recipe-cuisine" type="search" name="cuisine" value="<?= htmlspecialchars($cuisine ?? '') ?>" placeholder="Cuisine" autocomplete="off" data-search-reset-input>
+  <input class="input" id="recipe-cuisine" type="search" name="cuisine" value="<?= htmlspecialchars($cuisine ?? '') ?>" placeholder="Filter by cuisine..." autocomplete="off" data-search-reset-input>
   <select class="input" name="difficulty">
     <option value="">All difficulty</option>
     <?php foreach (['easy', 'medium', 'hard'] as $difficultyOption): ?>
@@ -36,7 +36,14 @@
   <div class="recipe-grid">
     <?php foreach ($recipes as $r): ?>
       <div class="recipe-card">
-        <div class="thumb">🍲</div>
+        <div class="thumb">
+          <?php if (!empty($r['image'])): ?>
+            <img src="<?= UPLOAD_URL ?>/<?= htmlspecialchars($r['image']) ?>"
+              alt="<?= htmlspecialchars($r['recipe_title']) ?>">
+          <?php else: ?>
+            <span class="thumb-fallback">Recipe</span>
+          <?php endif; ?>
+        </div>
         <div class="body">
           <h3><?= htmlspecialchars($r['recipe_title']) ?></h3>
           <div class="text-muted">by <?= htmlspecialchars($r['username']) ?> · <?= htmlspecialchars($r['cuisine_type']) ?>

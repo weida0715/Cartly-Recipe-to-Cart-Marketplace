@@ -5,6 +5,7 @@ namespace App\Controllers\Order;
 use App\Helpers\Controller;
 use App\Helpers\AuthHelper;
 use App\Helpers\Flash;
+use App\Helpers\Validator;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Voucher;
@@ -58,8 +59,15 @@ class CheckoutController extends Controller
         $payment = (string) $this->input('payment_method', 'simulated');
         $vouchers = $_POST['voucher'] ?? []; // [storeId => code]
 
-        if ($shipping === '' || $phone === '') {
-            Flash::set('error', 'Shipping address and phone are required.');
+        $v = new Validator([
+            'shipping_address' => $shipping,
+            'contact_phone' => $phone,
+        ]);
+        $v->required('shipping_address', 'Shipping address')
+            ->required('contact_phone', 'Contact phone')
+            ->phone('contact_phone', 'Contact phone');
+        if ($v->fails()) {
+            Flash::set('error', reset($v->errors));
             $this->redirect('/checkout');
         }
 

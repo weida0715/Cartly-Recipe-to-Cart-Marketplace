@@ -31,6 +31,7 @@ class RecipeSearchTest extends TestCase
         foreach ($recipe->queries as $query) {
             $this->assertStringContainsString('r.recipe_title LIKE :q_title', $query['sql']);
             $this->assertStringContainsString('r.description LIKE :q_description', $query['sql']);
+            $this->assertStringContainsString("ESCAPE '\\\\'", $query['sql']);
             $this->assertStringNotContainsString('r.cuisine_type LIKE', $query['sql']);
             $this->assertSame('%rice%', $query['params'][':q_title']);
             $this->assertSame('%rice%', $query['params'][':q_description']);
@@ -53,8 +54,57 @@ class RecipeSearchTest extends TestCase
 
         $this->assertStringContainsString('r.recipe_title LIKE :q_title', $recipe->lastQuery['sql']);
         $this->assertStringContainsString('r.description LIKE :q_description', $recipe->lastQuery['sql']);
+        $this->assertStringContainsString("ESCAPE '\\\\'", $recipe->lastQuery['sql']);
         $this->assertStringNotContainsString('r.cuisine_type LIKE', $recipe->lastQuery['sql']);
         $this->assertSame('%soup%', $recipe->lastQuery['params'][':q_title']);
         $this->assertSame('%soup%', $recipe->lastQuery['params'][':q_description']);
+    }
+
+    public function test_paginated_cuisine_filter_uses_partial_cuisine_match(): void
+    {
+        $recipe = new class extends Recipe {
+            public array $queries = [];
+
+            public function query(string $sql, array $params = []): array
+            {
+                $this->queries[] = ['sql' => $sql, 'params' => $params];
+                if (str_contains($sql, 'COUNT(*)')) {
+                    return [['cnt' => 0]];
+                }
+                return [];
+            }
+        };
+
+        $recipe->paginateActive('', 'malay');
+
+        $this->assertCount(2, $recipe->queries);
+        foreach ($recipe->queries as $query) {
+            $this->assertStringContainsString('r.cuisine_type LIKE :cuisine', $query['sql']);
+            $this->assertStringContainsString("ESCAPE '\\\\'", $query['sql']);
+            $this->assertSame('%malay%', $query['params'][':cuisine']);
+        }
+    }
+
+    public function test_cuisine_filter_escapes_like_wildcards(): void
+    {
+        $recipe = new class extends Recipe {
+            public array $queries = [];
+
+            public function query(string $sql, array $params = []): array
+            {
+                $this->queries[] = ['sql' => $sql, 'params' => $params];
+                if (str_contains($sql, 'COUNT(*)')) {
+                    return [['cnt' => 0]];
+                }
+                return [];
+            }
+        };
+
+        $recipe->paginateActive('', '50%_\\thai');
+
+        foreach ($recipe->queries as $query) {
+            $this->assertStringContainsString("ESCAPE '\\\\'", $query['sql']);
+            $this->assertSame('%50\\%\\_\\\\thai%', $query['params'][':cuisine']);
+        }
     }
 }

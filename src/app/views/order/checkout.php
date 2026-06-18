@@ -7,7 +7,7 @@
       <h3>Shipping details</h3>
       <div class="form-row"><label>Full name</label><input value="<?= htmlspecialchars($user['full_name']) ?>" disabled></div>
       <div class="form-row"><label>Shipping address</label><textarea name="shipping_address" required></textarea></div>
-      <div class="form-row"><label>Contact phone</label><input name="contact_phone" required></div>
+      <div class="form-row"><label>Contact phone</label><input name="contact_phone" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="20" required></div>
       <div class="form-row">
         <label>Payment method</label>
         <select name="payment_method">

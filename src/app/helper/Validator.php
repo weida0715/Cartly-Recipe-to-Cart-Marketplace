@@ -13,10 +13,15 @@ class Validator
         $this->data = $data;
     }
 
-    public function required(string $field, string $label = null): self
+    public function required(string $field, ?string $label = null): self
     {
         $label = $label ?: $field;
-        if (!isset($this->data[$field]) || trim((string) $this->data[$field]) === '') {
+        if (
+            !isset($this->data[$field])
+            || (is_array($this->data[$field])
+                ? empty($this->data[$field])
+                : trim((string) $this->data[$field]) === '')
+        ) {
             $this->errors[$field] = "{$label} is required.";
         }
         return $this;
@@ -27,6 +32,15 @@ class Validator
         $v = $this->data[$field] ?? '';
         if ($v !== '' && !filter_var($v, FILTER_VALIDATE_EMAIL)) {
             $this->errors[$field] = 'Please enter a valid email.';
+        }
+        return $this;
+    }
+
+    public function phone(string $field, string $label = 'Phone number'): self
+    {
+        $v = trim((string) ($this->data[$field] ?? ''));
+        if ($v !== '' && !ctype_digit($v)) {
+            $this->errors[$field] = "{$label} must contain digits only.";
         }
         return $this;
     }
