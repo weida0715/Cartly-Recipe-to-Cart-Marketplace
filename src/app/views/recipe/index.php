@@ -36,7 +36,14 @@
   <div class="recipe-grid">
     <?php foreach ($recipes as $r): ?>
       <div class="recipe-card">
-        <div class="thumb">🍲</div>
+        <div class="thumb">
+          <?php if (!empty($r['image'])): ?>
+            <img src="<?= UPLOAD_URL ?>/<?= htmlspecialchars($r['image']) ?>"
+              alt="<?= htmlspecialchars($r['recipe_title']) ?>">
+          <?php else: ?>
+            <span class="thumb-fallback">Recipe</span>
+          <?php endif; ?>
+        </div>
         <div class="body">
           <h3><?= htmlspecialchars($r['recipe_title']) ?></h3>
           <div class="text-muted">by <?= htmlspecialchars($r['username']) ?> · <?= htmlspecialchars($r['cuisine_type']) ?>

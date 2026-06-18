@@ -39,10 +39,14 @@ class ProductController extends Controller
             echo 'Product not found';
             return;
         }
+        $review = new Review();
         $this->view('product/show', [
             'title' => $product['product_name'] . ' · Cartly',
             'product' => $product,
-            'reviews' => (new Review())->forProduct((int) $id),
+            'reviews' => $review->forProduct((int) $id),
+            'currentUserReview' => AuthHelper::check()
+                ? $review->findForProductByUser((int) AuthHelper::id(), (int) $id)
+                : null,
         ]);
     }
 

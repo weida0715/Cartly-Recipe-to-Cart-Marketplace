@@ -16,13 +16,11 @@ class ReviewController extends Controller
 
         $rating = (int) $this->input('rating', 5);
         $comment = trim((string) $this->input('comment', ''));
-        if ($comment === '') {
-            Flash::set('error', 'Review comment is required.');
-            $this->redirect('/products/' . $id);
-        }
 
-        (new Review())->addProductReview((int) AuthHelper::id(), (int) $id, $rating, $comment);
-        Flash::set('success', 'Review submitted.');
+        $review = new Review();
+        $existing = $review->findForProductByUser((int) AuthHelper::id(), (int) $id);
+        $review->saveProductReview((int) AuthHelper::id(), (int) $id, $rating, $comment);
+        Flash::set('success', $existing ? 'Review updated.' : 'Review submitted.');
         $this->redirect('/products/' . $id);
     }
 
@@ -33,13 +31,11 @@ class ReviewController extends Controller
 
         $rating = (int) $this->input('rating', 5);
         $comment = trim((string) $this->input('comment', ''));
-        if ($comment === '') {
-            Flash::set('error', 'Review comment is required.');
-            $this->redirect('/recipes/' . $id);
-        }
 
-        (new Review())->addRecipeReview((int) AuthHelper::id(), (int) $id, $rating, $comment);
-        Flash::set('success', 'Recipe review submitted.');
+        $review = new Review();
+        $existing = $review->findForRecipeByUser((int) AuthHelper::id(), (int) $id);
+        $review->saveRecipeReview((int) AuthHelper::id(), (int) $id, $rating, $comment);
+        Flash::set('success', $existing ? 'Recipe review updated.' : 'Recipe review submitted.');
         $this->redirect('/recipes/' . $id);
     }
 }

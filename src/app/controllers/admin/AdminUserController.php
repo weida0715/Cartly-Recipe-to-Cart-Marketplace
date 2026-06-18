@@ -12,9 +12,10 @@ class AdminUserController extends Controller
     public function index(): void
     {
         AuthHelper::requireRole('admin');
+        $user = new User();
         $this->view('admin/users', [
             'title' => 'Users',
-            'users' => (new User())->all('created_at DESC'),
+            'users' => $user->allNonAdmins(),
         ], 'layout/admin-layout');
     }
 
@@ -22,8 +23,21 @@ class AdminUserController extends Controller
     {
         AuthHelper::requireRole('admin');
         $this->requireCsrf();
+        $user = new User();
+        $target = $user->find((int) $id);
+        if (!$target || $target['role'] === 'admin') {
+            Flash::set('error', 'Admin accounts cannot be managed from this page.');
+            $this->redirect('/admin/users');
+            return;
+        }
+
         $status = (string) $this->input('status', 'active');
-        (new User())->update((int) $id, ['status' => $status]);
+        if (!in_array($status, ['active', 'inactive', 'deactivated'], true)) {
+            Flash::set('error', 'Invalid status.');
+            $this->redirect('/admin/users');
+            return;
+        }
+        $user->update((int) $id, ['status' => $status]);
         Flash::set('success', 'User status updated.');
         $this->redirect('/admin/users');
     }
@@ -32,12 +46,21 @@ class AdminUserController extends Controller
     {
         AuthHelper::requireRole('admin');
         $this->requireCsrf();
+        $user = new User();
+        $target = $user->find((int) $id);
+        if (!$target || $target['role'] === 'admin') {
+            Flash::set('error', 'Admin accounts cannot be managed from this page.');
+            $this->redirect('/admin/users');
+            return;
+        }
+
         $role = (string) $this->input('role', 'customer');
-        if (!in_array($role, ['customer', 'merchant', 'admin'], true)) {
+        if (!in_array($role, ['customer', 'merchant'], true)) {
             Flash::set('error', 'Invalid role.');
             $this->redirect('/admin/users');
+            return;
         }
-        (new User())->update((int) $id, ['role' => $role]);
+        $user->update((int) $id, ['role' => $role]);
         Flash::set('success', 'User role updated.');
         $this->redirect('/admin/users');
     }
