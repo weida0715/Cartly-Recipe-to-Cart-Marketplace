@@ -95,6 +95,7 @@ Using the MySQL CLI:
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS cartly CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 mysql -u root -p cartly < src/database/schema.sql
 mysql -u root -p cartly < src/database/seed.sql
+php src/database/seed_assets.php
 ```
 
 If your local MySQL root user has no password, omit `-p`:
@@ -103,6 +104,7 @@ If your local MySQL root user has no password, omit `-p`:
 mysql -u root -e "CREATE DATABASE IF NOT EXISTS cartly CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 mysql -u root cartly < src/database/schema.sql
 mysql -u root cartly < src/database/seed.sql
+php src/database/seed_assets.php
 ```
 
 You can also import the same files with phpMyAdmin:
@@ -110,6 +112,8 @@ You can also import the same files with phpMyAdmin:
 1. Create a database named `cartly`.
 2. Import `src/database/schema.sql`.
 3. Import `src/database/seed.sql`.
+4. From the project root, run `php src/database/seed_assets.php` so seeded
+   product and recipe images are copied into `src/public/uploads/seeded/`.
 
 Optional spec-layout copies are also available at:
 
