@@ -132,7 +132,5 @@ All notable changes to this project will be documented in this file.
 ## [1.1.7] - 19th June 2026
 - Updated the marketplace voucher banner copy to promote browsing available merchant vouchers.
 - Added a public available vouchers page with merchant/code search, discount type filtering, and voucher sorting.
-
-## [1.1.8] - 19th June 2026
 - Linked checkout voucher entry to store-scoped available voucher code suggestions.
 - Restricted checkout voucher suggestions and redemption to vouchers valid for each merchant and subtotal.
