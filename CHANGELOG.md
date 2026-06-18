@@ -119,6 +119,6 @@ All notable changes to this project will be documented in this file.
 - Adds migration `003_unique_customer_reviews.sql`.
 
 ## [1.1.5] - 18th June 2026
-- Added server-side validation for merchant product payload fields to reject empty names, empty numeric fields, negative prices, negative stock quantities, and non-positive package quantities.
+- Added server-side validation for merchant product payload fields to reject empty names, empty or non-numeric numeric fields, negative prices, negative stock quantities, and non-positive package quantities.
 - Added inline merchant product form validation messages for invalid manual input without using browser popup dialogs.
 - Kept product price and stock number controls bounded to a minimum value of zero.

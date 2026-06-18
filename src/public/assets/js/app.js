@@ -30,6 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       {
         field: form.querySelector('[name="price"]'),
+        invalid: field => Number.isNaN(Number(field.value)),
+        message: 'Price must be a valid number.',
+      },
+      {
+        field: form.querySelector('[name="price"]'),
         invalid: field => Number(field.value) < 0,
         message: 'Price cannot be negative.',
       },
@@ -40,6 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       {
         field: form.querySelector('[name="stock_quantity"]'),
+        invalid: field => !/^-?\d+$/.test(field.value.trim()),
+        message: 'Stock quantity must be a valid integer.',
+      },
+      {
+        field: form.querySelector('[name="stock_quantity"]'),
         invalid: field => Number(field.value) < 0,
         message: 'Stock quantity cannot be negative.',
       },
@@ -47,6 +57,11 @@ document.addEventListener('DOMContentLoaded', () => {
         field: form.querySelector('[name="package_quantity"]'),
         invalid: field => field.value.trim() === '',
         message: 'Package quantity is required.',
+      },
+      {
+        field: form.querySelector('[name="package_quantity"]'),
+        invalid: field => Number.isNaN(Number(field.value)),
+        message: 'Package quantity must be a valid number.',
       },
       {
         field: form.querySelector('[name="package_quantity"]'),
