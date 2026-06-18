@@ -38,8 +38,11 @@ class MerchantOrderController extends Controller
             Flash::set('error', 'Invalid order status.');
             $this->redirect('/merchant/orders');
         }
-        $mo->updateStatusAndSyncParent((int) $id, $status);
-        Flash::set('success', 'Order status updated.');
+        if ($mo->updateStatusAndSyncParent((int) $id, $status)) {
+            Flash::set('success', 'Order status updated.');
+        } else {
+            Flash::set('error', 'Failed to update order status.');
+        }
         $this->redirect('/merchant/orders');
     }
 }

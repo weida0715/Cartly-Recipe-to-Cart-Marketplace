@@ -36,6 +36,9 @@ class Order extends Model
         if (count($unique) === 1) {
             return $unique[0];
         }
+        if (!array_diff($statuses, ['completed', 'cancelled'])) {
+            return 'completed';
+        }
         if (in_array('preparing', $statuses, true)) {
             return 'preparing';
         }

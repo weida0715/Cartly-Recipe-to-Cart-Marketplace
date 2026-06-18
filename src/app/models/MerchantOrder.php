@@ -40,11 +40,23 @@ class MerchantOrder extends Model
             return false;
         }
 
-        $updated = $this->update($merchantOrderId, ['status' => $status]);
-        if ($updated) {
+        $db = $this->db();
+        try {
+            $db->beginTransaction();
+            $updated = $this->update($merchantOrderId, ['status' => $status]);
+            if (!$updated) {
+                $db->rollBack();
+                return false;
+            }
             $this->syncParentStatus((int) $row['order_id']);
+            $db->commit();
+            return true;
+        } catch (\Throwable) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            return false;
         }
-        return $updated;
     }
 
     private function syncParentStatus(int $orderId): void
@@ -55,10 +67,11 @@ class MerchantOrder extends Model
             return;
         }
 
+        $uniqueStatuses = array_unique($statuses);
         $orderStatus = 'pending';
-        if (count(array_unique($statuses)) === 1 && $statuses[0] === 'cancelled') {
+        if (count($uniqueStatuses) === 1 && reset($uniqueStatuses) === 'cancelled') {
             $orderStatus = 'cancelled';
-        } elseif (count(array_unique($statuses)) === 1 && $statuses[0] === 'completed') {
+        } elseif (!array_diff($statuses, ['completed', 'cancelled'])) {
             $orderStatus = 'completed';
         } elseif (array_intersect($statuses, ['accepted', 'preparing', 'completed'])) {
             $orderStatus = 'processing';
