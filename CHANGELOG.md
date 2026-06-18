@@ -70,7 +70,11 @@ All notable changes to this project will be documented in this file.
 ## [1.0.7] - 15th June 2026
 - Fixed recipe search by using distinct prepared-statement placeholders for recipe title and description.
 - Kept the recipe search box scoped to recipe text, kept cuisine as a separate filter, and reset results when either clear button is used.
+<<<<<<< HEAD
+- 
+=======
 
+>>>>>>> origin
 ## [1.0.8] - 15th June 2026
 - Changed the recipe cuisine filter to support partial cuisine matches.
 - Updated the recipe cuisine filter placeholder so it is clear that the field filters cuisine.
@@ -104,3 +108,7 @@ All notable changes to this project will be documented in this file.
 ## [1.1.2] - 17th June 2026
 - Hid admin accounts from the admin user-management list.
 - Blocked direct admin user-management requests from changing admin account roles or statuses.
+
+## [1.1.3] - 17th June 2026
+- Added report status totals to the content moderation page.
+- Added target details for reported products, recipes, and reviews.

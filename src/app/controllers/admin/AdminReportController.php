@@ -15,9 +15,11 @@ class AdminReportController extends Controller
     public function index(): void
     {
         AuthHelper::requireRole('admin');
+        $report = new Report();
         $this->view('admin/reports', [
             'title' => 'Reports',
-            'reports' => (new Report())->pending(),
+            'reports' => $report->moderationList(),
+            'counts' => $report->statusCounts(),
         ], 'layout/admin-layout');
     }
 

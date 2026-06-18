@@ -28,9 +28,15 @@ class AdminUserController extends Controller
         if (!$target || $target['role'] === 'admin') {
             Flash::set('error', 'Admin accounts cannot be managed from this page.');
             $this->redirect('/admin/users');
+            return;
         }
 
         $status = (string) $this->input('status', 'active');
+        if (!in_array($status, ['active', 'inactive', 'deactivated'], true)) {
+            Flash::set('error', 'Invalid status.');
+            $this->redirect('/admin/users');
+            return;
+        }
         $user->update((int) $id, ['status' => $status]);
         Flash::set('success', 'User status updated.');
         $this->redirect('/admin/users');
@@ -45,12 +51,14 @@ class AdminUserController extends Controller
         if (!$target || $target['role'] === 'admin') {
             Flash::set('error', 'Admin accounts cannot be managed from this page.');
             $this->redirect('/admin/users');
+            return;
         }
 
         $role = (string) $this->input('role', 'customer');
         if (!in_array($role, ['customer', 'merchant'], true)) {
             Flash::set('error', 'Invalid role.');
             $this->redirect('/admin/users');
+            return;
         }
         $user->update((int) $id, ['role' => $role]);
         Flash::set('success', 'User role updated.');
