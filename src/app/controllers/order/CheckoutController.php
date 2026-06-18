@@ -32,6 +32,11 @@ class CheckoutController extends Controller
             $groups[$sid]['items'][] = $it + ['line_total' => $line];
             $groups[$sid]['subtotal'] = ($groups[$sid]['subtotal'] ?? 0) + $line;
         }
+        $voucherModel = new Voucher();
+        foreach ($groups as $sid => &$group) {
+            $group['vouchers'] = $voucherModel->availableForStoreSubtotal((int) $sid, (float) $group['subtotal']);
+        }
+        unset($group);
         $this->view('order/checkout', [
             'title' => 'Checkout',
             'user' => AuthHelper::user(),
@@ -111,11 +116,12 @@ class CheckoutController extends Controller
                 $code = trim((string) ($vouchers[$sid] ?? ''));
                 if ($code !== '') {
                     $voucher = $voucherModel->findValidForStore($code, (int) $sid, $subtotal);
-                    if ($voucher) {
-                        $discount = $voucherModel->computeDiscount($voucher, $subtotal);
-                        $voucherId = (int) $voucher['voucher_id'];
-                        $voucherModel->increment($voucherId);
+                    if (!$voucher) {
+                        throw new \RuntimeException('Invalid voucher for one of the selected stores.');
                     }
+                    $discount = $voucherModel->computeDiscount($voucher, $subtotal);
+                    $voucherId = (int) $voucher['voucher_id'];
+                    $voucherModel->increment($voucherId);
                 }
                 $moStmt = $db->prepare(
                     "INSERT INTO merchant_orders (order_id, store_id, subtotal, voucher_id, discount_amount, delivery_fee, final_amount, status)
