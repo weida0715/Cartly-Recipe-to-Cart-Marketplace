@@ -122,3 +122,8 @@ All notable changes to this project will be documented in this file.
 - Added server-side validation for merchant product payload fields to reject empty names, empty or non-numeric numeric fields, negative prices, negative stock quantities, and non-positive package quantities.
 - Added inline merchant product form validation messages for invalid manual input without using browser popup dialogs.
 - Kept product price and stock number controls bounded to a minimum value of zero.
+
+## [1.1.6] - 19th June 2026
+- Added active navigation highlighting to the shared customer navigation.
+- Kept parent navigation items active on product, recipe, order, merchant, and admin child pages.
+- Added accessible `aria-current="page"` attributes and distinct merchant/admin sidebar active states.
