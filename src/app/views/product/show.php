@@ -47,25 +47,28 @@
       <div class="card">
         <strong><?= htmlspecialchars($r['username']) ?></strong>
         <span class="badge badge-success"><?= (int) $r['rating'] ?> ★</span>
-        <p><?= nl2br(htmlspecialchars($r['comment'])) ?></p>
+        <?php if (trim((string) ($r['comment'] ?? '')) !== ''): ?>
+          <p><?= nl2br(htmlspecialchars($r['comment'])) ?></p>
+        <?php endif; ?>
       </div>
     <?php endforeach; endif; ?>
 </section>
 
 <?php if (AuthHelper::check()): ?>
   <section class="mt-3 grid grid-2">
+    <?php $currentUserReview = $currentUserReview ?? null; ?>
     <form method="post" action="<?= BASE_URL ?>/products/<?= (int) $product['product_id'] ?>/reviews" class="card">
       <?= Csrf::field() ?>
-      <h3>Write a review</h3>
+      <h3><?= $currentUserReview ? 'Edit your review' : 'Write a review' ?></h3>
       <label>Rating</label>
       <select name="rating">
         <?php foreach ([5, 4, 3, 2, 1] as $rating): ?>
-          <option value="<?= $rating ?>"><?= $rating ?> ★</option>
+          <option value="<?= $rating ?>" <?= (int) ($currentUserReview['rating'] ?? 5) === $rating ? 'selected' : '' ?>><?= $rating ?> ★</option>
         <?php endforeach; ?>
       </select>
       <label>Comment</label>
-      <textarea name="comment" required></textarea>
-      <button class="btn btn-primary mt-1">Submit review</button>
+      <textarea name="comment"><?= htmlspecialchars($currentUserReview['comment'] ?? '') ?></textarea>
+      <button class="btn btn-primary mt-1"><?= $currentUserReview ? 'Update review' : 'Submit review' ?></button>
     </form>
 
     <form method="post" action="<?= BASE_URL ?>/reports" class="card">

@@ -200,6 +200,8 @@ CREATE TABLE reviews (
   comment    TEXT,
   status     ENUM('visible','hidden','removed') NOT NULL DEFAULT 'visible',
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uniq_user_product_review (user_id, product_id),
+  UNIQUE KEY uniq_user_recipe_review (user_id, recipe_id),
   FOREIGN KEY (user_id)    REFERENCES users(user_id) ON DELETE CASCADE,
   FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE,
   FOREIGN KEY (recipe_id)  REFERENCES recipes(recipe_id) ON DELETE CASCADE

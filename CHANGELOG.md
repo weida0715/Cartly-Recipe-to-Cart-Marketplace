@@ -70,11 +70,7 @@ All notable changes to this project will be documented in this file.
 ## [1.0.7] - 15th June 2026
 - Fixed recipe search by using distinct prepared-statement placeholders for recipe title and description.
 - Kept the recipe search box scoped to recipe text, kept cuisine as a separate filter, and reset results when either clear button is used.
-<<<<<<< HEAD
-- 
-=======
 
->>>>>>> origin
 ## [1.0.8] - 15th June 2026
 - Changed the recipe cuisine filter to support partial cuisine matches.
 - Updated the recipe cuisine filter placeholder so it is clear that the field filters cuisine.
@@ -112,3 +108,12 @@ All notable changes to this project will be documented in this file.
 ## [1.1.3] - 17th June 2026
 - Added report status totals to the content moderation page.
 - Added target details for reported products, recipes, and reviews.
+
+## [1.1.4] - 17th June 2026
+- Allows product and recipe reviews to be submitted without a comment.
+- Limits each customer to one review per product or recipe.
+- Changes repeat review submissions into edits of the customer’s existing review.
+- Pre-fills the review form when the customer has already reviewed the product or recipe.
+- Updates the review form heading/button to show edit/update behavior.
+- Adds database uniqueness constraints for one review per customer per product/recipe.
+- Adds migration `003_unique_customer_reviews.sql`.
