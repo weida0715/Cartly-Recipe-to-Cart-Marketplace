@@ -122,3 +122,9 @@ All notable changes to this project will be documented in this file.
 - Added server-side validation for merchant product payload fields to reject empty names, empty or non-numeric numeric fields, negative prices, negative stock quantities, and non-positive package quantities.
 - Added inline merchant product form validation messages for invalid manual input without using browser popup dialogs.
 - Kept product price and stock number controls bounded to a minimum value of zero.
+
+## [1.1.6] - 19th June 2026
+- Fixed customer order history labels by starting new parent orders as pending and synchronizing parent order status from merchant order updates.
+- Added merchant order status validation so customer, merchant, and order detail views use consistent order states.
+- Updated customer order history, dashboard, confirmation, and detail pages to display status labels derived from merchant order statuses.
+- Treated mixed completed/cancelled merchant orders as completed and made merchant order status synchronization transactional.

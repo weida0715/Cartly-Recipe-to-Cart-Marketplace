@@ -97,7 +97,7 @@ class CheckoutController extends Controller
             // Parent order placeholder; total updated after merchant order discounts
             $stmt = $db->prepare(
                 "INSERT INTO orders (user_id, total_amount, payment_method, payment_status, order_status, shipping_address, contact_phone)
-                 VALUES (:u, 0, :pm, 'paid', 'processing', :sa, :ph)"
+                 VALUES (:u, 0, :pm, 'paid', 'pending', :sa, :ph)"
             );
             $stmt->execute([':u' => $userId, ':pm' => $payment, ':sa' => $shipping, ':ph' => $phone]);
             $orderId = (int) $db->lastInsertId();
