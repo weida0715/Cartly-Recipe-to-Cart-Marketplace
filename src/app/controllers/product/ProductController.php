@@ -8,6 +8,7 @@ use App\Helpers\Flash;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Review;
+use App\Models\CartItem;
 
 class ProductController extends Controller
 {
@@ -28,6 +29,9 @@ class ProductController extends Controller
             'page' => $result['page'],
             'pages' => $result['pages'],
             'total' => $result['total'],
+            'cartCount' => AuthHelper::check()
+                ? (new CartItem())->countForUser((int) AuthHelper::id())
+                : 0,
         ]);
     }
 

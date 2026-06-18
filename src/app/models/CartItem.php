@@ -8,6 +8,19 @@ class CartItem extends Model
     protected string $table = 'cart_items';
     protected string $primaryKey = 'cart_item_id';
 
+    public function countForUser(int $userId): int
+    {
+        $rows = $this->query(
+            "SELECT COUNT(ci.cart_item_id) AS item_count
+             FROM carts c
+             LEFT JOIN cart_items ci ON ci.cart_id = c.cart_id
+             WHERE c.user_id = :user_id",
+            [':user_id' => $userId]
+        );
+
+        return (int) ($rows[0]['item_count'] ?? 0);
+    }
+
     /** All items in the cart joined with product and store info. */
     public function detailed(int $cartId): array
     {

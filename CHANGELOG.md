@@ -133,3 +133,7 @@ All notable changes to this project will be documented in this file.
 - Added active navigation highlighting to the shared customer navigation.
 - Kept parent navigation items active on product, recipe, order, merchant, and admin child pages.
 - Added accessible `aria-current="page"` attributes and distinct merchant/admin sidebar active states.
+
+## [1.1.8] - 19th June 2026
+- Added a linked cart icon and item-count badge to the Marketplace page.
+- Calculated the cart indicator count on the server for the logged-in customer.
