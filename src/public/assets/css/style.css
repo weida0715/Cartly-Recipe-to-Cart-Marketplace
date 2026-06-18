@@ -367,6 +367,17 @@ textarea {
   color: var(--warning);
 }
 
+/* Validation dialog */
+.validation-dialog {
+  background: #fde8e8;
+  border: 1px solid #f8b4b4;
+  border-radius: var(--radius);
+  color: var(--danger);
+  font-weight: 700;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+}
+
 /* Tables */
 .table {
   width: 100%;
