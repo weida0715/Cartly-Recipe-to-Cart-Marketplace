@@ -48,6 +48,8 @@ config/database.local.php
 # =========================
 uploads/*
 !uploads/.gitkeep
+src/public/uploads/*
+!src/public/uploads/.gitkeep
 
 # =========================
 # Cache / runtime files
