@@ -100,3 +100,7 @@ All notable changes to this project will be documented in this file.
 - Added reusable phone validation logic to reject non-numeric phone input.
 - Applied digit-only phone validation to registration, customer profile, merchant request, merchant store profile, and checkout forms.
 - Added numeric-friendly phone input attributes and PHPUnit coverage for the validator rule.
+
+## [1.1.2] - 17th June 2026
+- Hid admin accounts from the admin user-management list.
+- Blocked direct admin user-management requests from changing admin account roles or statuses.

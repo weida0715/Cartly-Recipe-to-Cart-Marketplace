@@ -9,6 +9,18 @@ class User extends Model
     protected string $table = 'users';
     protected string $primaryKey = 'user_id';
 
+    public function allNonAdmins(string $order = 'created_at DESC'): array
+    {
+        $sql = 'SELECT * FROM users WHERE role <> :role';
+        if ($order !== '') {
+            $sql .= " ORDER BY {$order}";
+        }
+
+        $stmt = $this->db()->prepare($sql);
+        $stmt->execute([':role' => 'admin']);
+        return $stmt->fetchAll();
+    }
+
     public function findByLogin(string $login): ?array
     {
         $stmt = $this->db()->prepare(

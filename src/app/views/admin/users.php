@@ -21,7 +21,7 @@
           <form method="post" action="<?= BASE_URL ?>/admin/users/<?= (int) $u['user_id'] ?>/role" class="flex">
             <?= Csrf::field() ?>
             <select name="role">
-              <?php foreach (['customer', 'merchant', 'admin'] as $role): ?>
+              <?php foreach (['customer', 'merchant'] as $role): ?>
                 <option value="<?= $role ?>" <?= $u['role'] === $role ? 'selected' : '' ?>><?= $role ?></option>
               <?php endforeach; ?>
             </select>
