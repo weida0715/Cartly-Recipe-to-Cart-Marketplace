@@ -18,7 +18,7 @@ class CartItem extends Model
             [':user_id' => $userId]
         );
 
-        return (int) ($rows[0]['item_count'] ?? 0);
+        return empty($rows) ? 0 : (int) ($rows[0]['item_count'] ?? 0);
     }
 
     /** All items in the cart joined with product and store info. */

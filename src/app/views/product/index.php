@@ -1,10 +1,12 @@
 <div class="marketplace-heading">
   <h2>Marketplace</h2>
-  <a class="marketplace-cart" href="<?= BASE_URL ?>/cart"
-    aria-label="View cart, <?= (int) $cartCount ?> <?= (int) $cartCount === 1 ? 'item' : 'items' ?>">
-    <span class="marketplace-cart-icon" aria-hidden="true">&#128722;</span>
-    <span class="marketplace-cart-count" aria-hidden="true"><?= (int) $cartCount ?></span>
-  </a>
+  <?php if (\App\Helpers\AuthHelper::check()): ?>
+    <a class="marketplace-cart" href="<?= BASE_URL ?>/cart"
+      aria-label="View cart, <?= (int) $cartCount ?> <?= (int) $cartCount === 1 ? 'item' : 'items' ?>">
+      <span class="marketplace-cart-icon" aria-hidden="true">&#128722;</span>
+      <span class="marketplace-cart-count" aria-hidden="true"><?= (int) $cartCount ?></span>
+    </a>
+  <?php endif; ?>
 </div>
 <form class="filters" method="get" action="<?= BASE_URL ?>/products" data-search-reset>
   <input class="input" id="product-search" type="search" name="q" value="<?= htmlspecialchars($q) ?>"
