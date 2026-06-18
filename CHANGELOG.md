@@ -134,3 +134,4 @@ All notable changes to this project will be documented in this file.
 - Added a public available vouchers page with merchant/code search, discount type filtering, and voucher sorting.
 - Linked checkout voucher entry to store-scoped available voucher code suggestions.
 - Restricted checkout voucher suggestions and redemption to vouchers valid for each merchant and subtotal.
+- Improved checkout voucher error handling by returning invalid store voucher codes back to checkout with merchant-specific feedback.

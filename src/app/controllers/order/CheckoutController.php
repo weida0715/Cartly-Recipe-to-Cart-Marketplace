@@ -117,7 +117,12 @@ class CheckoutController extends Controller
                 if ($code !== '') {
                     $voucher = $voucherModel->findValidForStore($code, (int) $sid, $subtotal);
                     if (!$voucher) {
-                        throw new \RuntimeException('Invalid voucher for one of the selected stores.');
+                        if ($db->inTransaction()) {
+                            $db->rollBack();
+                        }
+                        $storeName = (string) ($g['items'][0]['store_name'] ?? 'one of the stores');
+                        Flash::set('error', 'Invalid voucher code for ' . $storeName . '.');
+                        $this->redirect('/checkout');
                     }
                     $discount = $voucherModel->computeDiscount($voucher, $subtotal);
                     $voucherId = (int) $voucher['voucher_id'];
