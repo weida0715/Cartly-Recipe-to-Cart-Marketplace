@@ -5,7 +5,10 @@ $action = $product
   : BASE_URL . '/merchant/products';
 ?>
 <h2><?= $product ? 'Edit product' : 'New product' ?></h2>
-<form method="post" action="<?= $action ?>" class="card" enctype="multipart/form-data">
+
+<div class="validation-dialog" data-product-validation-dialog hidden role="alert"></div>
+
+<form method="post" action="<?= $action ?>" class="card" enctype="multipart/form-data" data-product-form novalidate>
   <?= Csrf::field() ?>
   <div class="form-row"><label>Name</label><input name="product_name"
       value="<?= htmlspecialchars($product['product_name'] ?? '') ?>" required></div>
@@ -48,13 +51,16 @@ $action = $product
     </div>
   </div>
   <div class="form-grid">
-    <div class="form-row"><label>Price (RM)</label><input type="number" step="0.01" name="price"
+    <div class="form-row"><label>Price (RM)</label><input type="number" step="0.01" min="0" name="price"
+        required data-validation-label="Price"
         value="<?= htmlspecialchars((string) ($product['price'] ?? '0.00')) ?>"></div>
-    <div class="form-row"><label>Stock</label><input type="number" name="stock_quantity"
+    <div class="form-row"><label>Stock</label><input type="number" min="0" name="stock_quantity"
+        required data-validation-label="Stock quantity"
         value="<?= (int) ($product['stock_quantity'] ?? 0) ?>"></div>
   </div>
   <div class="form-grid">
-    <div class="form-row"><label>Package quantity</label><input type="number" step="0.01" name="package_quantity"
+    <div class="form-row"><label>Package quantity</label><input type="number" step="0.01" min="0.01" name="package_quantity"
+        required data-validation-label="Package quantity"
         value="<?= htmlspecialchars((string) ($product['package_quantity'] ?? '1')) ?>"></div>
     <div class="form-row"><label>Package unit</label><input name="package_unit"
         value="<?= htmlspecialchars($product['package_unit'] ?? 'g') ?>"></div>

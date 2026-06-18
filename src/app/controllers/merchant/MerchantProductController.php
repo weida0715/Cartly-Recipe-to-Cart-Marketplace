@@ -120,18 +120,52 @@ class MerchantProductController extends Controller
 
     private function payload(int $storeId, bool $forInsert = true): array
     {
+        $priceInput = trim((string) $this->input('price', ''));
+        $stockInput = trim((string) $this->input('stock_quantity', ''));
+        $packageQuantityInput = trim((string) $this->input('package_quantity', ''));
+
         $data = [
             'store_id' => $storeId,
             'category_id' => (int) $this->input('category_id') ?: null,
             'ingredient_id' => (int) $this->input('ingredient_id') ?: null,
             'product_name' => trim((string) $this->input('product_name', '')),
             'description' => (string) $this->input('description', ''),
-            'price' => (float) $this->input('price', 0),
-            'stock_quantity' => (int) $this->input('stock_quantity', 0),
-            'package_quantity' => (float) $this->input('package_quantity', 1),
+            'price' => (float) $priceInput,
+            'stock_quantity' => (int) $stockInput,
+            'package_quantity' => (float) $packageQuantityInput,
             'package_unit' => (string) $this->input('package_unit', ''),
             'status' => (string) $this->input('status', 'active'),
         ];
+        if ($data['product_name'] === '') {
+            throw new \RuntimeException('Product name is required.');
+        }
+        if ($priceInput === '') {
+            throw new \RuntimeException('Price is required.');
+        }
+        if (!is_numeric($priceInput)) {
+            throw new \RuntimeException('Price must be a valid number.');
+        }
+        if ($data['price'] < 0) {
+            throw new \RuntimeException('Price cannot be negative.');
+        }
+        if ($stockInput === '') {
+            throw new \RuntimeException('Stock quantity is required.');
+        }
+        if (filter_var($stockInput, FILTER_VALIDATE_INT) === false) {
+            throw new \RuntimeException('Stock quantity must be a valid integer.');
+        }
+        if ($data['stock_quantity'] < 0) {
+            throw new \RuntimeException('Stock quantity cannot be negative.');
+        }
+        if ($packageQuantityInput === '') {
+            throw new \RuntimeException('Package quantity is required.');
+        }
+        if (!is_numeric($packageQuantityInput)) {
+            throw new \RuntimeException('Package quantity must be a valid number.');
+        }
+        if ($data['package_quantity'] <= 0) {
+            throw new \RuntimeException('Package quantity must be greater than zero.');
+        }
         if (!$forInsert)
             unset($data['store_id']);
         $image = FileUploadHelper::image('image', 'products');

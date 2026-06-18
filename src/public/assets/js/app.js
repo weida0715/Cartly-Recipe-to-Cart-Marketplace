@@ -13,6 +13,101 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Merchant product validation message.
+  document.querySelectorAll('form[data-product-form]').forEach(form => {
+    const dialog = document.querySelector('[data-product-validation-dialog]');
+
+    const validations = [
+      {
+        field: form.querySelector('[name="product_name"]'),
+        invalid: field => field.value.trim() === '',
+        message: 'Product name is required.',
+      },
+      {
+        field: form.querySelector('[name="price"]'),
+        invalid: field => field.value.trim() === '',
+        message: 'Price is required.',
+      },
+      {
+        field: form.querySelector('[name="price"]'),
+        invalid: field => Number.isNaN(Number(field.value)),
+        message: 'Price must be a valid number.',
+      },
+      {
+        field: form.querySelector('[name="price"]'),
+        invalid: field => Number(field.value) < 0,
+        message: 'Price cannot be negative.',
+      },
+      {
+        field: form.querySelector('[name="stock_quantity"]'),
+        invalid: field => field.value.trim() === '',
+        message: 'Stock quantity is required.',
+      },
+      {
+        field: form.querySelector('[name="stock_quantity"]'),
+        invalid: field => !/^-?\d+$/.test(field.value.trim()),
+        message: 'Stock quantity must be a valid integer.',
+      },
+      {
+        field: form.querySelector('[name="stock_quantity"]'),
+        invalid: field => Number(field.value) < 0,
+        message: 'Stock quantity cannot be negative.',
+      },
+      {
+        field: form.querySelector('[name="package_quantity"]'),
+        invalid: field => field.value.trim() === '',
+        message: 'Package quantity is required.',
+      },
+      {
+        field: form.querySelector('[name="package_quantity"]'),
+        invalid: field => Number.isNaN(Number(field.value)),
+        message: 'Package quantity must be a valid number.',
+      },
+      {
+        field: form.querySelector('[name="package_quantity"]'),
+        invalid: field => Number(field.value) <= 0,
+        message: 'Package quantity must be greater than zero.',
+      },
+    ];
+
+    const showValidationDialog = text => {
+      if (!dialog) {
+        return;
+      }
+      dialog.textContent = text;
+      dialog.hidden = false;
+    };
+
+    const clearValidationDialog = () => {
+      if (dialog) {
+        dialog.textContent = '';
+        dialog.hidden = true;
+      }
+    };
+
+    const validateProductForm = () => {
+      const failed = validations.find(({ field, invalid }) => field && invalid(field));
+      if (failed) {
+        showValidationDialog(failed.message);
+        return failed;
+      }
+      clearValidationDialog();
+      return null;
+    };
+
+    validations.forEach(({ field }) => {
+      field?.addEventListener('input', validateProductForm);
+      field?.addEventListener('blur', validateProductForm);
+    });
+
+    form.addEventListener('submit', e => {
+      const failed = validateProductForm();
+      if (!failed) return;
+      e.preventDefault();
+      failed.field.focus({ preventScroll: true });
+    });
+  });
+
   // Quantity steppers: [data-stepper] containing [data-step="-1|1"] and an input
   document.querySelectorAll('[data-stepper]').forEach(box => {
     const input = box.querySelector('input[type=number]');
