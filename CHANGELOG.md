@@ -145,3 +145,10 @@ All notable changes to this project will be documented in this file.
 - Added merchant dashboard revenue, orders, products, average order value, and revenue change metric cards.
 - Added weekly merchant sales bar chart and order trend line chart with Mon-Sun x-axis labels and hover value tooltips.
 - Added recent merchant order item counts to the dashboard order summary.
+
+## [1.1.10] - 19th June 2026
+- Added admin category editing from the Category Management page.
+- Added per-category Edit and Deactivate actions in the same category card action row.
+- Added category update route and controller handling with CSRF and required-name validation.
+- Improved D3 loading so chart pages opt in instead of loading D3 on every page.
+- Hardened merchant dashboard date parsing and cart item lookup handling from code review feedback.
