@@ -27,9 +27,10 @@
                     <form method="post" action="<?= BASE_URL ?>/cart/update" class="flex">
                       <?= Csrf::field() ?>
                       <input type="hidden" name="cart_item_id" value="<?= (int)$it['cart_item_id'] ?>">
-                      <input class="qty" type="number" name="quantity" value="<?= (int)$it['quantity'] ?>" min="1">
+                      <input class="qty" type="number" name="quantity" value="<?= (int)$it['quantity'] ?>" min="1" max="<?= (int)$it['stock_quantity'] ?>">
                       <button class="btn btn-outline btn-sm">Update</button>
                     </form>
+                    <small class="text-muted">Stock: <?= (int)$it['stock_quantity'] ?></small>
                   </td>
                   <td>RM <?= number_format((float)$it['line_total'], 2) ?></td>
                   <td>

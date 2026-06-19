@@ -23,6 +23,20 @@ class CartItem extends Model
         );
     }
 
+    public function findForUser(int $cartItemId, int $userId): ?array
+    {
+        $rows = $this->query(
+            "SELECT ci.*, p.product_name, p.stock_quantity
+             FROM cart_items ci
+             JOIN carts c ON c.cart_id = ci.cart_id
+             JOIN products p ON p.product_id = ci.product_id
+             WHERE ci.cart_item_id = :ci AND c.user_id = :u
+             LIMIT 1",
+            [':ci' => $cartItemId, ':u' => $userId]
+        );
+        return $rows[0] ?? null;
+    }
+
     public function addOrIncrement(int $cartId, int $productId, int $qty, float $unitPrice, string $method = 'manual', ?int $recipeId = null, ?int $riId = null): int
     {
         // Manual adds dedupe by product. Recipe adds dedupe by (product, recipe, recipe_ingredient).

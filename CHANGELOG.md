@@ -135,3 +135,7 @@ All notable changes to this project will be documented in this file.
 - Linked checkout voucher entry to store-scoped available voucher code suggestions.
 - Restricted checkout voucher suggestions and redemption to vouchers valid for each merchant and subtotal.
 - Improved checkout voucher error handling by returning invalid store voucher codes back to checkout with merchant-specific feedback.
+
+## [1.1.8] - 19th June 2026
+- Added immediate cart update validation to reject item quantities that exceed available product stock.
+- Added cart quantity maximum hints and stock labels to the cart update form.
