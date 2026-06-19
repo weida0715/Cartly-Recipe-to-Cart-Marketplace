@@ -12,13 +12,24 @@
 <div class="grid grid-3">
   <?php foreach ($cats as $c): ?>
     <div class="card text-center">
-      <div style="font-size:2rem">🏷️</div>
+      <div style="font-size:2rem"><?= htmlspecialchars($c['category_icon'] ?: '🏷️') ?></div>
       <h4><?= htmlspecialchars($c['category_name']) ?></h4>
       <span class="badge"><?= htmlspecialchars($c['status']) ?></span>
-      <form method="post" action="<?= BASE_URL ?>/admin/categories/<?= (int)$c['category_id'] ?>/delete" class="mt-2" data-confirm="Deactivate?">
-        <?= Csrf::field() ?>
-        <button class="btn btn-danger btn-sm">Deactivate</button>
-      </form>
+      <div class="flex mt-2" style="justify-content:center; align-items:flex-start;">
+        <details>
+          <summary class="btn btn-outline btn-sm">Edit</summary>
+          <form method="post" action="<?= BASE_URL ?>/admin/categories/<?= (int)$c['category_id'] ?>/update" class="mt-2">
+            <?= Csrf::field() ?>
+            <div class="form-row"><label>Name</label><input name="category_name" value="<?= htmlspecialchars($c['category_name']) ?>" required></div>
+            <div class="form-row"><label>Icon</label><input name="category_icon" value="<?= htmlspecialchars((string)$c['category_icon']) ?>"></div>
+            <button class="btn btn-primary btn-sm">Update</button>
+          </form>
+        </details>
+        <form method="post" action="<?= BASE_URL ?>/admin/categories/<?= (int)$c['category_id'] ?>/delete" data-confirm="Deactivate?">
+          <?= Csrf::field() ?>
+          <button class="btn btn-danger btn-sm">Deactivate</button>
+        </form>
+      </div>
     </div>
   <?php endforeach; ?>
 </div>

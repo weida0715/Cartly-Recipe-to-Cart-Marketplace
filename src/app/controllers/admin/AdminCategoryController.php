@@ -37,6 +37,24 @@ class AdminCategoryController extends Controller
         $this->redirect('/admin/categories');
     }
 
+    public function update(string $id): void
+    {
+        AuthHelper::requireRole('admin');
+        $this->requireCsrf();
+        $name = trim((string) $this->input('category_name', ''));
+        if ($name === '') {
+            Flash::set('error', 'Category name is required.');
+            $this->redirect('/admin/categories');
+        }
+
+        (new Category())->update((int) $id, [
+            'category_name' => $name,
+            'category_icon' => (string) $this->input('category_icon', ''),
+        ]);
+        Flash::set('success', 'Category updated.');
+        $this->redirect('/admin/categories');
+    }
+
     public function delete(string $id): void
     {
         AuthHelper::requireRole('admin');

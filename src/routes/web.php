@@ -112,6 +112,7 @@ $router->post('/admin/merchants/{id}/reject', [AdminMerchantController::class, '
 $router->post('/admin/merchants/{id}/close', [AdminMerchantController::class, 'close']);
 $router->get('/admin/categories', [AdminCategoryController::class, 'index']);
 $router->post('/admin/categories', [AdminCategoryController::class, 'store']);
+$router->post('/admin/categories/{id}/update', [AdminCategoryController::class, 'update']);
 $router->post('/admin/categories/{id}/delete', [AdminCategoryController::class, 'delete']);
 $router->get('/admin/reports', [AdminReportController::class, 'index']);
 $router->post('/admin/reports/{id}/resolve', [AdminReportController::class, 'resolve']);
