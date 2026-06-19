@@ -39,6 +39,7 @@
     </div>
   </div>
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="<?= ASSET_URL ?>/js/app.js"></script>
 </body>
 </html>

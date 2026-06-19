@@ -9,3 +9,22 @@
   <div class="stat"><div class="num"><?= (int)$stats['orders'] ?></div><div class="label">Orders</div></div>
   <div class="stat"><div class="num"><?= (int)$stats['reports'] ?></div><div class="label">Open reports</div></div>
 </div>
+
+<div class="chart-grid">
+  <section class="card chart-card">
+    <h3>User roles</h3>
+    <div class="d3-chart" data-chart="pie" data-chart-values='<?= htmlspecialchars(json_encode([
+      ['label' => 'Customers', 'value' => (int) $stats['customers']],
+      ['label' => 'Merchants', 'value' => (int) $stats['merchants']],
+    ]), ENT_QUOTES) ?>'></div>
+  </section>
+  <section class="card chart-card">
+    <h3>Platform overview</h3>
+    <div class="d3-chart" data-chart="bar" data-chart-values='<?= htmlspecialchars(json_encode([
+      ['label' => 'Stores', 'value' => (int) $stats['stores']],
+      ['label' => 'Products', 'value' => (int) $stats['products']],
+      ['label' => 'Orders', 'value' => (int) $stats['orders']],
+      ['label' => 'Reports', 'value' => (int) $stats['reports']],
+    ]), ENT_QUOTES) ?>'></div>
+  </section>
+</div>

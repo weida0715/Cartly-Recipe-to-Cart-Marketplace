@@ -139,3 +139,9 @@ All notable changes to this project will be documented in this file.
 ## [1.1.8] - 19th June 2026
 - Added immediate cart update validation to reject item quantities that exceed available product stock.
 - Added cart quantity maximum hints and stock labels to the cart update form.
+
+## [1.1.9] - 19th June 2026
+- Added D3 chart visualizations to admin dashboard, merchant dashboard, and admin report statistics pages.
+- Added merchant dashboard revenue, orders, products, average order value, and revenue change metric cards.
+- Added weekly merchant sales bar chart and order trend line chart with Mon-Sun x-axis labels and hover value tooltips.
+- Added recent merchant order item counts to the dashboard order summary.

@@ -1,23 +1,34 @@
 <h2>Welcome, <?= htmlspecialchars($store['store_name']) ?></h2>
 <div class="stat-grid">
-  <div class="stat"><div class="num"><?= (int)$totals['orders'] ?></div><div class="label">Total orders</div></div>
-  <div class="stat"><div class="num">RM <?= number_format((float)$totals['revenue'], 2) ?></div><div class="label">Revenue</div></div>
-  <div class="stat"><div class="num"><?= (int)$totals['products'] ?></div><div class="label">Products</div></div>
-  <div class="stat"><div class="num"><?= (int)$totals['low_stock'] ?></div><div class="label">Low stock</div></div>
+  <div class="stat"><div class="num">RM <?= number_format((float)$totals['revenue'], 2) ?></div><div class="label">Revenue</div><div class="indicator <?= $revenueChange >= 0 ? 'up' : 'down' ?>"><?= $revenueChange >= 0 ? '▲' : '▼' ?> <?= number_format(abs((float) $revenueChange), 1) ?>% vs previous 30 days</div></div>
+  <div class="stat"><div class="num"><?= (int)$totals['orders'] ?></div><div class="label">Orders received</div></div>
+  <div class="stat"><div class="num"><?= (int)$totals['products'] ?></div><div class="label">Products managed</div></div>
+  <div class="stat"><div class="num">RM <?= number_format((float)$totals['average_order_value'], 2) ?></div><div class="label">Average order value</div></div>
+</div>
+<div class="chart-grid">
+  <section class="card chart-card">
+    <h3>Weekly Sale</h3>
+    <div class="d3-chart" data-chart="bar" data-value-prefix="RM " data-chart-values='<?= htmlspecialchars(json_encode($salesChart ?? []), ENT_QUOTES) ?>'></div>
+  </section>
+  <section class="card chart-card">
+    <h3>Order trend</h3>
+    <div class="d3-chart" data-chart="line" data-chart-values='<?= htmlspecialchars(json_encode($orderTrendChart ?? []), ENT_QUOTES) ?>'></div>
+  </section>
 </div>
 <div class="card">
   <h3>Recent orders</h3>
   <?php if (!$orders): ?><p class="text-muted">No orders yet.</p>
   <?php else: ?>
     <table class="table">
-      <thead><tr><th>#</th><th>Customer</th><th>Date</th><th>Subtotal</th><th>Status</th></tr></thead>
+      <thead><tr><th>#</th><th>Customer</th><th>Items</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
       <tbody>
       <?php foreach ($orders as $o): ?>
         <tr>
           <td>#<?= (int)$o['merchant_order_id'] ?></td>
           <td><?= htmlspecialchars($o['username']) ?></td>
+          <td><?= (int)($o['item_count'] ?? 0) ?></td>
           <td><?= htmlspecialchars($o['created_at']) ?></td>
-          <td>RM <?= number_format((float)$o['subtotal'], 2) ?></td>
+          <td>RM <?= number_format((float)$o['subtotal'] - (float)$o['discount_amount'], 2) ?></td>
           <td><span class="badge"><?= htmlspecialchars($o['status']) ?></span></td>
         </tr>
       <?php endforeach; ?>
