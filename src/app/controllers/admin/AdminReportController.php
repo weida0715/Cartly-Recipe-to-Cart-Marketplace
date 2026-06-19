@@ -20,6 +20,7 @@ class AdminReportController extends Controller
             'title' => 'Reports',
             'reports' => $report->moderationList(),
             'counts' => $report->statusCounts(),
+            'loadD3' => true,
         ], 'layout/admin-layout');
     }
 

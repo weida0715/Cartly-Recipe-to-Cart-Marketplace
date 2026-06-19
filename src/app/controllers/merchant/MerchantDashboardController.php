@@ -32,6 +32,9 @@ class MerchantDashboardController extends Controller
             $revenue = (float) $o['subtotal'] - (float) $o['discount_amount'];
             $totals['revenue'] += $revenue;
             $createdAt = strtotime((string) $o['created_at']);
+            if ($createdAt === false) {
+                continue;
+            }
             if ($createdAt >= $weekStart && $createdAt < $weekEnd) {
                 $day = date('D', $createdAt);
                 $salesByDay[$day] += $revenue;
@@ -53,6 +56,7 @@ class MerchantDashboardController extends Controller
             'salesChart' => array_map(fn($day, $value) => ['label' => $day, 'value' => round($value, 2)], array_keys($salesByDay), $salesByDay),
             'orderTrendChart' => array_map(fn($day, $value) => ['label' => $day, 'value' => (int) $value], array_keys($ordersByDay), $ordersByDay),
             'revenueChange' => $revenueChange,
+            'loadD3' => true,
         ], 'layout/merchant-layout');
     }
 }

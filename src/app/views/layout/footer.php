@@ -39,7 +39,9 @@
     </div>
   </div>
 </footer>
+<?php if (!empty($loadD3)): ?>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<?php endif; ?>
 <script src="<?= ASSET_URL ?>/js/app.js"></script>
 </body>
 </html>

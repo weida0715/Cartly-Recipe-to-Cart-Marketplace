@@ -34,7 +34,7 @@ class CartItem extends Model
              LIMIT 1",
             [':ci' => $cartItemId, ':u' => $userId]
         );
-        return $rows[0] ?? null;
+        return $rows ? $rows[0] : null;
     }
 
     public function addOrIncrement(int $cartId, int $productId, int $qty, float $unitPrice, string $method = 'manual', ?int $recipeId = null, ?int $riId = null): int
