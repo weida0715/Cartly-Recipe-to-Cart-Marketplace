@@ -84,7 +84,8 @@ class MerchantOrder extends Model
             "SELECT mo.*, o.created_at AS order_created_at
              FROM merchant_orders mo
              JOIN orders o ON o.order_id = mo.order_id
-             WHERE o.user_id = :u",
+             WHERE o.user_id = :u
+               AND mo.status IN ('ready_to_deliver', 'out_for_delivery')",
             [':u' => $userId]
         );
         foreach ($rows as $row) {
@@ -98,7 +99,8 @@ class MerchantOrder extends Model
             "SELECT mo.*, o.created_at AS order_created_at
              FROM merchant_orders mo
              JOIN orders o ON o.order_id = mo.order_id
-             WHERE mo.store_id = :s",
+             WHERE mo.store_id = :s
+               AND mo.status IN ('ready_to_deliver', 'out_for_delivery')",
             [':s' => $storeId]
         );
         foreach ($rows as $row) {
