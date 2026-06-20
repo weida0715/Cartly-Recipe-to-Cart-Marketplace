@@ -134,6 +134,176 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Mock delivery tracking: persist delivery leg transitions after short demo delays.
+  document.querySelectorAll('[data-tracking-status]').forEach(card => {
+    const labelsByStatus = {
+      pending: 'Order placed',
+      accepted: 'Merchant accepted',
+      preparing: 'Merchant preparing',
+      ready_to_deliver: 'Ready to deliver',
+      out_for_delivery: 'Out for delivery',
+      delivered: 'Delivered',
+      completed: 'Order complete',
+      cancelled: 'Merchant cancelled',
+    };
+    const statusSteps = {
+      pending: 1,
+      accepted: 2,
+      preparing: 3,
+      ready_to_deliver: 4,
+      out_for_delivery: 5,
+      delivered: 6,
+      completed: 7,
+      cancelled: 2,
+    };
+    const fill = card.querySelector('[data-tracking-fill]');
+    const label = card.querySelector('[data-tracking-label]');
+    const dots = [...card.querySelectorAll('[data-tracking-dot]')];
+    const badge = card.parentElement.querySelector('[data-tracking-badge]');
+    const form = card.querySelector('form[data-auto-advance]');
+    const statusInput = form?.querySelector('[name="status"]');
+    const receivedForm = card.querySelector('[data-received-form]');
+    const trackingUrl = card.dataset.trackingUrl;
+    const animationDuration = 450;
+    const pollInterval = 4000;
+    let pollTimer = null;
+    let transitionChain = Promise.resolve();
+
+    const progressForStep = step => Math.max(0, Math.min(1, (step - 1) / 6));
+
+    const setProgress = progress => {
+      if (fill) {
+        fill.style.width = `calc((100% - (100% / 7)) * ${progress})`;
+      }
+    };
+
+    const setDotsForStep = step => {
+      dots.forEach((dot, i) => dot.classList.toggle('is-done', i < step));
+    };
+
+    const render = (status, explicitStep = null) => {
+      const step = explicitStep ?? statusSteps[status] ?? 1;
+      card.dataset.trackingStatus = status;
+      card.dataset.trackingStep = String(step);
+      if (label) label.textContent = labelsByStatus[status] || labelsByStatus.pending;
+      setProgress(progressForStep(step));
+      setDotsForStep(step);
+      if (badge) badge.textContent = status.replaceAll('_', ' ');
+      if (receivedForm) receivedForm.hidden = status !== 'delivered';
+    };
+
+    const animateLine = (fromStep, toStep) => new Promise(resolve => {
+      const toProgress = progressForStep(toStep);
+      if (!fill) {
+        setProgress(toProgress);
+        resolve();
+        return;
+      }
+
+      const finish = () => {
+        fill.removeEventListener('transitionend', onTransitionEnd);
+        window.clearTimeout(fallback);
+        resolve();
+      };
+
+      const onTransitionEnd = event => {
+        if (event.target === fill && event.propertyName === 'width') {
+          finish();
+        }
+      };
+
+      const fallback = window.setTimeout(finish, animationDuration + 50);
+      fill.addEventListener('transitionend', onTransitionEnd, { once: true });
+
+      setProgress(progressForStep(fromStep));
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          setProgress(toProgress);
+        });
+      });
+    });
+
+    const animateToStatus = payload => {
+      const status = payload?.status || 'pending';
+      const nextStep = payload?.step || statusSteps[status] || 1;
+      const currentStep = parseInt(card.dataset.trackingStep || '1', 10);
+
+      if (nextStep <= currentStep) {
+        render(status, nextStep);
+        return Promise.resolve();
+      }
+
+      setDotsForStep(currentStep);
+      return animateLine(currentStep, nextStep).then(() => {
+        render(status, nextStep);
+      });
+    };
+
+    const queueStatusUpdate = payload => {
+      transitionChain = transitionChain.then(() => animateToStatus(payload));
+      return transitionChain;
+    };
+
+    const syncTrackingStatus = () => {
+      if (!trackingUrl) return Promise.resolve();
+
+      return fetch(trackingUrl, {
+        headers: { 'X-Requested-With': 'fetch' },
+      }).then(response => {
+        if (!response.ok) throw new Error('Tracking refresh failed.');
+        return response.json();
+      }).then(payload => {
+        const liveStatus = payload?.status || 'pending';
+        const liveStep = payload?.step || statusSteps[liveStatus] || 1;
+        const currentStatus = card.dataset.trackingStatus || 'pending';
+        const currentStep = parseInt(card.dataset.trackingStep || '1', 10);
+
+        if (liveStatus === currentStatus && liveStep === currentStep) {
+          return;
+        }
+
+        return queueStatusUpdate(payload);
+      }).catch(() => undefined);
+    };
+
+    const startPolling = () => {
+      if (!trackingUrl || pollTimer) return;
+      pollTimer = window.setInterval(() => {
+        syncTrackingStatus();
+      }, pollInterval);
+    };
+
+    render(card.dataset.trackingStatus || 'pending');
+    startPolling();
+    if (!form) return;
+
+    const advance = () => {
+      const nextStatus = statusInput?.value;
+      if (!nextStatus) return;
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'X-Requested-With': 'fetch' },
+      }).then(response => {
+        if (!response.ok) throw new Error('Delivery update failed.');
+        return response.json().catch(() => ({ status: nextStatus }));
+      }).then(payload => {
+        const appliedStatus = payload?.status || nextStatus;
+        const appliedStep = payload?.step || statusSteps[appliedStatus] || 1;
+        return queueStatusUpdate({ status: appliedStatus, step: appliedStep }).then(() => {
+          if (appliedStatus === 'out_for_delivery') {
+            statusInput.value = 'delivered';
+            setTimeout(advance, parseInt(form.dataset.autoAdvance || '10000', 10));
+          } else {
+            form.remove();
+          }
+        });
+      }).catch(() => window.location.reload());
+    };
+
+    setTimeout(advance, parseInt(form.dataset.autoAdvance || '10000', 10)); // ponytail: mock delivery timing only; replace with real carrier events later.
+  });
+
   // D3 dashboard charts.
   if (window.d3) {
     const colors = ['#2e7d32', '#f57c00', '#1e40af', '#d97706', '#dc2626', '#6b7280'];

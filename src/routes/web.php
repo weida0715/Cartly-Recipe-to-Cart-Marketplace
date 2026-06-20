@@ -74,6 +74,9 @@ $router->post('/reports', [ReportController::class, 'store']);
 $router->get('/checkout', [CheckoutController::class, 'index']);
 $router->post('/checkout', [CheckoutController::class, 'place']);
 $router->get('/orders', [OrderController::class, 'history']);
+$router->get('/orders/merchant/{id}/tracking', [OrderController::class, 'trackingStatus']);
+$router->post('/orders/merchant/{id}/advance', [OrderController::class, 'advanceDelivery']);
+$router->post('/orders/merchant/{id}/received', [OrderController::class, 'received']);
 $router->get('/orders/{id}', [OrderController::class, 'show']);
 $router->get('/orders/{id}/confirmation', [OrderController::class, 'confirmation']);
 
@@ -94,6 +97,7 @@ $router->post('/merchant/products/{id}/update', [MerchantProductController::clas
 $router->post('/merchant/products/{id}/delete', [MerchantProductController::class, 'delete']);
 $router->get('/merchant/orders', [MerchantOrderController::class, 'index']);
 $router->post('/merchant/orders/{id}/status', [MerchantOrderController::class, 'updateStatus']);
+$router->get('/merchant/orders/{id}/tracking', [MerchantOrderController::class, 'trackingStatus']);
 $router->get('/merchant/vouchers', [MerchantVoucherController::class, 'index']);
 $router->post('/merchant/vouchers', [MerchantVoucherController::class, 'store']);
 $router->post('/merchant/vouchers/{id}/update', [MerchantVoucherController::class, 'update']);

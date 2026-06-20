@@ -4,12 +4,24 @@ namespace App\Controllers\Order;
 
 use App\Helpers\Controller;
 use App\Helpers\AuthHelper;
+use App\Helpers\Flash;
 use App\Models\Order;
 use App\Models\MerchantOrder;
 use App\Models\OrderItem;
 
 class OrderController extends Controller
 {
+    private const TRACKING_LABELS = [
+        'pending' => 'Order placed',
+        'accepted' => 'Merchant accepted',
+        'preparing' => 'Merchant preparing',
+        'ready_to_deliver' => 'Ready to deliver',
+        'out_for_delivery' => 'Out for delivery',
+        'delivered' => 'Delivered',
+        'completed' => 'Order complete',
+        'cancelled' => 'Merchant cancelled',
+    ];
+
     public function history(): void
     {
         AuthHelper::requireLogin();
@@ -29,6 +41,62 @@ class OrderController extends Controller
         $this->renderOrder((int) $id, 'order/confirmation', 'Order Confirmed');
     }
 
+    public function received(string $id): void
+    {
+        AuthHelper::requireLogin();
+        $this->requireCsrf();
+        $mo = new MerchantOrder();
+        $row = $mo->belongsToCustomer((int) $id, (int) AuthHelper::id());
+        if (!$row || (string) $row['status'] !== 'delivered') {
+            http_response_code(403); echo 'Forbidden'; return;
+        }
+        $mo->updateStatusAndSyncParent((int) $id, 'completed');
+        Flash::set('success', 'Order marked as received.');
+        $this->redirect('/orders/' . (int) $row['order_id']);
+    }
+
+    public function advanceDelivery(string $id): void
+    {
+        AuthHelper::requireLogin();
+        $this->requireCsrf();
+        $target = (string) $this->input('status', '');
+        $allowed = [
+            'out_for_delivery' => ['ready_to_deliver'],
+            'delivered' => ['out_for_delivery'],
+        ];
+        $mo = new MerchantOrder();
+        $row = $mo->belongsToCustomer((int) $id, (int) AuthHelper::id());
+        if (!$row || !isset($allowed[$target]) || !in_array((string) $row['status'], $allowed[$target], true)) {
+            http_response_code(403); echo 'Forbidden'; return;
+        }
+        $mo->updateStatusAndSyncParent((int) $id, $target);
+        if (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'fetch') {
+            header('Content-Type: application/json');
+            $fresh = $mo->belongsToCustomer((int) $id, (int) AuthHelper::id());
+            echo json_encode($this->trackingPayload($fresh ?: ['status' => $target]));
+            return;
+        }
+        $this->redirect('/orders/' . (int) $row['order_id']);
+    }
+
+    public function trackingStatus(string $id): void
+    {
+        AuthHelper::requireLogin();
+        $mo = new MerchantOrder();
+        $row = $mo->belongsToCustomer((int) $id, (int) AuthHelper::id());
+        if (!$row) {
+            http_response_code(404);
+            echo 'Not found';
+            return;
+        }
+
+        $mo->syncTimedStatusesForOrder((int) $row['order_id']);
+        $fresh = $mo->belongsToCustomer((int) $id, (int) AuthHelper::id());
+
+        header('Content-Type: application/json');
+        echo json_encode($this->trackingPayload($fresh ?: $row));
+    }
+
     private function renderOrder(int $id, string $view, string $title): void
     {
         AuthHelper::requireLogin();
@@ -36,10 +104,12 @@ class OrderController extends Controller
         if (!$order || (int) $order['user_id'] !== (int) AuthHelper::id()) {
             http_response_code(404); echo 'Order not found'; return;
         }
+        (new MerchantOrder())->syncTimedStatusesForOrder($id);
         $merchantOrders = (new MerchantOrder())->forOrder($id);
         $order['display_order_status'] = (new Order())->displayStatusFromMerchantStatuses(array_column($merchantOrders, 'status'));
         $oi = new OrderItem();
         foreach ($merchantOrders as &$mo) {
+            $mo['persisted_tracking_status'] = (string) $mo['status'];
             $mo['items'] = $oi->forMerchantOrder((int) $mo['merchant_order_id']);
         }
         unset($mo);
@@ -48,5 +118,29 @@ class OrderController extends Controller
             'order' => $order,
             'merchantOrders' => $merchantOrders,
         ]);
+    }
+
+    private function trackingPayload(array $row): array
+    {
+        $status = (string) ($row['status'] ?? 'pending');
+        $step = match ($status) {
+            'pending' => 1,
+            'accepted' => 2,
+            'preparing' => 3,
+            'ready_to_deliver' => 4,
+            'out_for_delivery' => 5,
+            'delivered' => 6,
+            'completed' => 7,
+            'cancelled' => 2,
+            default => 1,
+        };
+
+        return [
+            'status' => $status,
+            'step' => $step,
+            'label' => self::TRACKING_LABELS[$status] ?? self::TRACKING_LABELS['pending'],
+            'badge' => str_replace('_', ' ', $status),
+            'showReceived' => $status === 'delivered',
+        ];
     }
 }
