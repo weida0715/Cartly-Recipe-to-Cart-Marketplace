@@ -161,3 +161,10 @@ All notable changes to this project will be documented in this file.
 - Hardened customer order status updates so database failures now surface error flashes instead of false success messages.
 - Excluded cancelled orders from merchant dashboard revenue, order count, and average order value metrics.
 - Added a safe fallback for checkout voucher store labels to avoid undefined array key warnings.
+
+## [1.1.12] - 20th June 2026
+- Store listing page for all users.
+- Store detail page showing merchant products and store-specific vouchers.
+- Navigation links for quick access to Stores.
+- Store products section uses about 2/3 of the page width.
+- Store vouchers section uses about 1/3 of the page width.
