@@ -22,6 +22,7 @@ $role = AuthHelper::role();
       <a class="brand" href="<?= BASE_URL ?>/">🛒 Cartly</a>
       <nav class="nav-links">
         <a href="<?= BASE_URL ?>/products">Marketplace</a>
+        <a href="<?= BASE_URL ?>/stores">Stores</a>
         <a href="<?= BASE_URL ?>/recipes">Recipes</a>
         <?php if ($user): ?>
           <a href="<?= BASE_URL ?>/dashboard">Dashboard</a>

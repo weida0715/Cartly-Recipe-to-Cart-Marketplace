@@ -19,6 +19,17 @@ class Store extends Model
         return $this->query("SELECT * FROM stores WHERE store_status='approved'");
     }
 
+    public function findApproved(int $storeId): ?array
+    {
+        $rows = $this->query(
+            "SELECT * FROM stores
+             WHERE store_id = :id AND store_status='approved'
+             LIMIT 1",
+            [':id' => $storeId]
+        );
+        return $rows[0] ?? null;
+    }
+
     public function pending(): array
     {
         return $this->query("SELECT s.*, u.username, u.email FROM stores s JOIN users u ON u.user_id=s.user_id WHERE s.store_status='pending' ORDER BY s.created_at DESC");

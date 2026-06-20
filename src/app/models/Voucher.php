@@ -13,6 +13,23 @@ class Voucher extends Model
         return $this->where('store_id', $storeId, 'voucher_id DESC');
     }
 
+    public function activeByStore(int $storeId): array
+    {
+        return $this->query(
+            "SELECT v.*, s.store_name
+             FROM vouchers v
+             JOIN stores s ON s.store_id = v.store_id
+             WHERE v.store_id = :sid
+               AND v.status = 'active'
+               AND s.store_status = 'approved'
+               AND (v.start_date IS NULL OR v.start_date <= CURDATE())
+               AND (v.end_date IS NULL OR v.end_date >= CURDATE())
+               AND (v.usage_limit = 0 OR v.used_count < v.usage_limit)
+             ORDER BY v.discount_value DESC, v.voucher_code ASC",
+            [':sid' => $storeId]
+        );
+    }
+
     public function available(string $q = '', string $type = '', string $sort = 'newest'): array
     {
         $sql = "SELECT v.*, s.store_name

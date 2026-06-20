@@ -9,8 +9,9 @@
   </div>
   <div>
     <h2><?= htmlspecialchars($product['product_name']) ?></h2>
-    <p class="text-muted"><?= htmlspecialchars($product['store_name']) ?> ·
-      <?= htmlspecialchars($product['category_name'] ?? '') ?>
+    <p class="text-muted">
+      <a href="<?= BASE_URL ?>/stores/<?= (int) $product['store_id'] ?>"><?= htmlspecialchars($product['store_name']) ?></a>
+      · <?= htmlspecialchars($product['category_name'] ?? '') ?>
     </p>
     <p><?= nl2br(htmlspecialchars($product['description'] ?? '')) ?></p>
     <p><strong>Price:</strong> RM <?= number_format((float) $product['price'], 2) ?></p>

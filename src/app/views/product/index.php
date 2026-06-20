@@ -45,7 +45,9 @@
         </div>
         <div class="body">
           <div class="name"><?= htmlspecialchars($p['product_name']) ?></div>
-          <div class="meta"><?= htmlspecialchars($p['store_name']) ?> · <?= htmlspecialchars($p['category_name'] ?? '') ?>
+          <div class="meta">
+            <a href="<?= BASE_URL ?>/stores/<?= (int) $p['store_id'] ?>"><?= htmlspecialchars($p['store_name']) ?></a>
+            · <?= htmlspecialchars($p['category_name'] ?? '') ?>
           </div>
           <div class="meta"><?= number_format((float) $p['package_quantity'], 0) ?>
             <?= htmlspecialchars($p['package_unit']) ?>

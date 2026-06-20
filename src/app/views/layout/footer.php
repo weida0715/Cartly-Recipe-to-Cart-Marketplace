@@ -11,6 +11,7 @@
         <h3>Platform</h3>
         <a href="<?= BASE_URL ?>/">Home</a>
         <a href="<?= BASE_URL ?>/products">Marketplace</a>
+        <a href="<?= BASE_URL ?>/stores">Stores</a>
         <a href="<?= BASE_URL ?>/recipes">Recipes</a>
       </div>
       <div>
