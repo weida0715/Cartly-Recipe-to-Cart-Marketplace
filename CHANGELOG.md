@@ -158,3 +158,6 @@ All notable changes to this project will be documented in this file.
 - Added live delivery tracking refresh on both customer order pages and the merchant orders page so the progress line and nodes stay in sync.
 - Added merchant-side tracking polling plus store-scoped tracking status endpoints so order progression updates are visible from both roles.
 - Fixed the order controller load failure caused by a missing PHP opening tag in `OrderController.php`.
+- Hardened customer order status updates so database failures now surface error flashes instead of false success messages.
+- Excluded cancelled orders from merchant dashboard revenue, order count, and average order value metrics.
+- Added a safe fallback for checkout voucher store labels to avoid undefined array key warnings.

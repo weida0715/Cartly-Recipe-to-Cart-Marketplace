@@ -20,7 +20,8 @@ class MerchantDashboardController extends Controller
         }
         $products = (new Product())->byStore((int) $store['store_id']);
         $orders = (new MerchantOrder())->forStore((int) $store['store_id']);
-        $totals = ['orders' => count($orders), 'revenue' => 0, 'average_order_value' => 0, 'low_stock' => 0, 'products' => count($products)];
+        $activeOrders = array_values(array_filter($orders, fn(array $order): bool => (string) ($order['status'] ?? '') !== 'cancelled'));
+        $totals = ['orders' => count($activeOrders), 'revenue' => 0, 'average_order_value' => 0, 'low_stock' => 0, 'products' => count($products)];
         $weekLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         $salesByDay = array_fill_keys($weekLabels, 0);
         $ordersByDay = array_fill_keys($weekLabels, 0);
@@ -28,7 +29,7 @@ class MerchantDashboardController extends Controller
         $weekEnd = strtotime('monday next week');
         $recentRevenue = 0;
         $previousRevenue = 0;
-        foreach ($orders as $o) {
+        foreach ($activeOrders as $o) {
             $revenue = (float) $o['subtotal'] - (float) $o['discount_amount'];
             $totals['revenue'] += $revenue;
             $createdAt = strtotime((string) $o['created_at']);

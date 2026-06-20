@@ -50,8 +50,11 @@ class OrderController extends Controller
         if (!$row || (string) $row['status'] !== 'delivered') {
             http_response_code(403); echo 'Forbidden'; return;
         }
-        $mo->updateStatusAndSyncParent((int) $id, 'completed');
-        Flash::set('success', 'Order marked as received.');
+        if ($mo->updateStatusAndSyncParent((int) $id, 'completed')) {
+            Flash::set('success', 'Order marked as received.');
+        } else {
+            Flash::set('error', 'Failed to mark order as received.');
+        }
         $this->redirect('/orders/' . (int) $row['order_id']);
     }
 
@@ -69,7 +72,16 @@ class OrderController extends Controller
         if (!$row || !isset($allowed[$target]) || !in_array((string) $row['status'], $allowed[$target], true)) {
             http_response_code(403); echo 'Forbidden'; return;
         }
-        $mo->updateStatusAndSyncParent((int) $id, $target);
+        if (!$mo->updateStatusAndSyncParent((int) $id, $target)) {
+            if (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'fetch') {
+                http_response_code(500);
+                header('Content-Type: application/json');
+                echo json_encode(['error' => 'Failed to update delivery status']);
+                return;
+            }
+            Flash::set('error', 'Failed to update delivery status.');
+            $this->redirect('/orders/' . (int) $row['order_id']);
+        }
         if (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'fetch') {
             header('Content-Type: application/json');
             $fresh = $mo->belongsToCustomer((int) $id, (int) AuthHelper::id());
