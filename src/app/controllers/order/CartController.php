@@ -62,7 +62,17 @@ class CartController extends Controller
         $this->requireCsrf();
         $id = (int) $this->input('cart_item_id');
         $qty = max(1, (int) $this->input('quantity', 1));
-        (new CartItem())->update($id, ['quantity' => $qty]);
+        $cartItem = new CartItem();
+        $item = $cartItem->findForUser($id, (int) AuthHelper::id());
+        if (!$item) {
+            Flash::set('error', 'Cart item not found.');
+            $this->redirect('/cart');
+        }
+        if ($qty > (int) $item['stock_quantity']) {
+            Flash::set('error', 'Only ' . (int) $item['stock_quantity'] . ' left in stock for ' . $item['product_name'] . '.');
+            $this->redirect('/cart');
+        }
+        $cartItem->update($id, ['quantity' => $qty]);
         Flash::set('success', 'Cart updated.');
         $this->redirect('/cart');
     }
