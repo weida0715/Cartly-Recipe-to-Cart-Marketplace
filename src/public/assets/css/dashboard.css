@@ -41,6 +41,16 @@
   color: var(--green-primary-dark);
   text-decoration: none;
 }
+.sidebar nav a.active {
+  background: #e2f3e4;
+  box-shadow: inset 3px 0 0 var(--green-primary);
+  color: var(--green-primary-dark);
+}
+.sidebar.admin nav a.active {
+  background: #fff4e5;
+  box-shadow: inset 3px 0 0 var(--orange-accent);
+  color: #9a4d00;
+}
 .portal-content {
   min-width: 0;
 }

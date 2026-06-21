@@ -125,6 +125,12 @@ h2 {
   color: var(--green-primary-dark);
   text-decoration: none;
 }
+.nav-links a.active {
+  background: #e2f3e4;
+  box-shadow: inset 0 -3px 0 var(--green-primary);
+  color: var(--green-primary-dark);
+  font-weight: 800;
+}
 .user-chip {
   font-size: 0.85rem;
   color: var(--muted);
