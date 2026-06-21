@@ -163,7 +163,7 @@ All notable changes to this project will be documented in this file.
 - Improved D3 loading so chart pages opt in instead of loading D3 on every page.
 - Hardened merchant dashboard date parsing and cart item lookup handling from code review feedback.
 
-## [1.1.13] - 20th June 2026
+## [1.2.0] - 20th June 2026
 - Added live delivery tracking refresh on both customer order pages and the merchant orders page so the progress line and nodes stay in sync.
 - Added merchant-side tracking polling plus store-scoped tracking status endpoints so order progression updates are visible from both roles.
 - Fixed the order controller load failure caused by a missing PHP opening tag in `OrderController.php`.
