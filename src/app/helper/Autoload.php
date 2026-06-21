@@ -29,10 +29,14 @@ spl_autoload_register(function (string $class): void {
         return;
     }
 
-    // Fallback: lowercase directories (common in Linux deployments).
-    $relLower = $map[$top] . '/' . strtolower(implode('/', array_slice($parts, 0, -1))) . '/' . end($parts) . '.php';
-    $pathLower = dirname(__DIR__) . '/' . $relLower;
-    if (is_file($pathLower)) {
-        require_once $pathLower;
+    // Fallback: lowercase directories while preserving the class filename.
+    $dirParts = array_slice($parts, 0, -1);
+    $file = end($parts);
+    if ($dirParts) {
+        $relLower = $map[$top] . '/' . strtolower(implode('/', $dirParts)) . '/' . $file . '.php';
+        $pathLower = dirname(__DIR__) . '/' . $relLower;
+        if (is_file($pathLower)) {
+            require_once $pathLower;
+        }
     }
 });

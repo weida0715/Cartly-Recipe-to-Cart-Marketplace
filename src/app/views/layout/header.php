@@ -41,8 +41,9 @@ $navAttributes = static function (string $path, bool $includeChildren = true) us
     <div class="container nav">
       <a class="brand" href="<?= BASE_URL ?>/">🛒 Cartly</a>
       <nav class="nav-links">
-        <a<?= $navAttributes('/products') ?> href="<?= BASE_URL ?>/products">Marketplace</a>
-        <a<?= $navAttributes('/recipes') ?> href="<?= BASE_URL ?>/recipes">Recipes</a>
+        <a href="<?= BASE_URL ?>/products">Marketplace</a>
+        <a href="<?= BASE_URL ?>/stores">Stores</a>
+        <a href="<?= BASE_URL ?>/recipes">Recipes</a>
         <?php if ($user): ?>
           <a<?= $navAttributes('/dashboard', false) ?> href="<?= BASE_URL ?>/dashboard">Dashboard</a>
           <a<?= $navAttributes('/cart') ?> href="<?= BASE_URL ?>/cart">Cart</a>

@@ -6,6 +6,7 @@ declare(strict_types=1);
 use App\Controllers\HomeController;
 use App\Controllers\Auth\AuthController;
 use App\Controllers\Product\ProductController;
+use App\Controllers\Store\StoreController;
 use App\Controllers\Recipe\RecipeController;
 use App\Controllers\Recipe\RecipeCartController;
 use App\Controllers\Order\CartController;
@@ -43,6 +44,8 @@ $router->get('/auth/logout', [AuthController::class, 'logout']);
 $router->get('/vouchers', [ProductController::class, 'vouchers']);
 $router->get('/products', [ProductController::class, 'index']);
 $router->get('/products/{id}', [ProductController::class, 'show']);
+$router->get('/stores', [StoreController::class, 'index']);
+$router->get('/stores/{id}', [StoreController::class, 'show']);
 
 // Recipes
 $router->get('/recipes', [RecipeController::class, 'index']);

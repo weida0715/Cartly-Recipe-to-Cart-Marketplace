@@ -109,6 +109,22 @@ class Product extends Model
         return $this->where('store_id', $storeId, 'created_at DESC');
     }
 
+    public function activeByStore(int $storeId): array
+    {
+        return $this->query(
+            "SELECT p.*, s.store_name, s.rating AS store_rating, c.category_name, i.ingredient_name
+             FROM products p
+             JOIN stores s ON s.store_id = p.store_id
+             LEFT JOIN categories c ON c.category_id = p.category_id
+             LEFT JOIN ingredients i ON i.ingredient_id = p.ingredient_id
+             WHERE p.store_id = :sid
+               AND p.status = 'active'
+               AND s.store_status = 'approved'
+             ORDER BY p.created_at DESC",
+            [':sid' => $storeId]
+        );
+    }
+
     /** Products that match a standard ingredient and are purchasable. */
     public function activeByIngredient(int $ingredientId): array
     {
