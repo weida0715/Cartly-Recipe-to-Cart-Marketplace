@@ -10,6 +10,7 @@ class Order extends Model
 
     public function historyForUser(int $userId): array
     {
+        (new MerchantOrder())->syncTimedStatusesForUser($userId);
         $orders = $this->query(
             "SELECT o.*, GROUP_CONCAT(mo.status) AS merchant_statuses
              FROM orders o
@@ -38,6 +39,15 @@ class Order extends Model
         }
         if (!array_diff($statuses, ['completed', 'cancelled'])) {
             return 'completed';
+        }
+        if (in_array('delivered', $statuses, true)) {
+            return 'delivered';
+        }
+        if (in_array('out_for_delivery', $statuses, true)) {
+            return 'out_for_delivery';
+        }
+        if (in_array('ready_to_deliver', $statuses, true)) {
+            return 'ready_to_deliver';
         }
         if (in_array('preparing', $statuses, true)) {
             return 'preparing';

@@ -29,7 +29,7 @@
           <div class="form-row mt-2">
             <label>Voucher code (this store)</label>
             <input name="voucher[<?= (int)$sid ?>]" list="voucher-options-<?= (int)$sid ?>"
-              placeholder="Search available vouchers for <?= htmlspecialchars($g['store_name']) ?>">
+              placeholder="Search available vouchers for <?= htmlspecialchars($g['store_name'] ?? ($g['items'][0]['store_name'] ?? 'this store')) ?>">
             <datalist id="voucher-options-<?= (int)$sid ?>">
               <?php foreach (($g['vouchers'] ?? []) as $voucher): ?>
                 <option value="<?= htmlspecialchars($voucher['voucher_code']) ?>">
