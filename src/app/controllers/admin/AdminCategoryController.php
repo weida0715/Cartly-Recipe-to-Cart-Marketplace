@@ -5,6 +5,7 @@ namespace App\Controllers\Admin;
 use App\Helpers\Controller;
 use App\Helpers\AuthHelper;
 use App\Helpers\Flash;
+use App\Helpers\FileUploadHelper;
 use App\Models\Category;
 
 class AdminCategoryController extends Controller
@@ -27,10 +28,20 @@ class AdminCategoryController extends Controller
             Flash::set('error', 'Category name is required.');
             $this->redirect('/admin/categories');
         }
+        try {
+            $icon = FileUploadHelper::image('category_icon', 'seeded/categories');
+        } catch (\RuntimeException $e) {
+            Flash::set('error', $e->getMessage());
+            $this->redirect('/admin/categories');
+        }
+        if ($icon === null) {
+            Flash::set('error', 'Category image is required.');
+            $this->redirect('/admin/categories');
+        }
 
         (new Category())->insert([
             'category_name' => $name,
-            'category_icon' => (string) $this->input('category_icon', ''),
+            'category_icon' => $icon,
             'status' => 'active',
         ]);
         Flash::set('success', 'Category added.');
@@ -41,16 +52,32 @@ class AdminCategoryController extends Controller
     {
         AuthHelper::requireRole('admin');
         $this->requireCsrf();
+        $category = (new Category())->find((int) $id);
+        if (!$category) {
+            Flash::set('error', 'Category not found.');
+            $this->redirect('/admin/categories');
+        }
         $name = trim((string) $this->input('category_name', ''));
         if ($name === '') {
             Flash::set('error', 'Category name is required.');
             $this->redirect('/admin/categories');
         }
 
-        (new Category())->update((int) $id, [
-            'category_name' => $name,
-            'category_icon' => (string) $this->input('category_icon', ''),
-        ]);
+        $data = ['category_name' => $name];
+        try {
+            $icon = FileUploadHelper::image('category_icon', 'seeded/categories');
+        } catch (\RuntimeException $e) {
+            Flash::set('error', $e->getMessage());
+            $this->redirect('/admin/categories');
+        }
+        if ($icon !== null) {
+            $data['category_icon'] = $icon;
+            if (!empty($category['category_icon']) && str_contains((string) $category['category_icon'], '/')) {
+                FileUploadHelper::delete((string) $category['category_icon']);
+            }
+        }
+
+        (new Category())->update((int) $id, $data);
         Flash::set('success', 'Category updated.');
         $this->redirect('/admin/categories');
     }
