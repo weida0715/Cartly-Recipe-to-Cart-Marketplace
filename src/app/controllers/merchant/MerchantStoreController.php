@@ -61,11 +61,15 @@ class MerchantStoreController extends Controller
             if ($store) {
                 $oldLogoPath = $store['store_logo'] ?? null;
                 $updateSuccess = $sm->update((int) $store['store_id'], $data);
-                if (!$updateSuccess) {
+                if ($updateSuccess === false) {
                     throw new \RuntimeException('Store update failed.');
                 }
                 if ($logo !== null && !empty($oldLogoPath)) {
-                    FileUploadHelper::delete((string) $oldLogoPath);
+                    try {
+                        FileUploadHelper::delete((string) $oldLogoPath);
+                    } catch (\Throwable $cleanupError) {
+                        error_log('Could not delete previous store logo: ' . $cleanupError->getMessage());
+                    }
                 }
                 Flash::set('success', 'Store updated.');
             } else {
@@ -77,8 +81,13 @@ class MerchantStoreController extends Controller
                 Flash::set('success', 'Store created - awaiting admin approval.');
             }
         } catch (\Throwable $e) {
+            error_log('Store save failed: ' . $e->getMessage());
             if ($logo !== null) {
-                FileUploadHelper::delete($logo);
+                try {
+                    FileUploadHelper::delete($logo);
+                } catch (\Throwable $cleanupError) {
+                    error_log('Could not delete unsaved store logo: ' . $cleanupError->getMessage());
+                }
             }
             Flash::set('error', 'Store could not be saved. Please try again.');
             $this->redirect('/merchant/store');

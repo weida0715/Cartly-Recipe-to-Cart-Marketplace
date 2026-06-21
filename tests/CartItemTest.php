@@ -40,35 +40,19 @@ class CartItemTest extends TestCase
         $this->assertSame(0, $cartItem->countForUser(12));
     }
 
-    public function test_manual_quantity_for_cart_product_returns_existing_quantity(): void
+    public function test_manual_cart_add_uses_a_transaction_and_row_locks(): void
     {
-        $cartItem = new class extends CartItem {
-            public array $lastQuery = [];
+        $method = new ReflectionMethod(CartItem::class, 'addManualWithinStock');
+        $source = file(__DIR__ . '/../src/app/models/CartItem.php');
+        $body = implode('', array_slice(
+            $source,
+            $method->getStartLine() - 1,
+            $method->getEndLine() - $method->getStartLine() + 1
+        ));
 
-            public function query(string $sql, array $params = []): array
-            {
-                $this->lastQuery = ['sql' => $sql, 'params' => $params];
-                return [['quantity' => 4]];
-            }
-        };
-
-        $this->assertSame(4, $cartItem->manualQuantityForCartProduct(9, 21));
-        $this->assertStringContainsString("added_method = 'manual'", $cartItem->lastQuery['sql']);
-        $this->assertSame(
-            [':cart_id' => 9, ':product_id' => 21],
-            $cartItem->lastQuery['params']
-        );
-    }
-
-    public function test_manual_quantity_for_cart_product_defaults_to_zero(): void
-    {
-        $cartItem = new class extends CartItem {
-            public function query(string $sql, array $params = []): array
-            {
-                return [];
-            }
-        };
-
-        $this->assertSame(0, $cartItem->manualQuantityForCartProduct(9, 21));
+        $this->assertStringContainsString('beginTransaction()', $body);
+        $this->assertGreaterThanOrEqual(2, substr_count($body, 'FOR UPDATE'));
+        $this->assertStringContainsString('rollBack()', $body);
+        $this->assertStringContainsString('commit()', $body);
     }
 }

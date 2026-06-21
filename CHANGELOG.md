@@ -196,3 +196,4 @@ All notable changes to this project will be documented in this file.
 - Prevented repeated add-to-cart actions from exceeding the product's available stock.
 - Added the same Add to cart action to featured products on the homepage.
 - Made marketplace and homepage product images link directly to their product detail pages.
+- Made cart additions atomic and hardened store-logo cleanup and path validation based on review feedback.

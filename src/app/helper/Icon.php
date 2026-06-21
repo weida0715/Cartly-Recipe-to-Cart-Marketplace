@@ -38,12 +38,14 @@ class Icon
     public static function storeLogo(array $store, string $class = ''): string
     {
         $storeName = trim((string) ($store['store_name'] ?? 'Store'));
-        $logo = trim((string) ($store['store_logo'] ?? ''));
+        $logo = str_replace('\\', '/', trim((string) ($store['store_logo'] ?? '')));
         $className = trim('store-logo ' . $class);
 
-        if ($logo !== '') {
+        if (preg_match('#\Astores/logos/[a-f0-9]{32}\.(?:jpg|png|webp|gif)\z#i', $logo) === 1) {
+            $fullLogoPath = UPLOAD_URL . '/' . $logo;
+
             return '<img class="' . htmlspecialchars($className, ENT_QUOTES, 'UTF-8') . '" src="'
-                . htmlspecialchars(UPLOAD_URL . '/' . ltrim($logo, '/'), ENT_QUOTES, 'UTF-8')
+                . htmlspecialchars($fullLogoPath, ENT_QUOTES, 'UTF-8')
                 . '" alt="' . htmlspecialchars($storeName . ' logo', ENT_QUOTES, 'UTF-8') . '">';
         }
 

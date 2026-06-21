@@ -50,24 +50,83 @@ class CartItem extends Model
         return $rows ? $rows[0] : null;
     }
 
-    public function manualQuantityForCartProduct(int $cartId, int $productId): int
+    public function addManualWithinStock(int $cartId, int $productId, int $qty): string
     {
-        $rows = $this->query(
-            "SELECT quantity
-             FROM cart_items
-             WHERE cart_id = :cart_id
-               AND product_id = :product_id
-               AND added_method = 'manual'
-               AND recipe_id IS NULL
-               AND recipe_ingredient_id IS NULL
-             LIMIT 1",
-            [
+        $db = $this->db();
+        $db->beginTransaction();
+
+        try {
+            $productStmt = $db->prepare(
+                "SELECT price, stock_quantity, status
+                 FROM products
+                 WHERE product_id = :product_id
+                 FOR UPDATE"
+            );
+            $productStmt->execute([':product_id' => $productId]);
+            $product = $productStmt->fetch();
+
+            if (!$product || $product['status'] !== 'active') {
+                $db->rollBack();
+                return 'unavailable';
+            }
+
+            $itemStmt = $db->prepare(
+                "SELECT cart_item_id, quantity
+                 FROM cart_items
+                 WHERE cart_id = :cart_id
+                   AND product_id = :product_id
+                   AND added_method = 'manual'
+                   AND recipe_id IS NULL
+                   AND recipe_ingredient_id IS NULL
+                 LIMIT 1
+                 FOR UPDATE"
+            );
+            $itemStmt->execute([
                 ':cart_id' => $cartId,
                 ':product_id' => $productId,
-            ]
-        );
+            ]);
+            $item = $itemStmt->fetch();
+            $newQuantity = (int) ($item['quantity'] ?? 0) + $qty;
 
-        return empty($rows) ? 0 : (int) ($rows[0]['quantity'] ?? 0);
+            if ($newQuantity > (int) $product['stock_quantity']) {
+                $db->rollBack();
+                return 'insufficient_stock';
+            }
+
+            if ($item) {
+                $updateStmt = $db->prepare(
+                    "UPDATE cart_items
+                     SET quantity = :quantity, unit_price = :unit_price
+                     WHERE cart_item_id = :cart_item_id"
+                );
+                $updateStmt->execute([
+                    ':quantity' => $newQuantity,
+                    ':unit_price' => (float) $product['price'],
+                    ':cart_item_id' => (int) $item['cart_item_id'],
+                ]);
+            } else {
+                $insertStmt = $db->prepare(
+                    "INSERT INTO cart_items
+                        (cart_id, product_id, recipe_id, recipe_ingredient_id, quantity, unit_price, added_method)
+                     VALUES
+                        (:cart_id, :product_id, NULL, NULL, :quantity, :unit_price, 'manual')"
+                );
+                $insertStmt->execute([
+                    ':cart_id' => $cartId,
+                    ':product_id' => $productId,
+                    ':quantity' => $qty,
+                    ':unit_price' => (float) $product['price'],
+                ]);
+            }
+
+            $db->commit();
+            return 'added';
+        } catch (\Throwable $e) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            throw $e;
+        }
     }
 
     public function addOrIncrement(int $cartId, int $productId, int $qty, float $unitPrice, string $method = 'manual', ?int $recipeId = null, ?int $riId = null): int
