@@ -197,3 +197,8 @@ All notable changes to this project will be documented in this file.
 - Added the same Add to cart action to featured products on the homepage.
 - Made marketplace and homepage product images link directly to their product detail pages.
 - Made cart additions atomic and hardened store-logo cleanup and path validation based on review feedback.
+
+## [1.2.5] - 21st June 2026
+- Reworked the recipe listing into a responsive two-column layout with filters on the left and recipes on the right.
+- Added labeled recipe filters, an active-filter reset link, a visible result count, and styled pagination.
+- Kept the filter sidebar sticky on desktop and stacked it above results on smaller screens.
