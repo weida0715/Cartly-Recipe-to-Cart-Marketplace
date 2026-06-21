@@ -282,6 +282,55 @@
   margin-top: auto;
 }
 
+.marketplace-heading {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.marketplace-heading h2 {
+  margin: 0;
+}
+.marketplace-cart {
+  align-items: center;
+  background: #fff;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  color: var(--green-primary-dark);
+  display: inline-flex;
+  height: 44px;
+  justify-content: center;
+  position: relative;
+  width: 48px;
+}
+.marketplace-cart:hover {
+  background: #eef8ef;
+  border-color: var(--green-primary);
+  text-decoration: none;
+}
+.marketplace-cart-icon {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+.marketplace-cart-count {
+  align-items: center;
+  background: var(--orange-accent);
+  border: 2px solid #fff;
+  border-radius: 999px;
+  color: #fff;
+  display: inline-flex;
+  font-size: 0.7rem;
+  font-weight: 800;
+  justify-content: center;
+  min-height: 22px;
+  min-width: 22px;
+  padding: 0 5px;
+  position: absolute;
+  right: -9px;
+  top: -9px;
+}
+
 .filters {
   display: flex;
   gap: 12px;
