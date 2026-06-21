@@ -130,6 +130,15 @@ All notable changes to this project will be documented in this file.
 - Treated mixed completed/cancelled merchant orders as completed and made merchant order status synchronization transactional.
 
 ## [1.1.7] - 19th June 2026
+- Added active navigation highlighting to the shared customer navigation.
+- Kept parent navigation items active on product, recipe, order, merchant, and admin child pages.
+- Added accessible `aria-current="page"` attributes and distinct merchant/admin sidebar active states.
+
+## [1.1.8] - 19th June 2026
+- Added a linked cart icon and item-count badge to the Marketplace page.
+- Calculated the cart indicator count on the server for the logged-in customer.
+
+## [1.1.9] - 19th June 2026
 - Updated the marketplace voucher banner copy to promote browsing available merchant vouchers.
 - Added a public available vouchers page with merchant/code search, discount type filtering, and voucher sorting.
 - Linked checkout voucher entry to store-scoped available voucher code suggestions.
