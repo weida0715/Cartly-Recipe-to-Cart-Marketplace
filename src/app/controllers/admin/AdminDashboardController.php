@@ -24,6 +24,7 @@ class AdminDashboardController extends Controller
         $this->view('admin/dashboard', [
             'title' => 'Admin Dashboard',
             'stats' => $stats,
+            'loadD3' => true,
         ], 'layout/admin-layout');
     }
 }

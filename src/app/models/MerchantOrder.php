@@ -12,7 +12,8 @@ class MerchantOrder extends Model
     public function forStore(int $storeId): array
     {
         return $this->query(
-            "SELECT mo.*, o.created_at, o.user_id, u.username
+            "SELECT mo.*, o.created_at, o.user_id, u.username,
+                    (SELECT COALESCE(SUM(quantity), 0) FROM order_items oi WHERE oi.merchant_order_id = mo.merchant_order_id) AS item_count
              FROM merchant_orders mo
              JOIN orders o ON o.order_id = mo.order_id
              JOIN users u  ON u.user_id  = o.user_id

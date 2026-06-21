@@ -10,6 +10,15 @@ $counts = $counts ?? ['pending' => 0, 'reviewed' => 0, 'resolved' => 0, 'total' 
   <div class="stat"><div class="num"><?= (int) $counts['resolved'] ?></div><div class="label">Resolved reports</div></div>
 </div>
 
+<section class="card chart-card">
+  <h3>Report status breakdown</h3>
+  <div class="d3-chart" data-chart="pie" data-chart-values='<?= htmlspecialchars(json_encode([
+    ['label' => 'Pending', 'value' => (int) $counts['pending']],
+    ['label' => 'Reviewed', 'value' => (int) $counts['reviewed']],
+    ['label' => 'Resolved', 'value' => (int) $counts['resolved']],
+  ]), ENT_QUOTES) ?>'></div>
+</section>
+
 <?php if (!$reports): ?>
   <div class="card text-muted">No reports found.</div>
 <?php else:
