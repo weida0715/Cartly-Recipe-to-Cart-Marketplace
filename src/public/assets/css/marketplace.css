@@ -338,6 +338,7 @@
   grid-template-columns: 260px minmax(0, 1fr);
 }
 .marketplace-filter-column {
+  align-self: stretch;
   min-width: 0;
 }
 .filters.marketplace-filters {
