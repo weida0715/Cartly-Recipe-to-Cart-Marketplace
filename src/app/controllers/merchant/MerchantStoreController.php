@@ -5,6 +5,7 @@ namespace App\Controllers\Merchant;
 use App\Helpers\Controller;
 use App\Helpers\AuthHelper;
 use App\Helpers\Flash;
+use App\Helpers\FileUploadHelper;
 use App\Helpers\Validator;
 use App\Models\Store;
 
@@ -45,9 +46,22 @@ class MerchantStoreController extends Controller
             $this->redirect('/merchant/store');
         }
 
+        try {
+            $logo = FileUploadHelper::image('store_logo', 'stores/logos');
+        } catch (\RuntimeException $e) {
+            Flash::set('error', $e->getMessage());
+            $this->redirect('/merchant/store');
+        }
+        if ($logo !== null) {
+            $data['store_logo'] = $logo;
+        }
+
         $sm = new Store();
         if ($store) {
             $sm->update((int) $store['store_id'], $data);
+            if ($logo !== null && !empty($store['store_logo'])) {
+                FileUploadHelper::delete((string) $store['store_logo']);
+            }
             Flash::set('success', 'Store updated.');
         } else {
             $data['user_id'] = $uid;

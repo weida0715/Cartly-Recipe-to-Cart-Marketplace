@@ -131,6 +131,41 @@ h2 {
   color: var(--green-primary-dark);
   font-weight: 800;
 }
+.ui-icon {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-style: normal;
+  justify-content: center;
+  line-height: 1;
+  min-height: 1em;
+  min-width: 1em;
+}
+.nav-links a,
+.btn {
+  align-items: center;
+  display: inline-flex;
+  gap: 7px;
+  justify-content: center;
+}
+.brand-icon {
+  font-size: 1.15em;
+}
+.nav-icon,
+.button-icon,
+.sidebar-icon {
+  font-size: 1em;
+}
+.heading-icon {
+  background: #e6f4ea;
+  border: 1px solid #c9e7ce;
+  border-radius: 6px;
+  color: var(--green-primary-dark);
+  height: 32px;
+  margin-right: 8px;
+  vertical-align: middle;
+  width: 32px;
+}
 .user-chip {
   font-size: 0.85rem;
   color: var(--muted);

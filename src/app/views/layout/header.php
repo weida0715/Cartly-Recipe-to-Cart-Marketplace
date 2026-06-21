@@ -39,28 +39,28 @@ $navAttributes = static function (string $path, bool $includeChildren = true) us
 <body>
   <header class="site-header">
     <div class="container nav">
-      <a class="brand" href="<?= BASE_URL ?>/">🛒 Cartly</a>
+      <a class="brand" href="<?= BASE_URL ?>/"><?= \App\Helpers\Icon::render('cart', 'brand-icon') ?> Cartly</a>
       <nav class="nav-links">
-        <a href="<?= BASE_URL ?>/products">Marketplace</a>
-        <a href="<?= BASE_URL ?>/stores">Stores</a>
-        <a href="<?= BASE_URL ?>/recipes">Recipes</a>
+        <a href="<?= BASE_URL ?>/products"><?= \App\Helpers\Icon::render('marketplace', 'nav-icon') ?>Marketplace</a>
+        <a href="<?= BASE_URL ?>/stores"><?= \App\Helpers\Icon::render('store', 'nav-icon') ?>Stores</a>
+        <a href="<?= BASE_URL ?>/recipes"><?= \App\Helpers\Icon::render('recipes', 'nav-icon') ?>Recipes</a>
         <?php if ($user): ?>
-          <a<?= $navAttributes('/dashboard', false) ?> href="<?= BASE_URL ?>/dashboard">Dashboard</a>
-          <a<?= $navAttributes('/cart') ?> href="<?= BASE_URL ?>/cart">Cart</a>
-          <a<?= $navAttributes('/orders') ?> href="<?= BASE_URL ?>/orders">Orders</a>
-          <a<?= $navAttributes('/saved-recipes', false) ?> href="<?= BASE_URL ?>/saved-recipes">Saved</a>
-          <a<?= $navAttributes('/profile', false) ?> href="<?= BASE_URL ?>/profile">Profile</a>
+          <a<?= $navAttributes('/dashboard', false) ?> href="<?= BASE_URL ?>/dashboard"><?= \App\Helpers\Icon::render('dashboard', 'nav-icon') ?>Dashboard</a>
+          <a<?= $navAttributes('/cart') ?> href="<?= BASE_URL ?>/cart"><?= \App\Helpers\Icon::render('cart', 'nav-icon') ?>Cart</a>
+          <a<?= $navAttributes('/orders') ?> href="<?= BASE_URL ?>/orders"><?= \App\Helpers\Icon::render('orders', 'nav-icon') ?>Orders</a>
+          <a<?= $navAttributes('/saved-recipes', false) ?> href="<?= BASE_URL ?>/saved-recipes"><?= \App\Helpers\Icon::render('saved', 'nav-icon') ?>Saved</a>
+          <a<?= $navAttributes('/profile', false) ?> href="<?= BASE_URL ?>/profile"><?= \App\Helpers\Icon::render('profile', 'nav-icon') ?>Profile</a>
           <?php if ($role === 'merchant'): ?>
-            <a<?= $navAttributes('/merchant') ?> href="<?= BASE_URL ?>/merchant">Merchant</a>
+            <a<?= $navAttributes('/merchant') ?> href="<?= BASE_URL ?>/merchant"><?= \App\Helpers\Icon::render('merchant', 'nav-icon') ?>Merchant</a>
           <?php endif; ?>
           <?php if ($role === 'admin'): ?>
-            <a<?= $navAttributes('/admin') ?> href="<?= BASE_URL ?>/admin">Admin</a>
+            <a<?= $navAttributes('/admin') ?> href="<?= BASE_URL ?>/admin"><?= \App\Helpers\Icon::render('admin', 'nav-icon') ?>Admin</a>
           <?php endif; ?>
           <span class="user-chip">Hi, <?= htmlspecialchars($user['username']) ?></span>
-          <a class="btn btn-ghost" href="<?= BASE_URL ?>/auth/logout">Logout</a>
+          <a class="btn btn-ghost" href="<?= BASE_URL ?>/auth/logout"><?= \App\Helpers\Icon::render('logout', 'nav-icon') ?>Logout</a>
         <?php else: ?>
-          <a class="btn btn-ghost" href="<?= BASE_URL ?>/auth/login">Login</a>
-          <a class="btn btn-primary" href="<?= BASE_URL ?>/auth/register">Register</a>
+          <a class="btn btn-ghost" href="<?= BASE_URL ?>/auth/login"><?= \App\Helpers\Icon::render('login', 'nav-icon') ?>Login</a>
+          <a class="btn btn-primary" href="<?= BASE_URL ?>/auth/register"><?= \App\Helpers\Icon::render('register', 'nav-icon') ?>Register</a>
         <?php endif; ?>
       </nav>
     </div>

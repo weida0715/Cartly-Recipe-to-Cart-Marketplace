@@ -14,9 +14,12 @@
     <?php foreach ($stores as $store): ?>
       <article class="store-card">
         <div class="store-card-top">
-          <div>
-            <h3><?= htmlspecialchars($store['store_name']) ?></h3>
-            <p class="text-muted"><?= htmlspecialchars($store['store_address'] ?? '') ?></p>
+          <div class="store-identity">
+            <?= \App\Helpers\Icon::storeLogo($store, 'store-card-logo') ?>
+            <div>
+              <h3><?= htmlspecialchars($store['store_name']) ?></h3>
+              <p class="text-muted"><?= htmlspecialchars($store['store_address'] ?? '') ?></p>
+            </div>
           </div>
           <span class="badge badge-success"><?= (int) $store['product_count'] ?> items</span>
         </div>
