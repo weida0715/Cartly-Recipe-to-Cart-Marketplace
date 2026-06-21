@@ -46,12 +46,14 @@ class CartController extends Controller
             Flash::set('error', 'Product unavailable.');
             $this->redirect('/products');
         }
-        if ((int) $product['stock_quantity'] < $qty) {
+        $cart = (new Cart())->findOrCreateForUser((int) AuthHelper::id());
+        $cartItem = new CartItem();
+        $existingQty = $cartItem->manualQuantityForCartProduct((int) $cart['cart_id'], $productId);
+        if ((int) $product['stock_quantity'] < $existingQty + $qty) {
             Flash::set('error', 'Not enough stock.');
             $this->redirect('/products/' . $productId);
         }
-        $cart = (new Cart())->findOrCreateForUser((int) AuthHelper::id());
-        (new CartItem())->addOrIncrement((int) $cart['cart_id'], $productId, $qty, (float) $product['price'], 'manual');
+        $cartItem->addOrIncrement((int) $cart['cart_id'], $productId, $qty, (float) $product['price'], 'manual');
         Flash::set('success', 'Added to cart.');
         $this->redirect('/cart');
     }

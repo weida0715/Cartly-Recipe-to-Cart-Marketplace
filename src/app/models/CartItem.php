@@ -50,6 +50,26 @@ class CartItem extends Model
         return $rows ? $rows[0] : null;
     }
 
+    public function manualQuantityForCartProduct(int $cartId, int $productId): int
+    {
+        $rows = $this->query(
+            "SELECT quantity
+             FROM cart_items
+             WHERE cart_id = :cart_id
+               AND product_id = :product_id
+               AND added_method = 'manual'
+               AND recipe_id IS NULL
+               AND recipe_ingredient_id IS NULL
+             LIMIT 1",
+            [
+                ':cart_id' => $cartId,
+                ':product_id' => $productId,
+            ]
+        );
+
+        return empty($rows) ? 0 : (int) ($rows[0]['quantity'] ?? 0);
+    }
+
     public function addOrIncrement(int $cartId, int $productId, int $qty, float $unitPrice, string $method = 'manual', ?int $recipeId = null, ?int $riId = null): int
     {
         // Manual adds dedupe by product. Recipe adds dedupe by (product, recipe, recipe_ingredient).

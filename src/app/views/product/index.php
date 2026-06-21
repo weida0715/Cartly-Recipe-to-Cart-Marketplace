@@ -1,3 +1,4 @@
+<?php use App\Helpers\Csrf; ?>
 <div class="marketplace-heading">
   <h2>Marketplace</h2>
   <?php if (\App\Helpers\AuthHelper::check()): ?>
@@ -71,28 +72,62 @@
     <?php else: ?>
       <div class="product-grid">
         <?php foreach ($products as $p): ?>
+          <?php
+          $reviewRating = (float) ($p['review_rating'] ?? 0);
+          $displayRating = $reviewRating > 0 ? $reviewRating : (float) ($p['rating'] ?? 0);
+          $reviewCount = (int) ($p['review_count'] ?? 0);
+          $inStock = (int) ($p['stock_quantity'] ?? 0) > 0;
+          ?>
           <div class="product-card">
-            <div class="thumb">
-              <?php if (!empty($p['image'])): ?>
-                <img src="<?= UPLOAD_URL ?>/<?= htmlspecialchars($p['image']) ?>"
-                  alt="<?= htmlspecialchars($p['product_name']) ?>">
-              <?php else: ?>
-                &#129365;
-              <?php endif; ?>
-            </div>
+            <a class="product-thumb-link" href="<?= BASE_URL ?>/products/<?= (int) $p['product_id'] ?>"
+              aria-label="View <?= htmlspecialchars($p['product_name']) ?> details">
+              <div class="thumb">
+                <?php if (!empty($p['image'])): ?>
+                  <img src="<?= htmlspecialchars(UPLOAD_URL . '/' . ltrim((string) $p['image'], '/'), ENT_QUOTES, 'UTF-8') ?>"
+                    alt="<?= htmlspecialchars($p['product_name']) ?>">
+                <?php else: ?>
+                  <?= \App\Helpers\Icon::render('marketplace', 'product-fallback-icon') ?>
+                <?php endif; ?>
+              </div>
+            </a>
             <div class="body">
+              <div class="product-card-topline">
+                <span class="product-category"><?= htmlspecialchars($p['category_name'] ?? 'Uncategorised') ?></span>
+                <span class="product-rating" aria-label="<?= number_format($displayRating, 1) ?> out of 5 stars">
+                  <span aria-hidden="true">&#9733;</span>
+                  <?= number_format($displayRating, 1) ?>
+                  <?php if ($reviewCount > 0): ?>
+                    <span class="product-review-count">(<?= $reviewCount ?>)</span>
+                  <?php endif; ?>
+                </span>
+              </div>
               <div class="name"><?= htmlspecialchars($p['product_name']) ?></div>
               <div class="meta">
-                <a href="<?= BASE_URL ?>/stores/<?= (int) $p['store_id'] ?>"><?= htmlspecialchars($p['store_name']) ?></a>
-                &middot; <?= htmlspecialchars($p['category_name'] ?? '') ?>
+                Sold by <a href="<?= BASE_URL ?>/stores/<?= (int) $p['store_id'] ?>"><?= htmlspecialchars($p['store_name']) ?></a>
               </div>
-              <div class="meta"><?= number_format((float) $p['package_quantity'], 0) ?>
-                <?= htmlspecialchars($p['package_unit']) ?>
+              <div class="product-package">
+                <?= number_format((float) $p['package_quantity'], 0) ?>
+                <?= htmlspecialchars($p['package_unit']) ?> per pack
               </div>
               <div class="price">RM <?= number_format((float) $p['price'], 2) ?></div>
+              <div class="product-stock <?= $inStock ? 'is-available' : 'is-unavailable' ?>">
+                <?= $inStock ? (int) $p['stock_quantity'] . ' available' : 'Out of stock' ?>
+              </div>
               <div class="actions">
                 <a class="btn btn-outline btn-sm"
                   href="<?= BASE_URL ?>/products/<?= (int) $p['product_id'] ?>">Details</a>
+                <?php if ($inStock): ?>
+                  <form method="post" action="<?= BASE_URL ?>/cart/add">
+                    <?= Csrf::field() ?>
+                    <input type="hidden" name="product_id" value="<?= (int) $p['product_id'] ?>">
+                    <input type="hidden" name="quantity" value="1">
+                    <button class="btn btn-primary btn-sm" type="submit">
+                      <?= \App\Helpers\Icon::render('cart', 'button-icon') ?>Add to cart
+                    </button>
+                  </form>
+                <?php else: ?>
+                  <button class="btn btn-primary btn-sm" type="button" disabled>Out of stock</button>
+                <?php endif; ?>
               </div>
             </div>
           </div>
