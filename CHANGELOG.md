@@ -128,3 +128,8 @@ All notable changes to this project will be documented in this file.
 - Added merchant order status validation so customer, merchant, and order detail views use consistent order states.
 - Updated customer order history, dashboard, confirmation, and detail pages to display status labels derived from merchant order statuses.
 - Treated mixed completed/cancelled merchant orders as completed and made merchant order status synchronization transactional.
+
+## [1.1.7] - 19th June 2026
+- Added active navigation highlighting to the shared customer navigation.
+- Kept parent navigation items active on product, recipe, order, merchant, and admin child pages.
+- Added accessible `aria-current="page"` attributes and distinct merchant/admin sidebar active states.
