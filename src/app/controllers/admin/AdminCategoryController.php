@@ -72,7 +72,11 @@ class AdminCategoryController extends Controller
         }
         if ($icon !== null) {
             $data['category_icon'] = $icon;
-            if (!empty($category['category_icon']) && str_contains((string) $category['category_icon'], '/')) {
+            if (
+                !empty($category['category_icon']) &&
+                str_contains((string) $category['category_icon'], '/') &&
+                !str_starts_with((string) $category['category_icon'], 'seeded/')
+            ) {
                 FileUploadHelper::delete((string) $category['category_icon']);
             }
         }
