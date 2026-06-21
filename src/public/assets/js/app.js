@@ -13,6 +13,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  document.querySelectorAll('[data-category-edit-open]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const dialog = document.getElementById(btn.dataset.dialogTarget || '');
+      if (!dialog) return;
+      if (typeof dialog.showModal === 'function') {
+        dialog.showModal();
+      } else {
+        dialog.setAttribute('open', '');
+      }
+    });
+  });
+
+  document.querySelectorAll('[data-category-edit-dialog]').forEach(dialog => {
+    dialog.addEventListener('click', e => {
+      if (e.target === dialog) {
+        dialog.close?.();
+        dialog.removeAttribute('open');
+      }
+    });
+    dialog.querySelectorAll('[data-dialog-close]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        dialog.close?.();
+        dialog.removeAttribute('open');
+      });
+    });
+  });
+
   // Merchant product validation message.
   document.querySelectorAll('form[data-product-form]').forEach(form => {
     const dialog = document.querySelector('[data-product-validation-dialog]');

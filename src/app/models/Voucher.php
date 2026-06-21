@@ -88,4 +88,15 @@ class Voucher extends Model
         $this->db()->prepare('UPDATE vouchers SET used_count = used_count + 1 WHERE voucher_id = :v')
             ->execute([':v' => $voucherId]);
     }
+
+    public function incrementIfAvailable(int $voucherId): bool
+    {
+        $stmt = $this->db()->prepare(
+            'UPDATE vouchers
+             SET used_count = used_count + 1
+             WHERE voucher_id = :v AND (usage_limit = 0 OR used_count < usage_limit)'
+        );
+        $stmt->execute([':v' => $voucherId]);
+        return $stmt->rowCount() === 1;
+    }
 }

@@ -126,7 +126,13 @@ class CheckoutController extends Controller
                     }
                     $discount = $voucherModel->computeDiscount($voucher, $subtotal);
                     $voucherId = (int) $voucher['voucher_id'];
-                    $voucherModel->increment($voucherId);
+                    if (!$voucherModel->incrementIfAvailable($voucherId)) {
+                        if ($db->inTransaction()) {
+                            $db->rollBack();
+                        }
+                        Flash::set('error', 'Voucher usage limit reached. Please remove the voucher and try again.');
+                        $this->redirect('/checkout');
+                    }
                 }
                 $moStmt = $db->prepare(
                     "INSERT INTO merchant_orders (order_id, store_id, subtotal, voucher_id, discount_amount, delivery_fee, final_amount, status)

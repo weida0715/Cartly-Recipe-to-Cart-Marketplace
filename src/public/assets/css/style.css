@@ -384,6 +384,38 @@ textarea {
   padding: 10px 14px;
 }
 
+.category-dialog {
+  border: none;
+  border-radius: 18px;
+  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.28);
+  max-width: min(560px, calc(100vw - 24px));
+  padding: 0;
+  width: 100%;
+}
+.category-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.56);
+}
+.category-dialog form {
+  background: #fff;
+  border-radius: 18px;
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+.dialog-header,
+.dialog-actions {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.dialog-header h3 {
+  margin: 0;
+}
+.dialog-actions {
+  justify-content: flex-end;
+}
+
 /* Tables */
 .table {
   width: 100%;

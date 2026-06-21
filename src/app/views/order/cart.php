@@ -16,6 +16,7 @@
             <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th></th></tr></thead>
             <tbody>
               <?php foreach ($g['items'] as $it): ?>
+                <?php $stock = (int) $it['stock_quantity']; ?>
                 <tr>
                   <td>
                     <?= htmlspecialchars($it['product_name']) ?>
@@ -27,10 +28,10 @@
                     <form method="post" action="<?= BASE_URL ?>/cart/update" class="flex">
                       <?= Csrf::field() ?>
                       <input type="hidden" name="cart_item_id" value="<?= (int)$it['cart_item_id'] ?>">
-                      <input class="qty" type="number" name="quantity" value="<?= (int)$it['quantity'] ?>" min="1" max="<?= (int)$it['stock_quantity'] ?>">
-                      <button class="btn btn-outline btn-sm">Update</button>
+                      <input class="qty" type="number" name="quantity" value="<?= (int)$it['quantity'] ?>" min="1" max="<?= max(1, $stock) ?>" <?= $stock === 0 ? 'disabled' : '' ?>>
+                      <button class="btn btn-outline btn-sm" <?= $stock === 0 ? 'disabled' : '' ?>>Update</button>
                     </form>
-                    <small class="text-muted">Stock: <?= (int)$it['stock_quantity'] ?></small>
+                    <small class="text-muted">Stock: <?= $stock ?><?= $stock === 0 ? ' · remove this item to continue' : '' ?></small>
                   </td>
                   <td>RM <?= number_format((float)$it['line_total'], 2) ?></td>
                   <td>
