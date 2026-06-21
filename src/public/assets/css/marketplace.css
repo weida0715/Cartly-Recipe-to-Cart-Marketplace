@@ -348,6 +348,48 @@
   max-width: 320px;
 }
 
+.voucher-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.voucher-card {
+  background: #fff;
+  border: 1px solid #f2d0a2;
+  border-left: 5px solid var(--orange-accent);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+.voucher-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+.voucher-code {
+  color: var(--green-primary-dark);
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+.voucher-card h3 {
+  margin: 14px 0 8px;
+  color: var(--orange-accent);
+}
+.voucher-card p {
+  margin: 6px 0;
+}
+@media (max-width: 900px) {
+  .voucher-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 560px) {
+  .voucher-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .product-detail {
   display: grid;
   grid-template-columns: 1fr 1fr;

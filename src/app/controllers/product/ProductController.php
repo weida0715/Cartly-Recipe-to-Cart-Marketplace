@@ -8,6 +8,7 @@ use App\Helpers\Flash;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Review;
+use App\Models\Voucher;
 use App\Models\CartItem;
 
 class ProductController extends Controller
@@ -51,6 +52,21 @@ class ProductController extends Controller
             'currentUserReview' => AuthHelper::check()
                 ? $review->findForProductByUser((int) AuthHelper::id(), (int) $id)
                 : null,
+        ]);
+    }
+
+    public function vouchers(): void
+    {
+        $q = trim((string) $this->input('q', ''));
+        $type = (string) $this->input('type', '');
+        $sort = (string) $this->input('sort', 'newest');
+
+        $this->view('product/vouchers', [
+            'title' => 'Available Vouchers · Cartly',
+            'vouchers' => (new Voucher())->available($q, $type, $sort),
+            'q' => $q,
+            'type' => $type,
+            'sort' => $sort,
         ]);
     }
 

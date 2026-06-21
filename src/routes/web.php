@@ -40,6 +40,7 @@ $router->post('/auth/reset-password', [AuthController::class, 'reset']);
 $router->get('/auth/logout', [AuthController::class, 'logout']);
 
 // Marketplace / products
+$router->get('/vouchers', [ProductController::class, 'vouchers']);
 $router->get('/products', [ProductController::class, 'index']);
 $router->get('/products/{id}', [ProductController::class, 'show']);
 

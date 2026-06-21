@@ -28,7 +28,27 @@
           <?php endforeach; ?>
           <div class="form-row mt-2">
             <label>Voucher code (this store)</label>
-            <input name="voucher[<?= (int)$sid ?>]" placeholder="optional">
+            <input name="voucher[<?= (int)$sid ?>]" list="voucher-options-<?= (int)$sid ?>"
+              placeholder="Search available vouchers for <?= htmlspecialchars($g['store_name']) ?>">
+            <datalist id="voucher-options-<?= (int)$sid ?>">
+              <?php foreach (($g['vouchers'] ?? []) as $voucher): ?>
+                <option value="<?= htmlspecialchars($voucher['voucher_code']) ?>">
+                  <?php if ($voucher['discount_type'] === 'percentage'): ?>
+                    <?= number_format((float) $voucher['discount_value'], 0) ?>% off
+                  <?php else: ?>
+                    RM <?= number_format((float) $voucher['discount_value'], 2) ?> off
+                  <?php endif; ?>
+                  · min RM <?= number_format((float) $voucher['minimum_spend'], 2) ?>
+                </option>
+              <?php endforeach; ?>
+            </datalist>
+            <small class="text-muted">
+              <?php if (!empty($g['vouchers'])): ?>
+                Showing vouchers valid for this merchant and subtotal only.
+              <?php else: ?>
+                No vouchers currently apply to this merchant subtotal.
+              <?php endif; ?>
+            </small>
           </div>
           <div class="line flex-between"><strong>Subtotal</strong><strong>RM <?= number_format((float)$g['subtotal'], 2) ?></strong></div>
         </div>

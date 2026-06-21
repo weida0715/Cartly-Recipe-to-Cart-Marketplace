@@ -13,6 +13,38 @@ class Voucher extends Model
         return $this->where('store_id', $storeId, 'voucher_id DESC');
     }
 
+    public function available(string $q = '', string $type = '', string $sort = 'newest'): array
+    {
+        $sql = "SELECT v.*, s.store_name
+                FROM vouchers v
+                JOIN stores s ON s.store_id = v.store_id
+                WHERE v.status = 'active'
+                  AND s.store_status = 'approved'
+                  AND (v.start_date IS NULL OR v.start_date <= CURDATE())
+                  AND (v.end_date IS NULL OR v.end_date >= CURDATE())
+                  AND (v.usage_limit = 0 OR v.used_count < v.usage_limit)";
+        $params = [];
+
+        if ($q !== '') {
+            $sql .= " AND (v.voucher_code LIKE :q OR s.store_name LIKE :q)";
+            $params[':q'] = '%' . $q . '%';
+        }
+        if (in_array($type, ['fixed', 'percentage'], true)) {
+            $sql .= " AND v.discount_type = :type";
+            $params[':type'] = $type;
+        }
+
+        $orders = [
+            'value_desc' => 'v.discount_value DESC',
+            'min_asc' => 'v.minimum_spend ASC',
+            'ending' => 'v.end_date IS NULL, v.end_date ASC',
+            'newest' => 'v.voucher_id DESC',
+        ];
+        $sql .= ' ORDER BY ' . ($orders[$sort] ?? $orders['newest']);
+
+        return $this->query($sql, $params);
+    }
+
     public function findValidForStore(string $code, int $storeId, float $subtotal): ?array
     {
         $stmt = $this->db()->prepare(
@@ -27,6 +59,20 @@ class Voucher extends Model
         $stmt->execute([':c' => $code, ':s' => $storeId, ':sub' => $subtotal]);
         $row = $stmt->fetch();
         return $row ?: null;
+    }
+
+    public function availableForStoreSubtotal(int $storeId, float $subtotal): array
+    {
+        return $this->query(
+            "SELECT * FROM vouchers
+             WHERE store_id = :s AND status = 'active'
+               AND (start_date IS NULL OR start_date <= CURDATE())
+               AND (end_date IS NULL OR end_date >= CURDATE())
+               AND (usage_limit = 0 OR used_count < usage_limit)
+               AND minimum_spend <= :sub
+             ORDER BY discount_value DESC, voucher_code ASC",
+            [':s' => $storeId, ':sub' => $subtotal]
+        );
     }
 
     public function computeDiscount(array $voucher, float $subtotal): float
