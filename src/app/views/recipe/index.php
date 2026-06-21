@@ -79,20 +79,20 @@
           <div class="recipe-card">
             <div class="thumb">
               <?php if (!empty($r['image'])): ?>
-                <img src="<?= htmlspecialchars(UPLOAD_URL . '/' . ltrim((string) $r['image'], '/'), ENT_QUOTES, 'UTF-8') ?>"
-                  alt="<?= htmlspecialchars($r['recipe_title']) ?>">
+                <img src="<?= htmlspecialchars(UPLOAD_URL . '/' . ltrim((string) ($r['image'] ?? ''), '/'), ENT_QUOTES, 'UTF-8') ?>"
+                  alt="<?= htmlspecialchars($r['recipe_title'] ?? '') ?>">
               <?php else: ?>
                 <span class="thumb-fallback">Recipe</span>
               <?php endif; ?>
             </div>
             <div class="body">
-              <h3><?= htmlspecialchars($r['recipe_title']) ?></h3>
-              <div class="text-muted">by <?= htmlspecialchars($r['username']) ?> &middot; <?= htmlspecialchars($r['cuisine_type']) ?>
+              <h3><?= htmlspecialchars($r['recipe_title'] ?? '') ?></h3>
+              <div class="text-muted">by <?= htmlspecialchars($r['username'] ?? 'Unknown') ?> &middot; <?= htmlspecialchars($r['cuisine_type'] ?? 'Other') ?>
               </div>
-              <div class="text-muted"><?= htmlspecialchars($r['difficulty']) ?> &middot;
-                <?= (int) $r['prep_time'] + (int) $r['cook_time'] ?> min
+              <div class="text-muted"><?= htmlspecialchars($r['difficulty'] ?? 'easy') ?> &middot;
+                <?= (int) ($r['prep_time'] ?? 0) + (int) ($r['cook_time'] ?? 0) ?> min
               </div>
-              <a class="btn btn-primary btn-sm mt-1" href="<?= BASE_URL ?>/recipes/<?= (int) $r['recipe_id'] ?>">Open</a>
+              <a class="btn btn-primary btn-sm mt-1" href="<?= BASE_URL ?>/recipes/<?= (int) ($r['recipe_id'] ?? 0) ?>">Open</a>
             </div>
           </div>
         <?php endforeach; ?>
