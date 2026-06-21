@@ -37,6 +37,7 @@ class OrderController extends Controller
             http_response_code(404); echo 'Order not found'; return;
         }
         $merchantOrders = (new MerchantOrder())->forOrder($id);
+        $order['display_order_status'] = (new Order())->displayStatusFromMerchantStatuses(array_column($merchantOrders, 'status'));
         $oi = new OrderItem();
         foreach ($merchantOrders as &$mo) {
             $mo['items'] = $oi->forMerchantOrder((int) $mo['merchant_order_id']);

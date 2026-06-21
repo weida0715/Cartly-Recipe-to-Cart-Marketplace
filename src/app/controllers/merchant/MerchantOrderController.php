@@ -34,8 +34,15 @@ class MerchantOrderController extends Controller
         $row = $mo->find((int) $id);
         if (!$row || (int) $row['store_id'] !== (int) $store['store_id']) { http_response_code(403); echo 'Forbidden'; return; }
         $status = (string) $this->input('status', 'pending');
-        $mo->update((int) $id, ['status' => $status]);
-        Flash::set('success', 'Order status updated.');
+        if (!in_array($status, MerchantOrder::STATUSES, true)) {
+            Flash::set('error', 'Invalid order status.');
+            $this->redirect('/merchant/orders');
+        }
+        if ($mo->updateStatusAndSyncParent((int) $id, $status)) {
+            Flash::set('success', 'Order status updated.');
+        } else {
+            Flash::set('error', 'Failed to update order status.');
+        }
         $this->redirect('/merchant/orders');
     }
 }
