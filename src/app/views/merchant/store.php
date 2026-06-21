@@ -1,4 +1,5 @@
 <?php use App\Helpers\Csrf; ?>
+<?php $store = is_array($store ?? null) ? $store : []; ?>
 <h2>Store profile</h2>
 <?php if ($store): ?>
   <p>Status: <span class="badge"><?= htmlspecialchars($store['store_status']) ?></span>

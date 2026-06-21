@@ -56,7 +56,7 @@
         <a class="category-tile" href="<?= BASE_URL ?>/products?cid=<?= (int) $c['category_id'] ?>">
           <span class="category-mark">
             <?php if (!empty($c['category_icon'])): ?>
-              <img class="category-icon-image" src="<?= UPLOAD_URL ?>/<?= htmlspecialchars(ltrim((string) $c['category_icon'], '/')) ?>"
+              <img class="category-icon-image" src="<?= htmlspecialchars(UPLOAD_URL . '/' . ltrim((string) $c['category_icon'], '/'), ENT_QUOTES, 'UTF-8') ?>"
                 alt="" aria-hidden="true">
             <?php else: ?>
               <?= \App\Helpers\Icon::render('marketplace', 'category-icon') ?>

@@ -30,6 +30,7 @@ $navAttributes = static function (string $path, bool $includeChildren = true) us
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= htmlspecialchars($title ?? 'Cartly') ?></title>
+  <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css">
   <link rel="stylesheet" href="<?= ASSET_URL ?>/css/style.css">
   <link rel="stylesheet" href="<?= ASSET_URL ?>/css/auth.css">
   <link rel="stylesheet" href="<?= ASSET_URL ?>/css/marketplace.css">

@@ -6,35 +6,35 @@ namespace App\Helpers;
 class Icon
 {
     private const ICONS = [
-        'admin' => '&#9881;',
-        'cart' => '&#128722;',
-        'categories' => '&#128451;',
-        'dashboard' => '&#128202;',
-        'login' => '&#128274;',
-        'logout' => '&#10140;',
-        'marketplace' => '&#129365;',
-        'merchant' => '&#127978;',
-        'orders' => '&#128230;',
-        'products' => '&#128722;',
-        'profile' => '&#128100;',
-        'recipes' => '&#127859;',
-        'register' => '&#10133;',
-        'reports' => '&#9873;',
-        'saved' => '&#9825;',
-        'store' => '&#127978;',
-        'store-profile' => '&#128205;',
-        'users' => '&#128101;',
-        'vouchers' => '&#127915;',
+        'admin' => 'settings',
+        'cart' => 'shopping-cart',
+        'categories' => 'category',
+        'dashboard' => 'apps',
+        'login' => 'sign-in-alt',
+        'logout' => 'sign-out-alt',
+        'marketplace' => 'carrot',
+        'merchant' => 'shop',
+        'orders' => 'box',
+        'products' => 'shopping-cart',
+        'profile' => 'user',
+        'recipes' => 'restaurant',
+        'register' => 'user-add',
+        'reports' => 'flag',
+        'saved' => 'heart',
+        'store' => 'shop',
+        'store-profile' => 'marker',
+        'users' => 'users',
+        'vouchers' => 'ticket',
     ];
 
     public static function render(string $name, string $class = ''): string
     {
-        $className = trim('ui-icon ' . $class);
+        $iconName = self::ICONS[$name] ?? 'apps';
+        $className = trim('ui-icon fi fi-rr-' . $iconName . ' ' . $class);
 
-        return '<span class="' . htmlspecialchars($className, ENT_QUOTES, 'UTF-8') . '" aria-hidden="true">'
-            . (self::ICONS[$name] ?? '&#8226;')
-            . '</span>';
+        return '<i class="' . htmlspecialchars($className, ENT_QUOTES, 'UTF-8') . '" aria-hidden="true"></i>';
     }
+
     public static function storeLogo(array $store, string $class = ''): string
     {
         $storeName = trim((string) ($store['store_name'] ?? 'Store'));
@@ -47,16 +47,20 @@ class Icon
                 . '" alt="' . htmlspecialchars($storeName . ' logo', ENT_QUOTES, 'UTF-8') . '">';
         }
 
-        $words = preg_split('/\s+/', $storeName) ?: [];
+        $words = preg_split('/\s+/u', $storeName) ?: [];
         $initials = '';
         foreach (array_slice($words, 0, 2) as $word) {
-            $initials .= strtoupper(substr($word, 0, 1));
+            if (function_exists('mb_substr') && function_exists('mb_strtoupper')) {
+                $initials .= mb_strtoupper(mb_substr($word, 0, 1, 'UTF-8'), 'UTF-8');
+            } else {
+                $initials .= strtoupper(substr($word, 0, 1));
+            }
         }
         if ($initials === '') {
             $initials = 'S';
         }
 
-        $tone = ((int) ($store['store_id'] ?? 0) % 4) + 1;
+        $tone = (abs((int) ($store['store_id'] ?? 0)) % 4) + 1;
 
         return '<span class="' . htmlspecialchars($className . ' store-logo-tone-' . $tone, ENT_QUOTES, 'UTF-8')
             . '" aria-hidden="true">' . htmlspecialchars($initials, ENT_QUOTES, 'UTF-8') . '</span>';

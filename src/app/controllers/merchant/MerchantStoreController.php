@@ -57,18 +57,33 @@ class MerchantStoreController extends Controller
         }
 
         $sm = new Store();
-        if ($store) {
-            $sm->update((int) $store['store_id'], $data);
-            if ($logo !== null && !empty($store['store_logo'])) {
-                FileUploadHelper::delete((string) $store['store_logo']);
+        try {
+            if ($store) {
+                $oldLogoPath = $store['store_logo'] ?? null;
+                $updateSuccess = $sm->update((int) $store['store_id'], $data);
+                if (!$updateSuccess) {
+                    throw new \RuntimeException('Store update failed.');
+                }
+                if ($logo !== null && !empty($oldLogoPath)) {
+                    FileUploadHelper::delete((string) $oldLogoPath);
+                }
+                Flash::set('success', 'Store updated.');
+            } else {
+                $data['user_id'] = $uid;
+                $data['store_status'] = 'pending';
+                if ($sm->insert($data) <= 0) {
+                    throw new \RuntimeException('Store creation failed.');
+                }
+                Flash::set('success', 'Store created - awaiting admin approval.');
             }
-            Flash::set('success', 'Store updated.');
-        } else {
-            $data['user_id'] = $uid;
-            $data['store_status'] = 'pending';
-            $sm->insert($data);
-            Flash::set('success', 'Store created — awaiting admin approval.');
+        } catch (\Throwable $e) {
+            if ($logo !== null) {
+                FileUploadHelper::delete($logo);
+            }
+            Flash::set('error', 'Store could not be saved. Please try again.');
+            $this->redirect('/merchant/store');
         }
+
         $this->redirect('/merchant/store');
     }
 }
