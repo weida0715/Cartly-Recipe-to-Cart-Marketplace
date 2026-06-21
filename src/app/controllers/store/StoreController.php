@@ -12,18 +12,7 @@ class StoreController extends Controller
     public function index(): void
     {
         $q = trim((string) $this->input('q', ''));
-        $stores = (new Store())->approved();
-        if ($q !== '') {
-            $needle = mb_strtolower($q);
-            $stores = array_values(array_filter($stores, static function (array $store) use ($needle): bool {
-                $haystack = mb_strtolower(
-                    (string) ($store['store_name'] ?? '') . ' ' .
-                    (string) ($store['store_description'] ?? '') . ' ' .
-                    (string) ($store['store_address'] ?? '')
-                );
-                return str_contains($haystack, $needle);
-            }));
-        }
+        $stores = (new Store())->approved($q);
 
         $productModel = new Product();
         $voucherModel = new Voucher();

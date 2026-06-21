@@ -14,9 +14,18 @@ class Store extends Model
         return $rows[0] ?? null;
     }
 
-    public function approved(): array
+    public function approved(string $q = ''): array
     {
-        return $this->query("SELECT * FROM stores WHERE store_status='approved'");
+        if ($q === '') {
+            return $this->query("SELECT * FROM stores WHERE store_status='approved'");
+        }
+
+        return $this->query(
+            "SELECT * FROM stores
+             WHERE store_status = 'approved'
+               AND (store_name LIKE :q OR store_description LIKE :q OR store_address LIKE :q)",
+            [':q' => '%' . $q . '%']
+        );
     }
 
     public function findApproved(int $storeId): ?array
