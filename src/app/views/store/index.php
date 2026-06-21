@@ -36,9 +36,8 @@
             <?php endforeach; ?>
           </div>
         <?php endif; ?>
-        <div class="flex-between mt-2">
-          <a class="btn btn-outline btn-sm" href="<?= BASE_URL ?>/stores/<?= (int) $store['store_id'] ?>">View store</a>
-          <a class="btn btn-primary btn-sm" href="<?= BASE_URL ?>/stores/<?= (int) $store['store_id'] ?>#store-vouchers">View vouchers</a>
+        <div class="flex mt-2" style="justify-content: flex-end;">
+          <a class="btn btn-primary btn-sm" href="<?= BASE_URL ?>/stores/<?= (int) $store['store_id'] ?>">View store</a>
         </div>
       </article>
     <?php endforeach; ?>
