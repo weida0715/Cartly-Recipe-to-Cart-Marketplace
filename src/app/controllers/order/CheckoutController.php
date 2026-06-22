@@ -125,13 +125,6 @@ class CheckoutController extends Controller
         }
         unset($group);
 
-        foreach ($items as $item) {
-            if ((int) $item['stock_quantity'] < (int) $item['quantity']) {
-                Flash::set('error', 'Insufficient stock for ' . $item['product_name'] . '.');
-                $this->redirect('/cart');
-            }
-        }
-
         $db = db();
         $productModel = new Product();
         try {
@@ -207,7 +200,12 @@ class CheckoutController extends Controller
                         ':q' => (int) $item['quantity'],
                         ':sub' => $lineSubtotal,
                     ]);
-                    $productModel->decrementStock((int) $item['product_id'], (int) $item['quantity']);
+                    if (!$productModel->decrementStockIfAvailable(
+                        (int) $item['product_id'],
+                        (int) $item['quantity']
+                    )) {
+                        throw new \DomainException('Insufficient stock for ' . $item['product_name'] . '.');
+                    }
                 }
                 $grandTotal += (float) $transactionPricing['final_total'];
             }

@@ -214,3 +214,4 @@ All notable changes to this project will be documented in this file.
 - Revalidated voucher status, dates, minimum spend, and usage limits during checkout.
 - Added order-level voucher history through the `merchant_order_vouchers` migration.
 - Prevented invalid merchant voucher date ranges with strict server validation and linked browser date constraints.
+- Hardened stacked voucher validation, blank date handling, and transactional stock updates based on review feedback.

@@ -121,18 +121,27 @@ class CartController extends Controller
 
         $selected = CartVoucherSession::all($userId, $cartId)[$storeId] ?? [];
         $currentPricing = $voucherModel->resolveCodesForStore($selected, $storeId, $subtotal);
-        CartVoucherSession::replaceStore(
-            $userId,
-            $cartId,
-            $storeId,
-            array_column($currentPricing['applied'], 'voucher_code')
-        );
-        if (in_array($code, array_column($currentPricing['applied'], 'voucher_code'), true)) {
+        $appliedCodes = array_column($currentPricing['applied'], 'voucher_code');
+        CartVoucherSession::replaceStore($userId, $cartId, $storeId, $appliedCodes);
+        if (in_array($code, $appliedCodes, true)) {
             Flash::set('info', 'This voucher is already applied.');
             $this->redirect('/cart');
         }
         if ((float) $currentPricing['final_total'] <= 0) {
             Flash::set('error', 'This merchant subtotal is already fully discounted.');
+            $this->redirect('/cart');
+        }
+
+        $testPricing = $voucherModel->resolveCodesForStore(
+            array_merge($appliedCodes, [$code]),
+            $storeId,
+            $subtotal
+        );
+        if (
+            in_array($code, $testPricing['invalid'], true)
+            || !in_array($code, array_column($testPricing['applied'], 'voucher_code'), true)
+        ) {
+            Flash::set('error', 'This voucher cannot be applied or provides no additional discount.');
             $this->redirect('/cart');
         }
 

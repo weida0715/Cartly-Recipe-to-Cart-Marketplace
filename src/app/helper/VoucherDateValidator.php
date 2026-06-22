@@ -10,7 +10,12 @@ final class VoucherDateValidator
         if ($noExpiry) {
             return null;
         }
-        if ($startDate === null || $endDate === null) {
+        if (
+            $startDate === null
+            || $endDate === null
+            || trim($startDate) === ''
+            || trim($endDate) === ''
+        ) {
             return 'Start date and end date are required unless no expiry date is checked.';
         }
 

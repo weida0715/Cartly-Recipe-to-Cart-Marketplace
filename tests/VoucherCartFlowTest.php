@@ -76,6 +76,14 @@ class VoucherCartFlowTest extends TestCase
             'Voucher dates are invalid.',
             VoucherDateValidator::error('2026-02-30', '2026-03-01', false)
         );
+        $this->assertSame(
+            'Start date and end date are required unless no expiry date is checked.',
+            VoucherDateValidator::error('', '2026-06-23', false)
+        );
+        $this->assertSame(
+            'Start date and end date are required unless no expiry date is checked.',
+            VoucherDateValidator::error('2026-06-22', '  ', false)
+        );
     }
 
     public function test_cart_renders_apply_and_remove_voucher_actions(): void
@@ -141,6 +149,20 @@ class VoucherCartFlowTest extends TestCase
         $this->assertStringContainsString('data-voucher-start', $html);
         $this->assertStringContainsString('data-voucher-end', $html);
         $this->assertStringContainsString('setCustomValidity', $html);
+    }
+
+    public function test_voucher_and_stock_guards_are_present(): void
+    {
+        $cartController = file_get_contents(__DIR__ . '/../src/app/controllers/order/CartController.php');
+        $checkoutController = file_get_contents(__DIR__ . '/../src/app/controllers/order/CheckoutController.php');
+        $productModel = file_get_contents(__DIR__ . '/../src/app/models/Product.php');
+
+        $this->assertIsString($cartController);
+        $this->assertIsString($checkoutController);
+        $this->assertIsString($productModel);
+        $this->assertStringContainsString('$testPricing', $cartController);
+        $this->assertStringContainsString('decrementStockIfAvailable', $checkoutController);
+        $this->assertStringContainsString('stock_quantity >= :available_qty', $productModel);
     }
 
     private function render(string $view, array $data): string
