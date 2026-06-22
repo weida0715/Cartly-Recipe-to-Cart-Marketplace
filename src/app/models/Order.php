@@ -23,6 +23,15 @@ class Order extends Model
         return array_map(fn(array $order): array => $this->withDisplayStatus($order), $orders);
     }
 
+    public function countForUser(int $userId): int
+    {
+        $rows = $this->query(
+            'SELECT COUNT(*) AS total FROM orders WHERE user_id = :u',
+            [':u' => $userId]
+        );
+        return (int) ($rows[0]['total'] ?? 0);
+    }
+
     public function withDisplayStatus(array $order): array
     {
         $statuses = array_filter(explode(',', (string) ($order['merchant_statuses'] ?? '')));
