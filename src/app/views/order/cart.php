@@ -57,8 +57,11 @@
       <div class="cart-summary">
         <h3>Order summary</h3>
         <div class="line"><span>Items</span><span><?= (int)$count ?></span></div>
-        <div class="line total"><span>Total</span><span>RM <?= number_format((float)$total, 2) ?></span></div>
+        <div class="line"><span>Estimated subtotal</span><span>RM <?= number_format((float)$total, 2) ?></span></div>
+        <div class="line"><span>Delivery cost</span><span>RM <?= number_format(0, 2) ?></span></div>
+        <div class="line total"><span>Total amount</span><span>RM <?= number_format((float)$total, 2) ?></span></div>
         <a class="btn btn-primary btn-block mt-2" href="<?= BASE_URL ?>/checkout">Proceed to checkout</a>
+        <a class="btn btn-outline btn-block mt-2 continue-shopping" href="<?= BASE_URL ?>/products">Continue shopping</a>
       </div>
     </div>
   </div>
