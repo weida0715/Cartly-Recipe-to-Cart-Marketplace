@@ -150,6 +150,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Scale displayed recipe ingredients and keep cart-preview servings in sync.
+  document.querySelectorAll('[data-recipe-servings]').forEach(control => {
+    const input = control.querySelector('input[type=number]');
+    const baseServings = Math.max(1, Number(control.dataset.baseServings) || 1);
+    const quantities = [...document.querySelectorAll('[data-ingredient-quantity]')];
+    const targets = [...document.querySelectorAll('[data-recipe-servings-target]')];
+
+    const formatQuantity = value => Number(value.toFixed(2)).toString();
+    const updateServings = () => {
+      const servings = Math.max(1, parseInt(input?.value || '1', 10) || 1);
+      if (input) input.value = String(servings);
+      quantities.forEach(quantity => {
+        const baseQuantity = Number(quantity.dataset.baseQuantity) || 0;
+        quantity.textContent = formatQuantity(baseQuantity * servings / baseServings);
+      });
+      targets.forEach(target => { target.value = String(servings); });
+    };
+
+    input?.addEventListener('input', updateServings);
+    input?.addEventListener('change', updateServings);
+    updateServings();
+  });
   // Reset filtered listing results when a search input is cleared.
   document.querySelectorAll('form[data-search-reset]').forEach(form => {
     form.querySelectorAll('[data-search-reset-input]').forEach(input => {
