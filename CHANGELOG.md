@@ -207,3 +207,8 @@ All notable changes to this project will be documented in this file.
 ## [1.2.6] - 22nd June 2026
 - Added a recipe count showing how many cards are displayed on the current page out of the total filtered results.
 - Added null-safe dashboard statistics, request/order data, and recipe filter values based on review feedback.
+
+## [1.2.7] - 23rd June 2026
+- Expanded the cart order summary with estimated subtotal, delivery cost, and total amount.
+- Added a continue-shopping action to the cart so customers can return to browsing products.
+- Reworked customer order history into responsive order cards with status badges, item counts, dates, totals, payment status, and view-detail actions.
