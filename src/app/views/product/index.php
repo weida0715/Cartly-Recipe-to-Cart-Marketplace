@@ -79,12 +79,12 @@
           $inStock = (int) ($p['stock_quantity'] ?? 0) > 0;
           ?>
           <div class="product-card">
-            <a class="product-thumb-link" href="<?= BASE_URL ?>/products/<?= (int) $p['product_id'] ?>"
-              aria-label="View <?= htmlspecialchars($p['product_name']) ?> details">
+            <a class="product-thumb-link" href="<?= BASE_URL ?>/products/<?= (int) ($p['product_id'] ?? 0) ?>"
+              aria-label="View <?= htmlspecialchars($p['product_name'] ?? '') ?> details">
               <div class="thumb">
                 <?php if (!empty($p['image'])): ?>
-                  <img src="<?= htmlspecialchars(UPLOAD_URL . '/' . ltrim((string) $p['image'], '/'), ENT_QUOTES, 'UTF-8') ?>"
-                    alt="<?= htmlspecialchars($p['product_name']) ?>">
+                  <img src="<?= htmlspecialchars(UPLOAD_URL . '/' . ltrim((string) ($p['image'] ?? ''), '/'), ENT_QUOTES, 'UTF-8') ?>"
+                    alt="<?= htmlspecialchars($p['product_name'] ?? '') ?>">
                 <?php else: ?>
                   <?= \App\Helpers\Icon::render('marketplace', 'product-fallback-icon') ?>
                 <?php endif; ?>
@@ -101,25 +101,25 @@
                   <?php endif; ?>
                 </span>
               </div>
-              <div class="name"><?= htmlspecialchars($p['product_name']) ?></div>
+              <div class="name"><?= htmlspecialchars($p['product_name'] ?? '') ?></div>
               <div class="meta">
-                Sold by <a href="<?= BASE_URL ?>/stores/<?= (int) $p['store_id'] ?>"><?= htmlspecialchars($p['store_name']) ?></a>
+                Sold by <a href="<?= BASE_URL ?>/stores/<?= (int) ($p['store_id'] ?? 0) ?>"><?= htmlspecialchars($p['store_name'] ?? 'Unknown Store') ?></a>
               </div>
               <div class="product-package">
-                <?= number_format((float) $p['package_quantity'], 0) ?>
-                <?= htmlspecialchars($p['package_unit']) ?> per pack
+                <?= number_format((float) ($p['package_quantity'] ?? 0), 0) ?>
+                <?= htmlspecialchars($p['package_unit'] ?? '') ?> per pack
               </div>
-              <div class="price">RM <?= number_format((float) $p['price'], 2) ?></div>
+              <div class="price">RM <?= number_format((float) ($p['price'] ?? 0), 2) ?></div>
               <div class="product-stock <?= $inStock ? 'is-available' : 'is-unavailable' ?>">
-                <?= $inStock ? (int) $p['stock_quantity'] . ' available' : 'Out of stock' ?>
+                <?= $inStock ? (int) ($p['stock_quantity'] ?? 0) . ' available' : 'Out of stock' ?>
               </div>
               <div class="actions">
                 <a class="btn btn-outline btn-sm"
-                  href="<?= BASE_URL ?>/products/<?= (int) $p['product_id'] ?>">Details</a>
+                  href="<?= BASE_URL ?>/products/<?= (int) ($p['product_id'] ?? 0) ?>">Details</a>
                 <?php if ($inStock): ?>
                   <form method="post" action="<?= BASE_URL ?>/cart/add">
                     <?= Csrf::field() ?>
-                    <input type="hidden" name="product_id" value="<?= (int) $p['product_id'] ?>">
+                    <input type="hidden" name="product_id" value="<?= (int) ($p['product_id'] ?? 0) ?>">
                     <input type="hidden" name="quantity" value="1">
                     <button class="btn btn-primary btn-sm" type="submit">
                       <?= \App\Helpers\Icon::render('cart', 'button-icon') ?>Add to cart
