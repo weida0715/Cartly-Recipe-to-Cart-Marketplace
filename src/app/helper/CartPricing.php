@@ -5,11 +5,16 @@ namespace App\Helpers;
 
 class CartPricing
 {
-    private const ESTIMATED_DELIVERY_FEE = 0.0;
+    private const DELIVERY_FEE_PER_STORE = 5.0;
+
+    public static function deliveryFeePerStore(): float
+    {
+        return self::DELIVERY_FEE_PER_STORE;
+    }
 
     public static function estimatedDeliveryFee(array $groups): float
     {
-        return $groups === [] ? 0.0 : self::ESTIMATED_DELIVERY_FEE;
+        return round(count($groups) * self::DELIVERY_FEE_PER_STORE, 2);
     }
 
     public static function totalWithDelivery(float $subtotal, float $deliveryFee): float
