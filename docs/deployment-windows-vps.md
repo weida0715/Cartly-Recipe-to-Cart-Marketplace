@@ -159,7 +159,7 @@ The workflows assume these repository secrets exist:
 - `CARTLY_VPS_HOST`
 - `CARTLY_VPS_PORT`
 - `CARTLY_VPS_USERNAME`
-- `CARTLY_VPS_SSH_PRIVATE_KEY`
+- `SSH_KEY`
 - `CARTLY_REPO_ROOT`
 - `CARTLY_PROD_ROOT`
 - `CARTLY_PREVIEW_ROOT`

@@ -15,7 +15,7 @@ jobs:
           host: ${{ secrets.CARTLY_VPS_HOST }}
           port: ${{ secrets.CARTLY_VPS_PORT }}
           username: ${{ secrets.CARTLY_VPS_USERNAME }}
-          key: ${{ secrets.CARTLY_VPS_SSH_PRIVATE_KEY }}
+          key: ${{ secrets.SSH_KEY }}
           script_stop: true
           command_timeout: 30m
           script: |
