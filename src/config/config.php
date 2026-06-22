@@ -1,13 +1,23 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/bootstrap.php';
+cartly_load_env();
+
 if (!defined('APP_NAME')) {
-    define('APP_NAME', 'Cartly');
+    define('APP_NAME', cartly_env('APP_NAME', 'Cartly'));
+}
+
+if (!defined('APP_ENV')) {
+    define('APP_ENV', cartly_env('APP_ENV', 'development'));
+}
+
+if (!defined('APP_BASE_PATH')) {
+    define('APP_BASE_PATH', cartly_normalize_base_path(cartly_env('APP_BASE_PATH')));
 }
 
 if (!defined('BASE_URL')) {
-    $scriptDir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/');
-    define('BASE_URL', $scriptDir === '/' ? '' : $scriptDir);
+    define('BASE_URL', cartly_app_base_url());
 }
 
 if (!defined('ASSET_URL')) {
@@ -24,4 +34,4 @@ if (!defined('UPLOAD_URL')) {
 
 date_default_timezone_set('Asia/Kuala_Lumpur');
 error_reporting(E_ALL);
-ini_set('display_errors', '1');
+ini_set('display_errors', APP_ENV === 'production' ? '0' : '1');

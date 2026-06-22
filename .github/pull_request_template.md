@@ -12,6 +12,8 @@
 
 ## Checklist
 
+<!-- Preview deployments are automatic for PRs targeting main. This checkbox is informational only. -->
+
 - [ ] I have linked the issue using "Closes #<issue_number>"
 - [ ] I have reviewed all file changes
 - [ ] No unrelated changes are included
@@ -21,6 +23,7 @@
 - [ ] Code follows project formatting rules
 - [ ] Gemini Code Assist review has been requested
 - [ ] AI review comments have been addressed
+- [ ] I request a deployment preview for this PR
 - [ ] Documentation has been updated (if applicable)
 - [ ] README has been updated (if applicable)
 - [ ] CHANGELOG has been updated (if applicable)

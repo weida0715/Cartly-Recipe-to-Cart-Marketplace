@@ -218,3 +218,8 @@ vendor/bin/phpunit
 ```
 
 Current automated coverage focuses on `tests/RecipeCartEngineTest.php`.
+
+## Deployment
+
+Windows VPS deployment, production release versioning, and PR preview
+automation are documented in [docs/deployment-windows-vps.md](docs/deployment-windows-vps.md).

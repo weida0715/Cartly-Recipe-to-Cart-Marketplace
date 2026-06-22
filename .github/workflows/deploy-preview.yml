@@ -1,0 +1,91 @@
+name: Deploy Preview
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
+
+concurrency:
+  group: preview-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-preview:
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy preview to Windows VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.CARTLY_VPS_HOST }}
+          port: ${{ secrets.CARTLY_VPS_PORT }}
+          username: ${{ secrets.CARTLY_VPS_USERNAME }}
+          key: ${{ secrets.CARTLY_VPS_SSH_PRIVATE_KEY }}
+          script_stop: true
+          command_timeout: 30m
+          script: |
+            powershell -NoProfile -ExecutionPolicy Bypass -File "${{ secrets.CARTLY_REPO_ROOT }}\scripts\deploy-preview.ps1" -RepoRoot "${{ secrets.CARTLY_REPO_ROOT }}" -PrNumber "${{ github.event.pull_request.number }}" -Ref "${{ github.event.pull_request.head.sha }}" -PreviewRoot "${{ secrets.CARTLY_PREVIEW_ROOT }}" -ApacheServiceName "${{ secrets.CARTLY_APACHE_SERVICE }}" -DbHost "${{ secrets.CARTLY_DB_HOST }}" -DbPort "${{ secrets.CARTLY_DB_PORT }}" -DbUser "${{ secrets.CARTLY_DB_USER }}" -DbPassword "${{ secrets.CARTLY_DB_PASSWORD }}"
+
+      - name: Upsert preview comment
+        uses: actions/github-script@v7
+        env:
+          PREVIEW_URL: https://preview.cartly.dpdns.net/pr-${{ github.event.pull_request.number }}/
+        with:
+          script: |
+            const marker = '<!-- cartly-preview-comment -->';
+            const body = [
+              marker,
+              '### Cartly Preview Deployment',
+              '',
+              'Preview for this PR is available here:',
+              '',
+              process.env.PREVIEW_URL,
+            ].join('\n');
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+
+            const existing = comments.find((comment) => comment.body && comment.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              });
+            }
+
+  cleanup-preview:
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove preview from Windows VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.CARTLY_VPS_HOST }}
+          port: ${{ secrets.CARTLY_VPS_PORT }}
+          username: ${{ secrets.CARTLY_VPS_USERNAME }}
+          key: ${{ secrets.CARTLY_VPS_SSH_PRIVATE_KEY }}
+          script_stop: true
+          command_timeout: 15m
+          script: |
+            powershell -NoProfile -ExecutionPolicy Bypass -File "${{ secrets.CARTLY_REPO_ROOT }}\scripts\cleanup-preview.ps1" -PrNumber "${{ github.event.pull_request.number }}" -PreviewRoot "${{ secrets.CARTLY_PREVIEW_ROOT }}" -DbHost "${{ secrets.CARTLY_DB_HOST }}" -DbPort "${{ secrets.CARTLY_DB_PORT }}" -DbUser "${{ secrets.CARTLY_DB_USER }}" -DbPassword "${{ secrets.CARTLY_DB_PASSWORD }}"

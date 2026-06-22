@@ -1,0 +1,22 @@
+name: Deploy Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-production:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy main to Windows VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.CARTLY_VPS_HOST }}
+          port: ${{ secrets.CARTLY_VPS_PORT }}
+          username: ${{ secrets.CARTLY_VPS_USERNAME }}
+          key: ${{ secrets.CARTLY_VPS_SSH_PRIVATE_KEY }}
+          script_stop: true
+          command_timeout: 30m
+          script: |
+            powershell -NoProfile -ExecutionPolicy Bypass -File "${{ secrets.CARTLY_REPO_ROOT }}\scripts\deploy-prod.ps1" -RepoRoot "${{ secrets.CARTLY_REPO_ROOT }}" -TargetRef "origin/main" -BranchName "main" -ProductionRoot "${{ secrets.CARTLY_PROD_ROOT }}" -ApacheServiceName "${{ secrets.CARTLY_APACHE_SERVICE }}" -DbHost "${{ secrets.CARTLY_DB_HOST }}" -DbPort "${{ secrets.CARTLY_DB_PORT }}" -DbName "${{ secrets.CARTLY_PROD_DB_NAME }}" -DbUser "${{ secrets.CARTLY_DB_USER }}" -DbPassword "${{ secrets.CARTLY_DB_PASSWORD }}"

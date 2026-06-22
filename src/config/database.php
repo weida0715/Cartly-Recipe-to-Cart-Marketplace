@@ -1,19 +1,17 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/bootstrap.php';
+cartly_load_env();
+
 // MySQL connection settings.
 if (!defined('DB_HOST')) {
-    $env = static function (string $key, string $default = ''): string {
-        $value = $_ENV[$key] ?? getenv($key);
-        return $value !== false && $value !== '' ? (string) $value : $default;
-    };
-
-    define('DB_HOST', $env('DB_HOST', '127.0.0.1'));
-    define('DB_PORT', $env('DB_PORT', '3306'));
-    define('DB_NAME', $env('DB_NAME', 'cartly'));
-    define('DB_USER', $env('DB_USER', 'root'));
-    define('DB_PASS', $env('DB_PASS', $env('DB_PASSWORD')));
-    define('DB_CHARSET', $env('DB_CHARSET', 'utf8mb4'));
+    define('DB_HOST', cartly_env('DB_HOST', '127.0.0.1'));
+    define('DB_PORT', cartly_env('DB_PORT', '3306'));
+    define('DB_NAME', cartly_env('DB_NAME', 'cartly'));
+    define('DB_USER', cartly_env('DB_USER', 'root'));
+    define('DB_PASS', cartly_env('DB_PASS', cartly_env('DB_PASSWORD')));
+    define('DB_CHARSET', cartly_env('DB_CHARSET', 'utf8mb4'));
 }
 
 /**
