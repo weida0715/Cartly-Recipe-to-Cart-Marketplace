@@ -39,4 +39,20 @@ class CartItemTest extends TestCase
 
         $this->assertSame(0, $cartItem->countForUser(12));
     }
+
+    public function test_manual_cart_add_uses_a_transaction_and_row_locks(): void
+    {
+        $method = new ReflectionMethod(CartItem::class, 'addManualWithinStock');
+        $source = file(__DIR__ . '/../src/app/models/CartItem.php');
+        $body = implode('', array_slice(
+            $source,
+            $method->getStartLine() - 1,
+            $method->getEndLine() - $method->getStartLine() + 1
+        ));
+
+        $this->assertStringContainsString('beginTransaction()', $body);
+        $this->assertGreaterThanOrEqual(2, substr_count($body, 'FOR UPDATE'));
+        $this->assertStringContainsString('rollBack()', $body);
+        $this->assertStringContainsString('commit()', $body);
+    }
 }

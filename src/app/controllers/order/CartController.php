@@ -7,7 +7,6 @@ use App\Helpers\AuthHelper;
 use App\Helpers\Flash;
 use App\Models\Cart;
 use App\Models\CartItem;
-use App\Models\Product;
 
 class CartController extends Controller
 {
@@ -41,17 +40,16 @@ class CartController extends Controller
         $this->requireCsrf();
         $productId = (int) $this->input('product_id');
         $qty = max(1, (int) $this->input('quantity', 1));
-        $product = (new Product())->find($productId);
-        if (!$product || $product['status'] !== 'active') {
+        $cart = (new Cart())->findOrCreateForUser((int) AuthHelper::id());
+        $result = (new CartItem())->addManualWithinStock((int) $cart['cart_id'], $productId, $qty);
+        if ($result === 'unavailable') {
             Flash::set('error', 'Product unavailable.');
             $this->redirect('/products');
         }
-        if ((int) $product['stock_quantity'] < $qty) {
+        if ($result === 'insufficient_stock') {
             Flash::set('error', 'Not enough stock.');
             $this->redirect('/products/' . $productId);
         }
-        $cart = (new Cart())->findOrCreateForUser((int) AuthHelper::id());
-        (new CartItem())->addOrIncrement((int) $cart['cart_id'], $productId, $qty, (float) $product['price'], 'manual');
         Flash::set('success', 'Added to cart.');
         $this->redirect('/cart');
     }

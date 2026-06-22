@@ -188,3 +188,12 @@ All notable changes to this project will be documented in this file.
 - Added icons to merchant and admin sidebars, dashboard headings, summary cards, homepage calls to action, and category shortcuts.
 - Displayed each category image and added uploaded or initials-based logos for merchant stores.
 - Added Flaticon attribution and kept decorative icons hidden from screen readers.
+
+## [1.2.4] - 21st June 2026
+- Added a CSRF-protected Add to cart action to each available marketplace product card.
+- Expanded product cards with category, rating, review count, package size, seller, price, and stock information.
+- Disabled the cart action for products that are out of stock.
+- Prevented repeated add-to-cart actions from exceeding the product's available stock.
+- Added the same Add to cart action to featured products on the homepage.
+- Made marketplace and homepage product images link directly to their product detail pages.
+- Made cart additions atomic and hardened store-logo cleanup and path validation based on review feedback.

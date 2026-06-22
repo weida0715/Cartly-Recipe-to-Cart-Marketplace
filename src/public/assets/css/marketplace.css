@@ -240,6 +240,15 @@
   box-shadow: var(--shadow-lg);
   transform: translateY(-2px);
 }
+.product-thumb-link {
+  color: inherit;
+  display: block;
+  text-decoration: none;
+}
+.product-thumb-link:focus-visible {
+  outline: 3px solid var(--orange-accent);
+  outline-offset: -3px;
+}
 .product-card .thumb {
   aspect-ratio: 1;
   background:
@@ -258,6 +267,12 @@
   height: 100%;
   object-fit: cover;
 }
+.product-thumb-link img {
+  transition: transform 0.2s ease;
+}
+.product-thumb-link:hover img {
+  transform: scale(1.03);
+}
 .product-card .body {
   padding: 14px;
   flex: 1;
@@ -269,17 +284,79 @@
   font-size: 1.02rem;
   font-weight: 800;
 }
+.product-card-topline {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+}
+.product-category {
+  background: #edf7ee;
+  border: 1px solid #c6e1c8;
+  border-radius: 999px;
+  color: var(--green-primary-dark);
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+  max-width: 65%;
+  overflow: hidden;
+  padding: 6px 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.product-rating {
+  color: #a85a00;
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.product-review-count {
+  color: var(--muted);
+  font-weight: 600;
+}
 .product-card .meta {
   font-size: 0.8rem;
   color: var(--muted);
+}
+.product-package {
+  color: var(--text);
+  font-size: 0.82rem;
 }
 .product-card .price {
   font-size: 1.2rem;
   font-weight: 700;
   color: var(--green-primary);
 }
+.product-stock {
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.product-stock.is-available {
+  color: var(--green-primary-dark);
+}
+.product-stock.is-unavailable {
+  color: var(--danger);
+}
 .product-card .actions {
+  align-items: stretch;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
   margin-top: auto;
+}
+.product-card .actions form,
+.product-card .actions .btn {
+  width: 100%;
+}
+.product-card .actions .btn {
+  min-height: 38px;
+}
+.product-card .actions > :only-child {
+  grid-column: 1 / -1;
+}
+.product-card .actions .btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .marketplace-heading {

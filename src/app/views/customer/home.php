@@ -77,20 +77,38 @@
   </div>
   <div class="product-grid">
     <?php foreach ($featured as $p): ?>
+      <?php $inStock = (int) ($p['stock_quantity'] ?? 0) > 0; ?>
       <div class="product-card">
-        <div class="thumb">
-          <?php if (!empty($p['image'])): ?>
-            <img src="<?= UPLOAD_URL ?>/<?= htmlspecialchars($p['image']) ?>"
-              alt="<?= htmlspecialchars($p['product_name']) ?>">
-          <?php else: ?>
-            <span class="thumb-fallback">Fresh</span>
-          <?php endif; ?>
-        </div>
+        <a class="product-thumb-link" href="<?= BASE_URL ?>/products/<?= (int) $p['product_id'] ?>"
+          aria-label="View <?= htmlspecialchars($p['product_name']) ?> details">
+          <div class="thumb">
+            <?php if (!empty($p['image'])): ?>
+              <img src="<?= htmlspecialchars(UPLOAD_URL . '/' . ltrim((string) $p['image'], '/'), ENT_QUOTES, 'UTF-8') ?>"
+                alt="<?= htmlspecialchars($p['product_name']) ?>">
+            <?php else: ?>
+              <span class="thumb-fallback">Fresh</span>
+            <?php endif; ?>
+          </div>
+        </a>
         <div class="body">
           <div class="name"><?= htmlspecialchars($p['product_name']) ?></div>
           <div class="meta"><?= htmlspecialchars($p['store_name']) ?></div>
           <div class="price">RM <?= number_format((float) $p['price'], 2) ?></div>
-          <a class="btn btn-outline btn-sm" href="<?= BASE_URL ?>/products/<?= (int) $p['product_id'] ?>">View</a>
+          <div class="actions">
+            <a class="btn btn-outline btn-sm" href="<?= BASE_URL ?>/products/<?= (int) $p['product_id'] ?>">Details</a>
+            <?php if ($inStock): ?>
+              <form method="post" action="<?= BASE_URL ?>/cart/add">
+                <?= \App\Helpers\Csrf::field() ?>
+                <input type="hidden" name="product_id" value="<?= (int) $p['product_id'] ?>">
+                <input type="hidden" name="quantity" value="1">
+                <button class="btn btn-primary btn-sm" type="submit">
+                  <?= \App\Helpers\Icon::render('cart', 'button-icon') ?>Add to cart
+                </button>
+              </form>
+            <?php else: ?>
+              <button class="btn btn-primary btn-sm" type="button" disabled>Out of stock</button>
+            <?php endif; ?>
+          </div>
         </div>
       </div>
     <?php endforeach; ?>
