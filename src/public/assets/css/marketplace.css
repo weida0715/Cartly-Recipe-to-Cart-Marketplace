@@ -931,6 +931,10 @@
   font-size: 0.9rem;
   font-weight: 700;
 }
+.recipe-count strong {
+  color: var(--green-primary-dark);
+}
+
 .recipe-pagination {
   display: flex;
   flex-wrap: wrap;

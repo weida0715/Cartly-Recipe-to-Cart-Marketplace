@@ -1,3 +1,4 @@
+<?php $displayedCount = count($recipes ?? []); ?>
 <div class="recipe-page-heading">
   <div>
     <h2>Discover recipes</h2>
@@ -68,7 +69,10 @@
   <section class="recipe-results" aria-labelledby="recipe-results-title">
     <div class="recipe-results-heading">
       <h3 id="recipe-results-title">Recipes</h3>
-      <span><?= (int) $total ?> <?= (int) $total === 1 ? 'result' : 'results' ?></span>
+      <span class="recipe-count">
+        Showing <strong><?= $displayedCount ?></strong> of <?= (int) ($total ?? 0) ?>
+        <?= (int) ($total ?? 0) === 1 ? 'recipe' : 'recipes' ?>
+      </span>
     </div>
 
     <?php if (!$recipes): ?>

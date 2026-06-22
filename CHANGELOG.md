@@ -203,3 +203,6 @@ All notable changes to this project will be documented in this file.
 - Added labeled recipe filters, an active-filter reset link, a visible result count, and styled pagination.
 - Kept the filter sidebar sticky on desktop and stacked it above results on smaller screens.
 - Added null-safe fallbacks to recipe, product, homepage, and merchant dashboard views based on review feedback.
+
+## [1.2.6] - 22nd June 2026
+- Added a recipe count showing how many cards are displayed on the current page out of the total filtered results.
