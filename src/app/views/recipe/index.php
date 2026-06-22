@@ -1,3 +1,4 @@
+<?php $displayedCount = count($recipes ?? []); ?>
 <div class="recipe-page-heading">
   <div>
     <h2>Discover recipes</h2>
@@ -11,14 +12,14 @@
     <form class="filters recipe-filters" method="get" action="<?= BASE_URL ?>/recipes" data-search-reset>
       <div class="recipe-filter-heading">
         <h3>Filters</h3>
-        <?php if ($q !== '' || ($cuisine ?? '') !== '' || ($difficulty ?? '') !== '' || ($sort ?? 'newest') !== 'newest'): ?>
+        <?php if (($q ?? '') !== '' || ($cuisine ?? '') !== '' || ($difficulty ?? '') !== '' || ($sort ?? 'newest') !== 'newest'): ?>
           <a href="<?= BASE_URL ?>/recipes">Reset</a>
         <?php endif; ?>
       </div>
 
       <div class="form-row">
         <label for="recipe-search">Search</label>
-        <input class="input" id="recipe-search" type="search" name="q" value="<?= htmlspecialchars($q) ?>"
+        <input class="input" id="recipe-search" type="search" name="q" value="<?= htmlspecialchars($q ?? '') ?>"
           placeholder="Title or description" autocomplete="off" data-search-reset-input>
       </div>
 
@@ -68,7 +69,10 @@
   <section class="recipe-results" aria-labelledby="recipe-results-title">
     <div class="recipe-results-heading">
       <h3 id="recipe-results-title">Recipes</h3>
-      <span><?= (int) $total ?> <?= (int) $total === 1 ? 'result' : 'results' ?></span>
+      <span class="recipe-count">
+        Showing <strong><?= $displayedCount ?></strong> of <?= (int) ($total ?? 0) ?>
+        <?= (int) ($total ?? 0) === 1 ? 'recipe' : 'recipes' ?>
+      </span>
     </div>
 
     <?php if (!$recipes): ?>

@@ -1,11 +1,15 @@
-<h2><?= \App\Helpers\Icon::render('dashboard', 'heading-icon') ?>My dashboard</h2>
+<?php
+$storeRequest = is_array($storeRequest ?? null) ? $storeRequest : null;
+$orders = is_array($orders ?? null) ? $orders : [];
+$recipes = is_array($recipes ?? null) ? $recipes : [];
+?><h2><?= \App\Helpers\Icon::render('dashboard', 'heading-icon') ?>My dashboard</h2>
 <div class="grid grid-2">
   <div class="card">
     <h3><?= \App\Helpers\Icon::render('merchant', 'heading-icon') ?>Merchant request</h3>
     <p class="text-muted">Want to open a store? Submit your store details for admin approval.</p>
     <?php if (($storeRequest ?? null)): ?>
-      <p><strong>Status:</strong> <span class="badge"><?= htmlspecialchars($storeRequest['store_status']) ?></span></p>
-      <p><strong>Store:</strong> <?= htmlspecialchars($storeRequest['store_name']) ?></p>
+      <p><strong>Status:</strong> <span class="badge"><?= htmlspecialchars($storeRequest['store_status'] ?? 'pending') ?></span></p>
+      <p><strong>Store:</strong> <?= htmlspecialchars($storeRequest['store_name'] ?? 'Unnamed store') ?></p>
       <p class="text-muted"><?= htmlspecialchars($storeRequest['admin_note'] ?? '') ?></p>
     <?php else: ?>
       <button type="button" class="btn btn-primary" id="merchantRequestToggle">Request to open store</button>
@@ -51,10 +55,10 @@
         <tbody>
           <?php foreach ($orders as $o): ?>
             <tr>
-              <td><a href="<?= BASE_URL ?>/orders/<?= (int) $o['order_id'] ?>">#<?= (int) $o['order_id'] ?></a></td>
-              <td><?= htmlspecialchars($o['created_at']) ?></td>
-              <td>RM <?= number_format((float) $o['total_amount'], 2) ?></td>
-              <td><span class="badge"><?= htmlspecialchars($o['display_order_status'] ?? $o['order_status']) ?></span></td>
+              <td><a href="<?= BASE_URL ?>/orders/<?= (int) ($o['order_id'] ?? 0) ?>">#<?= (int) ($o['order_id'] ?? 0) ?></a></td>
+              <td><?= htmlspecialchars($o['created_at'] ?? '') ?></td>
+              <td>RM <?= number_format((float) ($o['total_amount'] ?? 0), 2) ?></td>
+              <td><span class="badge"><?= htmlspecialchars($o['display_order_status'] ?? $o['order_status'] ?? 'pending') ?></span></td>
             </tr>
           <?php endforeach; ?>
         </tbody>
@@ -68,7 +72,7 @@
     <?php else: ?>
       <ul>
         <?php foreach ($recipes as $r): ?>
-          <li><a href="<?= BASE_URL ?>/recipes/<?= (int) $r['recipe_id'] ?>"><?= htmlspecialchars($r['recipe_title']) ?></a>
+          <li><a href="<?= BASE_URL ?>/recipes/<?= (int) ($r['recipe_id'] ?? 0) ?>"><?= htmlspecialchars($r['recipe_title'] ?? 'Untitled recipe') ?></a>
           </li>
         <?php endforeach; ?>
       </ul>

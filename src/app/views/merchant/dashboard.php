@@ -1,4 +1,4 @@
-<h2><?= \App\Helpers\Icon::render('store', 'heading-icon') ?>Welcome, <?= htmlspecialchars($store['store_name'] ?? 'Merchant') ?></h2>
+<h2><?= \App\Helpers\Icon::render('store', 'heading-icon') ?>Welcome, <?= htmlspecialchars(is_array($store ?? null) ? ($store['store_name'] ?? 'Merchant') : 'Merchant') ?></h2>
 <div class="stat-grid">
   <div class="stat"><?= \App\Helpers\Icon::render('vouchers', 'stat-icon') ?><div class="num">RM <?= number_format((float) ($totals['revenue'] ?? 0), 2) ?></div><div class="label">Revenue</div><div class="indicator <?= ($revenueChange ?? 0) >= 0 ? 'up' : 'down' ?>"><?= ($revenueChange ?? 0) >= 0 ? '▲' : '▼' ?> <?= number_format(abs((float) ($revenueChange ?? 0)), 1) ?>% vs previous 30 days</div></div>
   <div class="stat"><?= \App\Helpers\Icon::render('orders', 'stat-icon') ?><div class="num"><?= (int) ($totals['orders'] ?? 0) ?></div><div class="label">Orders received</div></div>
