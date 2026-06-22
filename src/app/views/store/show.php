@@ -1,9 +1,12 @@
 <div class="card store-hero">
   <div class="flex-between">
-    <div>
-      <p class="hero-eyebrow">Merchant store</p>
-      <h2><?= htmlspecialchars($store['store_name']) ?></h2>
-      <p class="text-muted"><?= htmlspecialchars($store['store_address'] ?? '') ?></p>
+    <div class="store-identity store-hero-identity">
+      <?= \App\Helpers\Icon::storeLogo($store, 'store-hero-logo') ?>
+      <div>
+        <p class="hero-eyebrow">Merchant store</p>
+        <h2><?= htmlspecialchars($store['store_name']) ?></h2>
+        <p class="text-muted"><?= htmlspecialchars($store['store_address'] ?? '') ?></p>
+      </div>
     </div>
     <div class="store-hero-badges">
       <span class="badge badge-success"><?= (int) count($store['products'] ?? []) ?> products</span>

@@ -1,7 +1,7 @@
-<h2>My dashboard</h2>
+<h2><?= \App\Helpers\Icon::render('dashboard', 'heading-icon') ?>My dashboard</h2>
 <div class="grid grid-2">
   <div class="card">
-    <h3>Merchant request</h3>
+    <h3><?= \App\Helpers\Icon::render('merchant', 'heading-icon') ?>Merchant request</h3>
     <p class="text-muted">Want to open a store? Submit your store details for admin approval.</p>
     <?php if (($storeRequest ?? null)): ?>
       <p><strong>Status:</strong> <span class="badge"><?= htmlspecialchars($storeRequest['store_status']) ?></span></p>
@@ -35,7 +35,7 @@
     <?php endif; ?>
   </div>
   <div class="card">
-    <h3>Recent orders</h3>
+    <h3><?= \App\Helpers\Icon::render('orders', 'heading-icon') ?>Recent orders</h3>
     <?php if (!$orders): ?>
       <p class="text-muted">No orders yet.</p>
     <?php else: ?>
@@ -62,7 +62,7 @@
     <?php endif; ?>
   </div>
   <div class="card">
-    <h3>My recipes</h3>
+    <h3><?= \App\Helpers\Icon::render('recipes', 'heading-icon') ?>My recipes</h3>
     <?php if (!$recipes): ?>
       <p class="text-muted">No recipes yet.</p>
     <?php else: ?>

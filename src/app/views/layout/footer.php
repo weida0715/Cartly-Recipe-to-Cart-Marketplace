@@ -37,6 +37,7 @@
     <div class="footer-bottom">
       <p>&copy; <?= date('Y') ?> Cartly. All rights reserved.</p>
       <p>Built for recipe planning, local shopping, and smarter carts.</p>
+      <p><a href="https://www.flaticon.com/uicons" target="_blank" rel="noopener noreferrer">Interface icons by Flaticon</a></p>
     </div>
   </div>
 </footer>

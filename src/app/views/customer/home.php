@@ -4,8 +4,8 @@
     <h1>Fresh ingredients. Real recipes. One cart.</h1>
     <p>Discover recipes, scale servings, and Cartly fills your basket from local merchants.</p>
     <div class="hero-actions">
-      <a class="btn btn-accent" href="<?= BASE_URL ?>/recipes">Browse Recipes</a>
-      <a class="btn btn-outline hero-outline" href="<?= BASE_URL ?>/products">Shop Marketplace</a>
+      <a class="btn btn-accent" href="<?= BASE_URL ?>/recipes"><?= \App\Helpers\Icon::render('recipes', 'button-icon') ?>Browse Recipes</a>
+      <a class="btn btn-outline hero-outline" href="<?= BASE_URL ?>/products"><?= \App\Helpers\Icon::render('marketplace', 'button-icon') ?>Shop Marketplace</a>
     </div>
   </div>
   <div class="hero-panel" aria-hidden="true">
@@ -40,8 +40,8 @@
     </p>
   </div>
   <div class="promo-banner-actions">
-    <a class="btn btn-accent" href="<?= BASE_URL ?>/vouchers">View Available Vouchers</a>
-    <a class="btn btn-outline" href="<?= BASE_URL ?>/products">Shop Marketplace</a>
+    <a class="btn btn-accent" href="<?= BASE_URL ?>/vouchers"><?= \App\Helpers\Icon::render('vouchers', 'button-icon') ?>View Available Vouchers</a>
+    <a class="btn btn-outline" href="<?= BASE_URL ?>/products"><?= \App\Helpers\Icon::render('marketplace', 'button-icon') ?>Shop Marketplace</a>
   </div>
 </section>
 
@@ -54,7 +54,15 @@
     <div class="grid grid-4">
       <?php foreach (array_slice($cats, 0, 8) as $c): ?>
         <a class="category-tile" href="<?= BASE_URL ?>/products?cid=<?= (int) $c['category_id'] ?>">
-          <span class="category-mark">Cart</span>
+          <span class="category-mark">
+            <?php if (!empty($c['category_icon'])): ?>
+              <img class="category-icon-image" src="<?= htmlspecialchars(UPLOAD_URL . '/' . ltrim((string) $c['category_icon'], '/'), ENT_QUOTES, 'UTF-8') ?>"
+                alt="" aria-hidden="true">
+            <?php else: ?>
+              <?= \App\Helpers\Icon::render('marketplace', 'category-icon') ?>
+            <?php endif; ?>
+            Shop
+          </span>
           <strong><?= htmlspecialchars($c['category_name']) ?></strong>
         </a>
       <?php endforeach; ?>

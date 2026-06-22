@@ -182,3 +182,9 @@ All notable changes to this project will be documented in this file.
 - Reworked the Marketplace into a responsive two-column layout with filters on the left and products on the right.
 - Added clear filter labels, an active-filter reset link, and a visible product result count.
 - Kept the product grid responsive by collapsing the layout for tablet and mobile screens.
+
+## [1.2.3] - 21st June 2026
+- Added reusable Flaticon UIcons to the shared navigation and authentication actions.
+- Added icons to merchant and admin sidebars, dashboard headings, summary cards, homepage calls to action, and category shortcuts.
+- Displayed each category image and added uploaded or initials-based logos for merchant stores.
+- Added Flaticon attribution and kept decorative icons hidden from screen readers.
