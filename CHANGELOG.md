@@ -207,3 +207,10 @@ All notable changes to this project will be documented in this file.
 ## [1.2.6] - 22nd June 2026
 - Added a recipe count showing how many cards are displayed on the current page out of the total filtered results.
 - Added null-safe dashboard statistics, request/order data, and recipe filter values based on review feedback.
+
+## [1.2.7] - 22nd June 2026
+- Moved voucher application from checkout to each merchant section of the shopping cart.
+- Added support for applying and removing multiple vouchers with server-calculated discounts and totals.
+- Revalidated voucher status, dates, minimum spend, and usage limits during checkout.
+- Added order-level voucher history through the `merchant_order_vouchers` migration.
+- Prevented invalid merchant voucher date ranges with strict server validation and linked browser date constraints.
