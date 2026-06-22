@@ -177,3 +177,8 @@ All notable changes to this project will be documented in this file.
 - Navigation links for quick access to Stores.
 - Store products section uses about 2/3 of the page width.
 - Store vouchers section uses about 1/3 of the page width.
+
+## [1.2.2] - 21st June 2026
+- Reworked the Marketplace into a responsive two-column layout with filters on the left and products on the right.
+- Added clear filter labels, an active-filter reset link, and a visible product result count.
+- Kept the product grid responsive by collapsing the layout for tablet and mobile screens.
