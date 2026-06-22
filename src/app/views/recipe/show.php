@@ -9,7 +9,7 @@ $baseServings = max(1, (int) ($recipe['base_servings'] ?? 1));
 $instructionText = trim((string) ($recipe['instructions'] ?? ''));
 $instructionSteps = [];
 if ($instructionText !== '') {
-    $parts = preg_split('/(?:\r?\n)+|(?=\d+[.)]\s+)/', $instructionText) ?: [];
+    $parts = preg_split('/(?:\r?\n)+|(?<=[.!?])\s+(?=\d+[.)]\s+)/', $instructionText) ?: [];
     foreach ($parts as $part) {
         $step = trim((string) preg_replace('/^\d+[.)]\s*/', '', trim($part)));
         if ($step !== '') {

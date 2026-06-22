@@ -68,6 +68,19 @@ class RecipeDetailLayoutTest extends TestCase
         $this->assertStringContainsString('>2.5</strong>', $html);
     }
 
+    public function test_instruction_parser_keeps_numbers_inside_a_step(): void
+    {
+        $html = $this->renderRecipeShow([
+            'recipe_id' => 9,
+            'recipe_title' => 'Measured Recipe',
+            'base_servings' => 1,
+            'instructions' => 'Add 1. Then stir until combined.',
+        ], []);
+
+        $this->assertSame(1, substr_count($html, '<li><span>'));
+        $this->assertStringContainsString('Add 1. Then stir until combined.', $html);
+    }
+
     public function test_recipe_details_render_empty_ingredient_and_instruction_states(): void
     {
         $html = $this->renderRecipeShow([
@@ -89,6 +102,9 @@ class RecipeDetailLayoutTest extends TestCase
         $this->assertStringContainsString('[data-recipe-servings]', $javascript);
         $this->assertStringContainsString('[data-recipe-servings-target]', $javascript);
         $this->assertStringContainsString('[data-ingredient-quantity]', $javascript);
+        $this->assertStringContainsString("event?.type === 'input'", $javascript);
+        $this->assertStringContainsString('Number.isNaN(parsed)', $javascript);
+        $this->assertStringContainsString("event?.type === 'change' || !event", $javascript);
     }
 
     private function renderRecipeShow(array $recipe, array $ingredients): string

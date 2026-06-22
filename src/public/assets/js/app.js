@@ -158,9 +158,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const targets = [...document.querySelectorAll('[data-recipe-servings-target]')];
 
     const formatQuantity = value => Number(value.toFixed(2)).toString();
-    const updateServings = () => {
-      const servings = Math.max(1, parseInt(input?.value || '1', 10) || 1);
-      if (input) input.value = String(servings);
+    const updateServings = event => {
+      const rawValue = input?.value || '';
+      const parsed = parseInt(rawValue, 10);
+
+      if (event?.type === 'input' && (Number.isNaN(parsed) || parsed < 1)) {
+        return;
+      }
+
+      const servings = Math.max(1, parsed || 1);
+      if (input && (event?.type === 'change' || !event)) {
+        input.value = String(servings);
+      }
       quantities.forEach(quantity => {
         const baseQuantity = Number(quantity.dataset.baseQuantity) || 0;
         quantity.textContent = formatQuantity(baseQuantity * servings / baseServings);

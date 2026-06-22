@@ -213,3 +213,4 @@ All notable changes to this project will be documented in this file.
 - Added a clear unrated state for recipes that do not have any visible reviews yet.
 - Reworked the recipe details page with a two-column image and summary layout.
 - Added dedicated ingredient and numbered instruction cards with serving-based quantity scaling.
+- Refined instruction parsing and serving input behavior based on review feedback.
