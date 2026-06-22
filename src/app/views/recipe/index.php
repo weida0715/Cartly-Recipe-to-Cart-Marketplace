@@ -12,14 +12,14 @@
     <form class="filters recipe-filters" method="get" action="<?= BASE_URL ?>/recipes" data-search-reset>
       <div class="recipe-filter-heading">
         <h3>Filters</h3>
-        <?php if ($q !== '' || ($cuisine ?? '') !== '' || ($difficulty ?? '') !== '' || ($sort ?? 'newest') !== 'newest'): ?>
+        <?php if (($q ?? '') !== '' || ($cuisine ?? '') !== '' || ($difficulty ?? '') !== '' || ($sort ?? 'newest') !== 'newest'): ?>
           <a href="<?= BASE_URL ?>/recipes">Reset</a>
         <?php endif; ?>
       </div>
 
       <div class="form-row">
         <label for="recipe-search">Search</label>
-        <input class="input" id="recipe-search" type="search" name="q" value="<?= htmlspecialchars($q) ?>"
+        <input class="input" id="recipe-search" type="search" name="q" value="<?= htmlspecialchars($q ?? '') ?>"
           placeholder="Title or description" autocomplete="off" data-search-reset-input>
       </div>
 

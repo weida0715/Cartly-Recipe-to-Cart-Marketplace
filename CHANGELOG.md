@@ -206,3 +206,4 @@ All notable changes to this project will be documented in this file.
 
 ## [1.2.6] - 22nd June 2026
 - Added a recipe count showing how many cards are displayed on the current page out of the total filtered results.
+- Added null-safe dashboard statistics, request/order data, and recipe filter values based on review feedback.
