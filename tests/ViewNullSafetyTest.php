@@ -92,8 +92,8 @@ class ViewNullSafetyTest extends TestCase
                 ],
             ],
             'subtotal' => 12.50,
-            'deliveryFee' => 5.0,
-            'total' => 17.50,
+            'deliveryFee' => 2.0,
+            'total' => 14.50,
         ]);
 
         $this->assertStringContainsString('Estimated subtotal', $html);
@@ -128,8 +128,8 @@ class ViewNullSafetyTest extends TestCase
                 ],
             ],
             'subtotal' => 12.50,
-            'deliveryFee' => 5.0,
-            'total' => 17.50,
+            'deliveryFee' => 2.0,
+            'total' => 14.50,
         ]);
 
         $this->assertStringContainsString('Cost summary', $html);

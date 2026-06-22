@@ -18,7 +18,7 @@ class CartPricingTest extends TestCase
 
         $deliveryFee = CartPricing::estimatedDeliveryFee($groups);
 
-        $this->assertSame(15.0, $deliveryFee);
-        $this->assertSame(65.0, CartPricing::totalWithDelivery(50.0, $deliveryFee));
+        $this->assertSame(6.0, $deliveryFee);
+        $this->assertSame(56.0, CartPricing::totalWithDelivery(50.0, $deliveryFee));
     }
 }

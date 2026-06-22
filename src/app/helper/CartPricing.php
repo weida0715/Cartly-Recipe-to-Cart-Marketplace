@@ -5,7 +5,7 @@ namespace App\Helpers;
 
 class CartPricing
 {
-    private const DELIVERY_FEE_PER_STORE = 5.0;
+    private const DELIVERY_FEE_PER_STORE = 2.0;
 
     public static function deliveryFeePerStore(): float
     {
