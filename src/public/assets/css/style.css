@@ -157,7 +157,11 @@ h2 {
   z-index: 1;
 }
 .nav-more > summary {
+  -webkit-appearance: none;
+  appearance: none;
   align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: var(--radius);
   color: var(--text);
   cursor: pointer;
@@ -169,7 +173,13 @@ h2 {
   position: relative;
   z-index: 1;
 }
+.nav-more > summary:focus {
+  outline: none;
+}
 .nav-more > summary::-webkit-details-marker {
+  display: none;
+}
+.nav-more:not([open]) > .nav-more-menu {
   display: none;
 }
 .nav-more > summary:hover,
