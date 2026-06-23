@@ -173,7 +173,7 @@ h2 {
   position: relative;
   z-index: 1;
 }
-.nav-more > summary:focus {
+.nav-more > summary:focus:not(:focus-visible) {
   outline: none;
 }
 .nav-more > summary:focus-visible {
@@ -192,6 +192,7 @@ h2 {
   background: #e2f3e4;
   color: var(--green-primary-dark);
 }
+
 .nav-more-menu {
   background: var(--surface);
   border: 1px solid var(--border);
