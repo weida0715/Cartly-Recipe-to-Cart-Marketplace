@@ -1,4 +1,5 @@
 <?php
+$stats = is_array($stats ?? null) ? $stats : [];
 $changes = $changes ?? [];
 $changeClass = static function (float $value): string {
   if ($value > 0) return 'up';
@@ -21,31 +22,31 @@ $changeText = static function (float $value): string {
 </div>
 <div class="stat-grid">
   <div class="stat">
-    <div class="num"><?= (int)$stats['users'] ?></div>
-    <div class="label">Platform users</div>
+    <div class="num"><?= (int) ($stats['users'] ?? 0) ?></div>
+    <div class="label">Users</div>
     <div class="indicator <?= $changeClass((float) ($changes['users'] ?? 0)) ?>"><?= $changeText((float) ($changes['users'] ?? 0)) ?></div>
   </div>
   <div class="stat">
-    <div class="num"><?= (int)$stats['active_merchants'] ?></div>
+    <div class="num"><?= (int) ($stats['active_merchants'] ?? 0) ?></div>
     <div class="label">Active merchants</div>
     <div class="indicator <?= $changeClass((float) ($changes['active_merchants'] ?? 0)) ?>"><?= $changeText((float) ($changes['active_merchants'] ?? 0)) ?></div>
   </div>
   <div class="stat">
-    <div class="num">RM <?= number_format((float)$stats['revenue'], 2) ?></div>
+    <div class="num">RM <?= number_format((float) ($stats['revenue'] ?? 0), 2) ?></div>
     <div class="label">Platform revenue</div>
     <div class="indicator <?= $changeClass((float) ($changes['revenue'] ?? 0)) ?>"><?= $changeText((float) ($changes['revenue'] ?? 0)) ?></div>
   </div>
   <div class="stat">
-    <div class="num"><?= (int)$stats['orders'] ?></div>
+    <div class="num"><?= (int) ($stats['orders'] ?? 0) ?></div>
     <div class="label">Orders placed</div>
     <div class="indicator <?= $changeClass((float) ($changes['orders'] ?? 0)) ?>"><?= $changeText((float) ($changes['orders'] ?? 0)) ?></div>
   </div>
 </div>
 
 <div class="stat-grid admin-detail-grid">
-  <div class="stat"><div class="num"><?= (int)$stats['pending'] ?></div><div class="label">Pending stores</div></div>
-  <div class="stat"><div class="num"><?= (int)$stats['products'] ?></div><div class="label">Active products</div></div>
-  <div class="stat"><div class="num"><?= (int)$stats['reports'] ?></div><div class="label">Open reports</div></div>
+  <div class="stat"><div class="num"><?= (int) ($stats['pending'] ?? 0) ?></div><div class="label">Pending stores</div></div>
+  <div class="stat"><div class="num"><?= (int) ($stats['products'] ?? 0) ?></div><div class="label">Active products</div></div>
+  <div class="stat"><div class="num"><?= (int) ($stats['reports'] ?? 0) ?></div><div class="label">Open reports</div></div>
 </div>
 
 <div class="chart-grid">
