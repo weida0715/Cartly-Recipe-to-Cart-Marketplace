@@ -16,25 +16,52 @@
             <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th></th></tr></thead>
             <tbody>
               <?php foreach ($g['items'] as $it): ?>
-                <?php $stock = (int) $it['stock_quantity']; ?>
-                <tr>
-                  <td>
-                    <?= htmlspecialchars($it['product_name']) ?>
-                    <?php if ($it['added_method'] === 'recipe'): ?>
-                      <span class="badge badge-success">recipe</span>
-                    <?php endif; ?>
+                <?php
+                  $stock = (int) $it['stock_quantity'];
+                  $packageQuantity = rtrim(rtrim(number_format((float) $it['package_quantity'], 2, '.', ''), '0'), '.');
+                ?>
+                <tr class="cart-row">
+                  <td class="cart-item-cell">
+                    <div class="cart-item">
+                      <div class="cart-item-thumb" aria-hidden="true">
+                        <?php if (!empty($it['image'])): ?>
+                          <img src="<?= UPLOAD_URL ?>/<?= htmlspecialchars($it['image']) ?>" alt="<?= htmlspecialchars($it['product_name']) ?>">
+                        <?php else: ?>
+                          <span class="thumb-fallback">Item</span>
+                        <?php endif; ?>
+                      </div>
+                      <div class="cart-item-copy">
+                        <div class="cart-item-title-row">
+                          <strong class="cart-item-title"><?= htmlspecialchars($it['product_name']) ?></strong>
+                          <?php if ($it['added_method'] === 'recipe'): ?>
+                            <span class="badge badge-success">recipe</span>
+                          <?php endif; ?>
+                        </div>
+                        <div class="cart-item-meta">
+                          <span>Pack: <?= htmlspecialchars($packageQuantity) ?> <?= htmlspecialchars($it['package_unit']) ?></span>
+                          <span>Unit price: RM <?= number_format((float)$it['unit_price'], 2) ?></span>
+                        </div>
+                        <small class="text-muted">Stock available: <?= $stock ?><?= $stock === 0 ? ' · remove this item to continue' : '' ?></small>
+                      </div>
+                    </div>
                   </td>
-                  <td>
-                    <form method="post" action="<?= BASE_URL ?>/cart/update" class="flex">
+                  <td class="cart-qty-cell">
+                    <span class="cart-mobile-label">Qty</span>
+                    <form method="post" action="<?= BASE_URL ?>/cart/update" class="cart-qty-form">
                       <?= Csrf::field() ?>
                       <input type="hidden" name="cart_item_id" value="<?= (int)$it['cart_item_id'] ?>">
                       <input class="qty" type="number" name="quantity" value="<?= (int)$it['quantity'] ?>" min="1" max="<?= max(1, $stock) ?>" <?= $stock === 0 ? 'disabled' : '' ?>>
                       <button class="btn btn-outline btn-sm" <?= $stock === 0 ? 'disabled' : '' ?>>Update</button>
                     </form>
-                    <small class="text-muted">Stock: <?= $stock ?><?= $stock === 0 ? ' · remove this item to continue' : '' ?></small>
+                    <small class="text-muted">Quantity in cart</small>
                   </td>
-                  <td>RM <?= number_format((float)$it['line_total'], 2) ?></td>
-                  <td>
+                  <td class="cart-price-cell">
+                    <span class="cart-mobile-label">Total</span>
+                    <strong>RM <?= number_format((float)$it['line_total'], 2) ?></strong>
+                    <small class="text-muted"><?= (int)$it['quantity'] ?> × RM <?= number_format((float)$it['unit_price'], 2) ?></small>
+                  </td>
+                  <td class="cart-action-cell">
+                    <span class="cart-mobile-label">Action</span>
                     <form method="post" action="<?= BASE_URL ?>/cart/remove" data-confirm="Remove this item?">
                       <?= Csrf::field() ?>
                       <input type="hidden" name="cart_item_id" value="<?= (int)$it['cart_item_id'] ?>">
@@ -43,7 +70,7 @@
                   </td>
                 </tr>
               <?php endforeach; ?>
-              <tr><td colspan="3" class="text-right"><strong>Subtotal</strong></td><td><strong>RM <?= number_format((float)$g['subtotal'], 2) ?></strong></td></tr>
+              <tr class="cart-subtotal-row"><td colspan="3" class="text-right"><strong>Subtotal</strong></td><td><strong>RM <?= number_format((float)$g['subtotal'], 2) ?></strong></td></tr>
             </tbody>
           </table>
         </div>
