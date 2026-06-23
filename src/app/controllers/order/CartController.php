@@ -58,7 +58,7 @@ class CartController extends Controller
         if ($invalidRemoved) {
             Flash::set('info', 'One or more vouchers were removed because they are no longer valid for the cart.');
         }
-        $deliveryFee = CartPricing::estimatedDeliveryFee($groups);
+        $deliveryFee = round(count($groups) * (new AppSetting())->deliveryFee(), 2);
         $totalAfterDiscount = max(0, $subtotal - $discountTotal);
         $this->view('order/cart', [
             'title' => 'Your Cart - Cartly',

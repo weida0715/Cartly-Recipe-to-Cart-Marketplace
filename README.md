@@ -7,6 +7,7 @@ Merchants manage products, orders, and vouchers. Admins moderate users,
 stores, categories, and reports.
 
 ## Stack
+
 - PHP 8.1+ (no framework, custom mini-MVC under `src/app/`)
 - MySQL 5.7+ / MariaDB 10.4+
 - Plain HTML + CSS + vanilla JS
@@ -149,21 +150,21 @@ From the project root, run:
 php -S localhost:8000 -t src/public
 ```
 
-Then open <http://localhost:8000>.
+Then open [http://localhost:8000](http://localhost:8000).
 
 #### Option B: XAMPP/WAMP/MAMP
 
 1. Put the project in your web root, for example `xampp/htdocs/cartly`.
 2. Start Apache and MySQL.
-3. Open <http://localhost/cartly/src/public/>.
+3. Open [http://localhost/cartly/src/public/](http://localhost/cartly/src/public/).
 
 ## Default logins
 
-| Role     | Username  | Password    |
-|----------|-----------|-------------|
-| Admin    | admin     | password123 |
-| Merchant | merchant  | password123 |
-| Customer | customer  | password123 |
+| Role     | Username | Password    |
+| -------- | -------- | ----------- |
+| Admin    | admin    | password123 |
+| Merchant | merchant | password123 |
+| Customer | customer | password123 |
 
 (See `src/database/README.md` if you need to regenerate the hash.)
 

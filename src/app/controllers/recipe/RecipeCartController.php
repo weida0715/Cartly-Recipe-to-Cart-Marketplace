@@ -6,6 +6,7 @@ use App\Helpers\Controller;
 use App\Helpers\AuthHelper;
 use App\Helpers\CartPricing;
 use App\Helpers\Flash;
+use App\Models\AppSetting;
 use App\Models\RecipeCartEngine;
 use App\Models\Cart;
 use App\Models\CartItem;
@@ -25,7 +26,7 @@ class RecipeCartController extends Controller
             static fn (float $sum, array $group): float => $sum + (float) ($group['subtotal'] ?? 0),
             0.0
         );
-        $deliveryFee = CartPricing::estimatedDeliveryFee($grouped);
+        $deliveryFee = round(count($grouped) * (new AppSetting())->deliveryFee(), 2);
         $this->view('recipe/cart-preview', [
             'title'    => 'Cart Preview',
             'recipe'   => $result['recipe'],

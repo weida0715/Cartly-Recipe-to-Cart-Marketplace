@@ -9,6 +9,7 @@ use App\Helpers\CartPricing;
 use App\Helpers\Flash;
 use App\Helpers\Validator;
 use App\Models\Cart;
+use App\Models\AppSetting;
 use App\Models\CartItem;
 use App\Models\Voucher;
 use App\Models\Product;
@@ -55,7 +56,7 @@ class CheckoutController extends Controller
             $discountTotal += (float) $pricing['discount_total'];
         }
         unset($group);
-        $deliveryFee = CartPricing::estimatedDeliveryFee($groups);
+        $deliveryFee = round(count($groups) * (new AppSetting())->deliveryFee(), 2);
         $totalAfterDiscount = max(0, $subtotal - $discountTotal);
         $this->view('order/checkout', [
             'title' => 'Checkout',
@@ -106,6 +107,7 @@ class CheckoutController extends Controller
         $groups = $this->groupItems($items);
         $selected = CartVoucherSession::all($userId, $cartId);
         $voucherModel = new Voucher();
+        $deliveryFee = round(count($groups) * (new AppSetting())->deliveryFee(), 2);
         foreach ($groups as $storeId => &$group) {
             $pricing = $voucherModel->resolveCodesForStore(
                 $selected[$storeId] ?? [],
@@ -159,6 +161,11 @@ class CheckoutController extends Controller
                 $firstVoucherId = $appliedVouchers
                     ? (int) $appliedVouchers[0]['voucher_id']
                     : null;
+                $merchantTotal = CartPricing::merchantTotal(
+                    (float) $group['subtotal'],
+                    (float) $transactionPricing['discount_total'],
+                    $deliveryFee
+                );
                 $merchantOrder = $db->prepare(
                     "INSERT INTO merchant_orders (order_id, store_id, subtotal, voucher_id, discount_amount, delivery_fee, final_amount, status)
                      VALUES (:o, :s, :sub, :v, :d, :df, :final, 'pending')"
@@ -169,8 +176,8 @@ class CheckoutController extends Controller
                     ':sub' => (float) $group['subtotal'],
                     ':v' => $firstVoucherId,
                     ':d' => (float) $transactionPricing['discount_total'],
-                    ':df' => CartPricing::deliveryFeePerStore(),
-                    ':final' => (float) $transactionPricing['final_total'],
+                    ':df' => $deliveryFee,
+                    ':final' => $merchantTotal,
                 ]);
                 $merchantOrderId = (int) $db->lastInsertId();
 
@@ -211,7 +218,7 @@ class CheckoutController extends Controller
                         throw new \DomainException('Insufficient stock for ' . $item['product_name'] . '.');
                     }
                 }
-                $grandTotal += (float) $transactionPricing['final_total'];
+                $grandTotal += $merchantTotal;
             }
 
             $db->prepare('UPDATE orders SET total_amount = :t WHERE order_id = :o')
