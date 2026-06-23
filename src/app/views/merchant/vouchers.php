@@ -81,48 +81,48 @@ foreach ($vouchers as $voucher) {
             ? number_format((float) $v['discount_value'], 0) . '% off'
             : 'RM ' . number_format((float) $v['discount_value'], 2) . ' off';
         $validityLabel = $noExpiry
-            ? 'No expiry date'
+            ? 'No expiry'
             : trim(($v['start_date'] ? $v['start_date'] : 'Any time') . ' to ' . ($v['end_date'] ? $v['end_date'] : 'No end date'));
+        $usageLabel = (int) $v['usage_limit'] > 0
+            ? (int) $v['used_count'] . ' of ' . (int) $v['usage_limit'] . ' used'
+            : (int) $v['used_count'] . ' used, unlimited';
         $dialogId = 'voucher-edit-' . (int) $v['voucher_id'];
       ?>
       <article class="card voucher-record">
-        <div class="voucher-record-top">
+        <div class="voucher-record-summary">
           <div class="voucher-record-title">
+            <h3><?= htmlspecialchars($v['voucher_code']) ?></h3>
             <div class="voucher-chip-row">
               <span class="badge <?= $statusClass ?>"><?= htmlspecialchars($status) ?></span>
               <span class="badge"><?= htmlspecialchars($v['discount_type']) ?></span>
             </div>
-            <h3><?= htmlspecialchars($v['voucher_code']) ?></h3>
-            <p class="text-muted">Merchant voucher for this store</p>
           </div>
-          <div class="voucher-record-kpi">
+          <div class="voucher-summary-item voucher-summary-discount">
+            <span>Discount</span>
             <strong><?= htmlspecialchars($discountLabel) ?></strong>
-            <span>discount</span>
           </div>
-        </div>
-
-        <div class="voucher-record-meta">
-          <div>
+          <div class="voucher-summary-item">
             <span>Minimum spend</span>
             <strong>RM <?= number_format((float) $v['minimum_spend'], 2) ?></strong>
           </div>
-          <div>
+          <div class="voucher-summary-item">
             <span>Usage</span>
-            <strong>Used <?= (int) $v['used_count'] ?>/<?= (int) $v['usage_limit'] ?: '∞' ?></strong>
+            <strong><?= htmlspecialchars($usageLabel) ?></strong>
           </div>
-          <div>
+          <div class="voucher-summary-item">
             <span>Validity</span>
             <strong><?= htmlspecialchars($validityLabel) ?></strong>
           </div>
-        </div>
-
-        <div class="voucher-record-actions">
-          <button type="button" class="btn btn-outline btn-sm" data-category-edit-open data-dialog-target="<?= htmlspecialchars($dialogId) ?>">Edit</button>
-          <form method="post" action="<?= BASE_URL ?>/merchant/vouchers/<?= (int) $v['voucher_id'] ?>/delete"
-            data-confirm="Deactivate this voucher?">
-            <?= Csrf::field() ?>
-            <button class="btn btn-danger btn-sm">Deactivate</button>
-          </form>
+          <div class="voucher-record-actions">
+            <button type="button" class="btn btn-outline btn-sm" data-category-edit-open data-dialog-target="<?= htmlspecialchars($dialogId) ?>">Edit</button>
+            <?php if ($status === 'active'): ?>
+              <form method="post" action="<?= BASE_URL ?>/merchant/vouchers/<?= (int) $v['voucher_id'] ?>/delete"
+                data-confirm="Deactivate this voucher?">
+                <?= Csrf::field() ?>
+                <button class="btn btn-danger btn-sm">Deactivate</button>
+              </form>
+            <?php endif; ?>
+          </div>
         </div>
       </article>
 

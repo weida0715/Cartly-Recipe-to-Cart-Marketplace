@@ -238,6 +238,11 @@ All notable changes to this project will be documented in this file.
 - Added a recipe count showing how many cards are displayed on the current page out of the total filtered results.
 - Added null-safe dashboard statistics, request/order data, and recipe filter values based on review feedback.
 
+## [1.2.7] - 23rd June 2026
+- Simplified merchant voucher records into compact summaries with clear Edit and Deactivate actions.
+- Expanded pending merchant requests with owner, contact, address, operating hours, description, and request date details.
+- Added an approved merchant request history view that preserves approval timestamps when stores are later closed.
+- Restricted merchant approval actions to valid status transitions and required reasons for rejection and closure.
 ## [1.2.7] - 22nd June 2026
 
 - Added item subtotal, delivery cost, and total amount rows to the Recipe-to-Cart preview and shopping cart summaries.
@@ -286,5 +291,5 @@ All notable changes to this project will be documented in this file.
 ## [1.4.1] - 22nd June 2026
 
 - Resetting the summary control appearance
-- Explicitly hiding .nav-more-menu when the details is closed
+- Explicitly hiding `.nav-more-menu` when the details is closed
 - Removing the browser focus outline from the summary so it doesn’t show as a stray box

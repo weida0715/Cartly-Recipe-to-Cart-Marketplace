@@ -70,6 +70,41 @@ class Store extends Model
 
     public function pending(): array
     {
-        return $this->query("SELECT s.*, u.username, u.email FROM stores s JOIN users u ON u.user_id=s.user_id WHERE s.store_status='pending' ORDER BY s.created_at DESC");
+        return $this->query(
+            "SELECT s.*, u.username, u.full_name AS owner_name, u.email AS account_email, u.phone AS account_phone
+             FROM stores s
+             JOIN users u ON u.user_id = s.user_id
+             WHERE s.store_status = 'pending'
+             ORDER BY s.created_at ASC"
+        );
+    }
+
+    public function approvedRequestHistory(): array
+    {
+        return $this->query(
+            "SELECT s.*, u.username, u.full_name AS owner_name, u.email AS account_email,
+                    COALESCE(s.reviewed_at, s.created_at) AS approved_at
+             FROM stores s
+             JOIN users u ON u.user_id = s.user_id
+             WHERE s.store_status IN ('approved', 'closed')
+             ORDER BY COALESCE(s.reviewed_at, s.created_at) DESC, s.store_id DESC"
+        );
+    }
+
+    public function recordReview(int $storeId, string $status, string $adminNote): bool
+    {
+        $stmt = $this->db()->prepare(
+            "UPDATE stores
+             SET store_status = :status,
+                 admin_note = :admin_note,
+                 reviewed_at = CURRENT_TIMESTAMP
+             WHERE store_id = :store_id"
+        );
+
+        return $stmt->execute([
+            ':status' => $status,
+            ':admin_note' => $adminNote,
+            ':store_id' => $storeId,
+        ]);
     }
 }

@@ -55,6 +55,7 @@ CREATE TABLE stores (
   admin_note        TEXT,
   rating            DECIMAL(3,2) DEFAULT 0.00,
   created_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
+  reviewed_at       DATETIME NULL,
   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 CREATE TABLE categories (
