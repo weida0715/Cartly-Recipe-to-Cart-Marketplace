@@ -115,14 +115,6 @@ class CheckoutController extends Controller
         $paymentGateway = new MockPaymentGateway();
         $user = AuthHelper::user() ?? [];
 
-        // Group items by store.
-        $groups = [];
-        foreach ($items as $it) {
-            $sid = (int) $it['store_id'];
-            $groups[$sid]['items'][] = $it;
-            $groups[$sid]['subtotal'] = ($groups[$sid]['subtotal'] ?? 0) + (float) $it['unit_price'] * (int) $it['quantity'];
-        }
-
         // Stock sanity.
         foreach ($items as $it) {
             if ((int) $it['stock_quantity'] < (int) $it['quantity']) {
@@ -265,6 +257,7 @@ class CheckoutController extends Controller
                 ':order_id' => $orderId,
             ]);
 
+            $cartModel->clear($cartId);
             $db->commit();
         } catch (\RuntimeException $e) {
             if ($db->inTransaction()) {
