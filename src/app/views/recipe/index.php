@@ -80,6 +80,10 @@
     <?php else: ?>
       <div class="recipe-grid">
         <?php foreach ($recipes as $r): ?>
+          <?php
+          $reviewRating = (float) ($r['review_rating'] ?? 0);
+          $reviewCount = (int) ($r['review_count'] ?? 0);
+          ?>
           <div class="recipe-card">
             <div class="thumb">
               <?php if (!empty($r['image'])): ?>
@@ -96,6 +100,15 @@
               <div class="text-muted"><?= htmlspecialchars($r['difficulty'] ?? 'easy') ?> &middot;
                 <?= (int) ($r['prep_time'] ?? 0) + (int) ($r['cook_time'] ?? 0) ?> min
               </div>
+              <?php if ($reviewCount > 0): ?>
+                <div class="recipe-rating" aria-label="<?= number_format($reviewRating, 1) ?> out of 5 stars from <?= $reviewCount ?> <?= $reviewCount === 1 ? 'review' : 'reviews' ?>">
+                  <span aria-hidden="true">&#9733;</span>
+                  <strong><?= number_format($reviewRating, 1) ?></strong>
+                  <span class="recipe-review-count">(<?= $reviewCount ?> <?= $reviewCount === 1 ? 'review' : 'reviews' ?>)</span>
+                </div>
+              <?php else: ?>
+                <div class="recipe-rating is-unrated">Not rated yet</div>
+              <?php endif; ?>
               <a class="btn btn-primary btn-sm mt-1" href="<?= BASE_URL ?>/recipes/<?= (int) ($r['recipe_id'] ?? 0) ?>">Open</a>
             </div>
           </div>

@@ -17,7 +17,7 @@
       </div>
     </div>
     <div>
-      <?php $grand = 0; foreach ($groups as $sid => $g): $grand += $g['subtotal']; ?>
+      <?php foreach ($groups as $sid => $g): ?>
         <div class="card">
           <h4><?= htmlspecialchars($g['store_name']) ?></h4>
           <?php foreach ($g['items'] as $it): ?>
@@ -54,7 +54,9 @@
         </div>
       <?php endforeach; ?>
       <div class="cart-summary">
-        <div class="line total"><span>Grand total</span><span>RM <?= number_format($grand, 2) ?></span></div>
+        <div class="line"><span>Item subtotal</span><span>RM <?= number_format((float) $subtotal, 2) ?></span></div>
+        <div class="line"><span>Delivery cost</span><span>RM <?= number_format((float) $deliveryFee, 2) ?></span></div>
+        <div class="line total"><span>Total amount</span><span>RM <?= number_format((float) $total, 2) ?></span></div>
         <button class="btn btn-primary btn-block mt-2">Place order</button>
       </div>
     </div>

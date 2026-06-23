@@ -209,6 +209,19 @@ All notable changes to this project will be documented in this file.
 - Added null-safe dashboard statistics, request/order data, and recipe filter values based on review feedback.
 
 ## [1.2.7] - 22nd June 2026
+- Added item subtotal, delivery cost, and total amount rows to the Recipe-to-Cart preview and shopping cart summaries.
+- Added a fixed per-store delivery fee calculation so carts with multiple merchant stores charge delivery once per store.
+- Included delivery fees in checkout totals, saved merchant order totals, and order detail displays.
+- Added tests for delivery fee calculation and summary display coverage.
+
+## [1.2.8] - 22nd June 2026
+- Added average user ratings and review counts to recipe listing cards.
+- Added a clear unrated state for recipes that do not have any visible reviews yet.
+- Reworked the recipe details page with a two-column image and summary layout.
+- Added dedicated ingredient and numbered instruction cards with serving-based quantity scaling.
+- Refined instruction parsing and serving input behavior based on review feedback.
+
+## [1.2.9] - 22nd June 2026
 - Changed the customer profile page into an account overview with profile details, quick stats, shortcut actions, merchant application access, and recent orders.
 - Moved profile editing into a dedicated Edit Profile page.
 - Added account activity count helpers for orders, saved recipes, and reviews.
