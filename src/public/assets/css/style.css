@@ -176,6 +176,10 @@ h2 {
 .nav-more > summary:focus {
   outline: none;
 }
+.nav-more > summary:focus-visible {
+  outline: 3px solid rgba(245, 124, 0, 0.28);
+  outline-offset: 2px;
+}
 .nav-more > summary::-webkit-details-marker {
   display: none;
 }
