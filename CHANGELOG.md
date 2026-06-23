@@ -207,3 +207,9 @@ All notable changes to this project will be documented in this file.
 ## [1.2.6] - 22nd June 2026
 - Added a recipe count showing how many cards are displayed on the current page out of the total filtered results.
 - Added null-safe dashboard statistics, request/order data, and recipe filter values based on review feedback.
+
+## [1.2.7] - 22nd June 2026
+- Added item subtotal, delivery cost, and total amount rows to the Recipe-to-Cart preview and shopping cart summaries.
+- Added a fixed per-store delivery fee calculation so carts with multiple merchant stores charge delivery once per store.
+- Included delivery fees in checkout totals, saved merchant order totals, and order detail displays.
+- Added tests for delivery fee calculation and summary display coverage.
