@@ -4,6 +4,7 @@ namespace App\Controllers\Order;
 
 use App\Helpers\Controller;
 use App\Helpers\AuthHelper;
+use App\Helpers\CartVoucherSession;
 use App\Helpers\CartPricing;
 use App\Helpers\Flash;
 use App\Helpers\Validator;
@@ -11,44 +12,59 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Voucher;
 use App\Models\Product;
-use App\Models\AppSetting;
 
 class CheckoutController extends Controller
 {
     public function index(): void
     {
         AuthHelper::requireLogin();
-        $cart = (new Cart())->findOrCreateForUser((int) AuthHelper::id());
-        $items = (new CartItem())->detailed((int) $cart['cart_id']);
+        $userId = (int) AuthHelper::id();
+        $cart = (new Cart())->findOrCreateForUser($userId);
+        $cartId = (int) $cart['cart_id'];
+        $items = (new CartItem())->detailed($cartId);
         if (!$items) {
             Flash::set('info', 'Your cart is empty.');
             $this->redirect('/cart');
         }
-        $groups = [];
-        $total = 0;
-        foreach ($items as $it) {
-            $line = (float) $it['unit_price'] * (int) $it['quantity'];
-            $total += $line;
-            $sid = (int) $it['store_id'];
-            $groups[$sid]['store_name'] = $it['store_name'];
-            $groups[$sid]['items'][] = $it + ['line_total' => $line];
-            $groups[$sid]['subtotal'] = ($groups[$sid]['subtotal'] ?? 0) + $line;
-        }
+
+        $groups = $this->groupItems($items);
+        $selected = CartVoucherSession::all($userId, $cartId);
         $voucherModel = new Voucher();
-        foreach ($groups as $sid => &$group) {
-            $group['vouchers'] = $voucherModel->availableForStoreSubtotal((int) $sid, (float) $group['subtotal']);
+        $subtotal = 0.0;
+        $discountTotal = 0.0;
+        foreach ($groups as $storeId => &$group) {
+            $pricing = $voucherModel->resolveCodesForStore(
+                $selected[$storeId] ?? [],
+                (int) $storeId,
+                (float) $group['subtotal']
+            );
+            if ($pricing['invalid']) {
+                CartVoucherSession::replaceStore(
+                    $userId,
+                    $cartId,
+                    (int) $storeId,
+                    array_column($pricing['applied'], 'voucher_code')
+                );
+                Flash::set('error', 'A voucher is no longer valid. Review your cart before checkout.');
+                $this->redirect('/cart');
+            }
+            $group['applied_vouchers'] = $pricing['applied'];
+            $group['discount_total'] = $pricing['discount_total'];
+            $group['final_total'] = $pricing['final_total'];
+            $subtotal += (float) $group['subtotal'];
+            $discountTotal += (float) $pricing['discount_total'];
         }
         unset($group);
-        $deliveryFeePerStore = (new AppSetting())->deliveryFee();
-        $deliveryFee = CartPricing::deliveryFeeForGroups($groups, $deliveryFeePerStore);
+        $deliveryFee = CartPricing::estimatedDeliveryFee($groups);
+        $totalAfterDiscount = max(0, $subtotal - $discountTotal);
         $this->view('order/checkout', [
             'title' => 'Checkout',
             'user' => AuthHelper::user(),
             'groups' => $groups,
-            'subtotal' => $total,
-            'deliveryFeePerStore' => $deliveryFeePerStore,
+            'subtotal' => $subtotal,
+            'discountTotal' => $discountTotal,
             'deliveryFee' => $deliveryFee,
-            'total' => CartPricing::totalWithDelivery((float) $total, $deliveryFee),
+            'total' => CartPricing::totalWithDelivery($totalAfterDiscount, $deliveryFee),
         ]);
     }
 
@@ -60,7 +76,8 @@ class CheckoutController extends Controller
 
         $cartModel = new Cart();
         $cart = $cartModel->findOrCreateForUser($userId);
-        $items = (new CartItem())->detailed((int) $cart['cart_id']);
+        $cartId = (int) $cart['cart_id'];
+        $items = (new CartItem())->detailed($cartId);
         if (!$items) {
             Flash::set('error', 'Cart is empty.');
             $this->redirect('/cart');
@@ -69,130 +86,164 @@ class CheckoutController extends Controller
         $shipping = trim((string) $this->input('shipping_address', ''));
         $phone = trim((string) $this->input('contact_phone', ''));
         $payment = (string) $this->input('payment_method', 'simulated');
-        $vouchers = $_POST['voucher'] ?? []; // [storeId => code]
 
-        $v = new Validator([
+        $validator = new Validator([
             'shipping_address' => $shipping,
             'contact_phone' => $phone,
         ]);
-        $v->required('shipping_address', 'Shipping address')
+        $validator->required('shipping_address', 'Shipping address')
             ->required('contact_phone', 'Contact phone')
             ->phone('contact_phone', 'Contact phone');
-        if ($v->fails()) {
-            Flash::set('error', reset($v->errors));
+        if ($validator->fails()) {
+            Flash::set('error', reset($validator->errors));
+            $this->redirect('/checkout');
+        }
+        if (!in_array($payment, ['simulated_card', 'simulated_cod'], true)) {
+            Flash::set('error', 'Payment method is invalid.');
             $this->redirect('/checkout');
         }
 
-        $db = db();
+        $groups = $this->groupItems($items);
+        $selected = CartVoucherSession::all($userId, $cartId);
         $voucherModel = new Voucher();
-        $productModel = new Product();
-        $deliveryFeePerStore = (new AppSetting())->deliveryFee();
-
-        // Group items by store
-        $groups = [];
-        foreach ($items as $it) {
-            $sid = (int) $it['store_id'];
-            $groups[$sid]['items'][] = $it;
-            $groups[$sid]['subtotal'] = ($groups[$sid]['subtotal'] ?? 0) + (float) $it['unit_price'] * (int) $it['quantity'];
-        }
-
-        // Stock sanity
-        foreach ($items as $it) {
-            if ((int) $it['stock_quantity'] < (int) $it['quantity']) {
-                Flash::set('error', 'Insufficient stock for ' . $it['product_name'] . '.');
+        foreach ($groups as $storeId => &$group) {
+            $pricing = $voucherModel->resolveCodesForStore(
+                $selected[$storeId] ?? [],
+                (int) $storeId,
+                (float) $group['subtotal']
+            );
+            if ($pricing['invalid']) {
+                CartVoucherSession::replaceStore(
+                    $userId,
+                    $cartId,
+                    (int) $storeId,
+                    array_column($pricing['applied'], 'voucher_code')
+                );
+                Flash::set('error', 'A voucher is no longer valid. Review your cart and try again.');
                 $this->redirect('/cart');
             }
+            $group['applied_vouchers'] = $pricing['applied'];
+            $group['discount_total'] = $pricing['discount_total'];
+            $group['final_total'] = $pricing['final_total'];
         }
+        unset($group);
 
+        $db = db();
+        $productModel = new Product();
         try {
             $db->beginTransaction();
-
-            // Parent order placeholder; total updated after merchant order discounts
             $stmt = $db->prepare(
                 "INSERT INTO orders (user_id, total_amount, payment_method, payment_status, order_status, shipping_address, contact_phone)
                  VALUES (:u, 0, :pm, 'paid', 'pending', :sa, :ph)"
             );
             $stmt->execute([':u' => $userId, ':pm' => $payment, ':sa' => $shipping, ':ph' => $phone]);
             $orderId = (int) $db->lastInsertId();
-
             $grandTotal = 0.0;
 
-            foreach ($groups as $sid => $g) {
-                $subtotal = (float) $g['subtotal'];
-                $deliveryFee = $deliveryFeePerStore;
-                $voucherId = null;
-                $discount = 0.0;
-                $code = trim((string) ($vouchers[$sid] ?? ''));
-                if ($code !== '') {
-                    $voucher = $voucherModel->findValidForStore($code, (int) $sid, $subtotal);
-                    if (!$voucher) {
-                        if ($db->inTransaction()) {
-                            $db->rollBack();
-                        }
-                        $storeName = (string) ($g['items'][0]['store_name'] ?? 'one of the stores');
-                        Flash::set('error', 'Invalid voucher code for ' . $storeName . '.');
-                        $this->redirect('/checkout');
-                    }
-                    $discount = $voucherModel->computeDiscount($voucher, $subtotal);
-                    $voucherId = (int) $voucher['voucher_id'];
-                    if (!$voucherModel->incrementIfAvailable($voucherId)) {
-                        if ($db->inTransaction()) {
-                            $db->rollBack();
-                        }
-                        Flash::set('error', 'Voucher usage limit reached. Please remove the voucher and try again.');
-                        $this->redirect('/checkout');
+            foreach ($groups as $storeId => $group) {
+                $transactionPricing = $voucherModel->resolveCodesForStore(
+                    array_column($group['applied_vouchers'], 'voucher_code'),
+                    (int) $storeId,
+                    (float) $group['subtotal']
+                );
+                if ($transactionPricing['invalid']) {
+                    throw new \DomainException('A voucher is no longer valid.');
+                }
+                $appliedVouchers = $transactionPricing['applied'];
+                foreach ($appliedVouchers as $voucher) {
+                    if (!$voucherModel->incrementIfAvailable((int) $voucher['voucher_id'])) {
+                        throw new \DomainException('Voucher usage limit reached.');
                     }
                 }
-                $moStmt = $db->prepare(
+
+                $firstVoucherId = $appliedVouchers
+                    ? (int) $appliedVouchers[0]['voucher_id']
+                    : null;
+                $merchantOrder = $db->prepare(
                     "INSERT INTO merchant_orders (order_id, store_id, subtotal, voucher_id, discount_amount, delivery_fee, final_amount, status)
                      VALUES (:o, :s, :sub, :v, :d, :df, :final, 'pending')"
                 );
-                $finalAmount = CartPricing::merchantTotal($subtotal, $discount, $deliveryFee);
-                $moStmt->execute([
+                $merchantOrder->execute([
                     ':o' => $orderId,
-                    ':s' => $sid,
-                    ':sub' => $subtotal,
-                    ':v' => $voucherId,
-                    ':d' => $discount,
-                    ':df' => $deliveryFee,
-                    ':final' => $finalAmount,
+                    ':s' => $storeId,
+                    ':sub' => (float) $group['subtotal'],
+                    ':v' => $firstVoucherId,
+                    ':d' => (float) $transactionPricing['discount_total'],
+                    ':df' => CartPricing::deliveryFeePerStore(),
+                    ':final' => (float) $transactionPricing['final_total'],
                 ]);
-                $moId = (int) $db->lastInsertId();
+                $merchantOrderId = (int) $db->lastInsertId();
 
-                $oiStmt = $db->prepare(
+                if ($appliedVouchers) {
+                    $orderVoucher = $db->prepare(
+                        'INSERT INTO merchant_order_vouchers (merchant_order_id, voucher_id, discount_amount)
+                         VALUES (:merchant_order_id, :voucher_id, :discount_amount)'
+                    );
+                    foreach ($appliedVouchers as $voucher) {
+                        $orderVoucher->execute([
+                            ':merchant_order_id' => $merchantOrderId,
+                            ':voucher_id' => (int) $voucher['voucher_id'],
+                            ':discount_amount' => (float) $voucher['discount_amount'],
+                        ]);
+                    }
+                }
+
+                $orderItem = $db->prepare(
                     "INSERT INTO order_items (merchant_order_id, product_id, recipe_id, recipe_ingredient_id, product_name_snapshot, unit_price, quantity, subtotal)
                      VALUES (:mo, :p, :r, :ri, :pn, :up, :q, :sub)"
                 );
-                foreach ($g['items'] as $it) {
-                    $lineSubtotal = (float) $it['unit_price'] * (int) $it['quantity'];
-                    $oiStmt->execute([
-                        ':mo' => $moId,
-                        ':p' => (int) $it['product_id'],
-                        ':r' => $it['recipe_id'] !== null ? (int) $it['recipe_id'] : null,
-                        ':ri' => $it['recipe_ingredient_id'] !== null ? (int) $it['recipe_ingredient_id'] : null,
-                        ':pn' => $it['product_name'],
-                        ':up' => (float) $it['unit_price'],
-                        ':q' => (int) $it['quantity'],
+                foreach ($group['items'] as $item) {
+                    $lineSubtotal = (float) $item['unit_price'] * (int) $item['quantity'];
+                    $orderItem->execute([
+                        ':mo' => $merchantOrderId,
+                        ':p' => (int) $item['product_id'],
+                        ':r' => $item['recipe_id'] !== null ? (int) $item['recipe_id'] : null,
+                        ':ri' => $item['recipe_ingredient_id'] !== null ? (int) $item['recipe_ingredient_id'] : null,
+                        ':pn' => $item['product_name'],
+                        ':up' => (float) $item['unit_price'],
+                        ':q' => (int) $item['quantity'],
                         ':sub' => $lineSubtotal,
                     ]);
-                    $productModel->decrementStock((int) $it['product_id'], (int) $it['quantity']);
+                    if (!$productModel->decrementStockIfAvailable(
+                        (int) $item['product_id'],
+                        (int) $item['quantity']
+                    )) {
+                        throw new \DomainException('Insufficient stock for ' . $item['product_name'] . '.');
+                    }
                 }
-                $grandTotal += $finalAmount;
+                $grandTotal += (float) $transactionPricing['final_total'];
             }
 
-            $db->prepare("UPDATE orders SET total_amount = :t WHERE order_id = :o")
+            $db->prepare('UPDATE orders SET total_amount = :t WHERE order_id = :o')
                 ->execute([':t' => $grandTotal, ':o' => $orderId]);
-
-            $cartModel->clear((int) $cart['cart_id']);
-
+            $cartModel->clear($cartId);
             $db->commit();
-        } catch (\Throwable $e) {
-            $db->rollBack();
-            Flash::set('error', 'Checkout failed: ' . $e->getMessage());
+        } catch (\Throwable $error) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            error_log('Checkout failed: ' . $error->getMessage());
+            Flash::set('error', $error instanceof \DomainException
+                ? $error->getMessage() . ' Review your cart and try again.'
+                : 'Checkout failed. Please review your cart and try again.');
             $this->redirect('/cart');
         }
 
+        CartVoucherSession::clear($userId, $cartId);
         Flash::set('success', 'Order placed.');
         $this->redirect('/orders/' . $orderId . '/confirmation');
+    }
+
+    private function groupItems(array $items): array
+    {
+        $groups = [];
+        foreach ($items as $item) {
+            $line = (float) $item['unit_price'] * (int) $item['quantity'];
+            $storeId = (int) $item['store_id'];
+            $groups[$storeId]['store_name'] = $item['store_name'];
+            $groups[$storeId]['items'][] = $item + ['line_total' => $line];
+            $groups[$storeId]['subtotal'] = ($groups[$storeId]['subtotal'] ?? 0) + $line;
+        }
+        return $groups;
     }
 }

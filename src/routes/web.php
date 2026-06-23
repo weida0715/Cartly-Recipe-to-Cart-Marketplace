@@ -66,6 +66,8 @@ $router->post('/recipes/{id}/confirm-cart', [RecipeCartController::class, 'confi
 // Cart
 $router->get('/cart', [CartController::class, 'index']);
 $router->post('/cart/add', [CartController::class, 'add']);
+$router->post('/cart/vouchers/apply', [CartController::class, 'applyVoucher']);
+$router->post('/cart/vouchers/remove', [CartController::class, 'removeVoucher']);
 $router->post('/cart/update', [CartController::class, 'update']);
 $router->post('/cart/remove', [CartController::class, 'remove']);
 $router->post('/cart/clear', [CartController::class, 'clear']);
@@ -88,6 +90,7 @@ $router->get('/orders/{id}/confirmation', [OrderController::class, 'confirmation
 $router->get('/dashboard', [CustomerDashboardController::class, 'index']);
 $router->get('/saved-recipes', [CustomerDashboardController::class, 'savedRecipes']);
 $router->get('/profile', [CustomerDashboardController::class, 'profile']);
+$router->get('/profile/edit', [CustomerDashboardController::class, 'editProfile']);
 $router->post('/profile', [CustomerDashboardController::class, 'updateProfile']);
 $router->post('/merchant/request', [CustomerDashboardController::class, 'requestMerchant']);
 

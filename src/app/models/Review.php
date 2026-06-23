@@ -48,6 +48,15 @@ class Review extends Model
         return $rows[0] ?? null;
     }
 
+    public function countForUser(int $userId): int
+    {
+        $rows = $this->query(
+            'SELECT COUNT(*) AS total FROM reviews WHERE user_id = :u',
+            [':u' => $userId]
+        );
+        return (int) ($rows[0]['total'] ?? 0);
+    }
+
     public function saveProductReview(int $userId, int $productId, int $rating, string $comment): int
     {
         $existing = $this->findForProductByUser($userId, $productId);
