@@ -14,9 +14,12 @@
     <?php foreach ($stores as $store): ?>
       <article class="store-card">
         <div class="store-card-top">
-          <div>
-            <h3><?= htmlspecialchars($store['store_name']) ?></h3>
-            <p class="text-muted"><?= htmlspecialchars($store['store_address'] ?? '') ?></p>
+          <div class="store-identity">
+            <?= \App\Helpers\Icon::storeLogo($store, 'store-card-logo') ?>
+            <div>
+              <h3><?= htmlspecialchars($store['store_name']) ?></h3>
+              <p class="text-muted"><?= htmlspecialchars($store['store_address'] ?? '') ?></p>
+            </div>
           </div>
           <span class="badge badge-success"><?= (int) $store['product_count'] ?> items</span>
         </div>
@@ -36,9 +39,8 @@
             <?php endforeach; ?>
           </div>
         <?php endif; ?>
-        <div class="flex-between mt-2">
-          <a class="btn btn-outline btn-sm" href="<?= BASE_URL ?>/stores/<?= (int) $store['store_id'] ?>">View store</a>
-          <a class="btn btn-primary btn-sm" href="<?= BASE_URL ?>/stores/<?= (int) $store['store_id'] ?>#store-vouchers">View vouchers</a>
+        <div class="flex mt-2" style="justify-content: flex-end;">
+          <a class="btn btn-primary btn-sm" href="<?= BASE_URL ?>/stores/<?= (int) $store['store_id'] ?>">View store</a>
         </div>
       </article>
     <?php endforeach; ?>

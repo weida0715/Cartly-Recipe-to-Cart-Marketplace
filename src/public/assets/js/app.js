@@ -13,6 +13,41 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  document.querySelectorAll('.nav-more').forEach(menu => {
+    menu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        menu.removeAttribute('open');
+      });
+    });
+  });
+
+  document.querySelectorAll('[data-category-edit-open]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const dialog = document.getElementById(btn.dataset.dialogTarget || '');
+      if (!dialog) return;
+      if (typeof dialog.showModal === 'function') {
+        dialog.showModal();
+      } else {
+        dialog.setAttribute('open', '');
+      }
+    });
+  });
+
+  document.querySelectorAll('[data-category-edit-dialog]').forEach(dialog => {
+    dialog.addEventListener('click', e => {
+      if (e.target === dialog) {
+        dialog.close?.();
+        dialog.removeAttribute('open');
+      }
+    });
+    dialog.querySelectorAll('[data-dialog-close]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        dialog.close?.();
+        dialog.removeAttribute('open');
+      });
+    });
+  });
+
   // Merchant product validation message.
   document.querySelectorAll('form[data-product-form]').forEach(form => {
     const dialog = document.querySelector('[data-product-validation-dialog]');
@@ -123,6 +158,37 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Scale displayed recipe ingredients and keep cart-preview servings in sync.
+  document.querySelectorAll('[data-recipe-servings]').forEach(control => {
+    const input = control.querySelector('input[type=number]');
+    const baseServings = Math.max(1, Number(control.dataset.baseServings) || 1);
+    const quantities = [...document.querySelectorAll('[data-ingredient-quantity]')];
+    const targets = [...document.querySelectorAll('[data-recipe-servings-target]')];
+
+    const formatQuantity = value => Number(value.toFixed(2)).toString();
+    const updateServings = event => {
+      const rawValue = input?.value || '';
+      const parsed = parseInt(rawValue, 10);
+
+      if (event?.type === 'input' && (Number.isNaN(parsed) || parsed < 1)) {
+        return;
+      }
+
+      const servings = Math.max(1, parsed || 1);
+      if (input && (event?.type === 'change' || !event)) {
+        input.value = String(servings);
+      }
+      quantities.forEach(quantity => {
+        const baseQuantity = Number(quantity.dataset.baseQuantity) || 0;
+        quantity.textContent = formatQuantity(baseQuantity * servings / baseServings);
+      });
+      targets.forEach(target => { target.value = String(servings); });
+    };
+
+    input?.addEventListener('input', updateServings);
+    input?.addEventListener('change', updateServings);
+    updateServings();
+  });
   // Reset filtered listing results when a search input is cleared.
   document.querySelectorAll('form[data-search-reset]').forEach(form => {
     form.querySelectorAll('[data-search-reset-input]').forEach(input => {

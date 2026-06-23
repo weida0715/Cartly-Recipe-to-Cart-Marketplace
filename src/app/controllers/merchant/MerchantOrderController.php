@@ -8,6 +8,7 @@ use App\Helpers\Flash;
 use App\Models\Store;
 use App\Models\MerchantOrder;
 use App\Models\OrderItem;
+use App\Models\ReturnRequest;
 
 class MerchantOrderController extends Controller
 {
@@ -31,7 +32,12 @@ class MerchantOrderController extends Controller
         $mo->syncTimedStatusesForStore((int) $store['store_id']);
         $orders = $mo->forStore((int) $store['store_id']);
         $oi = new OrderItem();
-        foreach ($orders as &$o) $o['items'] = $oi->forMerchantOrder((int) $o['merchant_order_id']);
+        $returnRequestModel = new ReturnRequest();
+        foreach ($orders as &$o) {
+            $o['items'] = $oi->forMerchantOrder((int) $o['merchant_order_id']);
+            $o['return_requests'] = $returnRequestModel->forMerchantOrder((int) $o['merchant_order_id']);
+        }
+        unset($o);
         $this->view('merchant/orders', [
             'title' => 'Orders',
             'orders' => $orders,

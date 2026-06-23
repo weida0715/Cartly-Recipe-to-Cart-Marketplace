@@ -5,7 +5,9 @@ namespace App\Controllers\Merchant;
 use App\Helpers\Controller;
 use App\Helpers\AuthHelper;
 use App\Helpers\Flash;
+use App\Helpers\FileUploadHelper;
 use App\Helpers\Validator;
+use App\Helpers\StoreHours;
 use App\Models\Store;
 
 class MerchantStoreController extends Controller
@@ -14,9 +16,13 @@ class MerchantStoreController extends Controller
     {
         AuthHelper::requireRole('merchant');
         $store = (new Store())->byUser((int) AuthHelper::id());
+        $statistics = $store
+            ? (new Store())->statistics((int) $store['store_id'])
+            : [];
         $this->view('merchant/store', [
             'title' => 'Store Profile',
             'store' => $store,
+            'statistics' => $statistics,
         ], 'layout/merchant-layout');
     }
 
@@ -32,8 +38,8 @@ class MerchantStoreController extends Controller
             'contact_email' => trim((string) $this->input('contact_email', '')),
             'contact_phone' => trim((string) $this->input('contact_phone', '')),
             'store_address' => trim((string) $this->input('store_address', '')),
-            'opening_time' => $this->input('opening_time') ?: null,
-            'closing_time' => $this->input('closing_time') ?: null,
+            'opening_time' => StoreHours::normalize((string) $this->input('opening_time', '')),
+            'closing_time' => StoreHours::normalize((string) $this->input('closing_time', '')),
         ];
         $v = new Validator($data);
         $v->required('store_name', 'Store name')
@@ -44,17 +50,62 @@ class MerchantStoreController extends Controller
             Flash::set('error', reset($v->errors));
             $this->redirect('/merchant/store');
         }
+        $hoursError = StoreHours::error(
+            (string) $this->input('opening_time', ''),
+            (string) $this->input('closing_time', '')
+        );
+        if ($hoursError !== null) {
+            Flash::set('error', $hoursError);
+            $this->redirect('/merchant/store');
+        }
+
+        try {
+            $logo = FileUploadHelper::image('store_logo', 'stores/logos');
+        } catch (\RuntimeException $e) {
+            Flash::set('error', $e->getMessage());
+            $this->redirect('/merchant/store');
+        }
+        if ($logo !== null) {
+            $data['store_logo'] = $logo;
+        }
 
         $sm = new Store();
-        if ($store) {
-            $sm->update((int) $store['store_id'], $data);
-            Flash::set('success', 'Store updated.');
-        } else {
-            $data['user_id'] = $uid;
-            $data['store_status'] = 'pending';
-            $sm->insert($data);
-            Flash::set('success', 'Store created — awaiting admin approval.');
+        try {
+            if ($store) {
+                $oldLogoPath = $store['store_logo'] ?? null;
+                $updateSuccess = $sm->update((int) $store['store_id'], $data);
+                if ($updateSuccess === false) {
+                    throw new \RuntimeException('Store update failed.');
+                }
+                if ($logo !== null && !empty($oldLogoPath)) {
+                    try {
+                        FileUploadHelper::delete((string) $oldLogoPath);
+                    } catch (\Throwable $cleanupError) {
+                        error_log('Could not delete previous store logo: ' . $cleanupError->getMessage());
+                    }
+                }
+                Flash::set('success', 'Store updated.');
+            } else {
+                $data['user_id'] = $uid;
+                $data['store_status'] = 'pending';
+                if ($sm->insert($data) <= 0) {
+                    throw new \RuntimeException('Store creation failed.');
+                }
+                Flash::set('success', 'Store created - awaiting admin approval.');
+            }
+        } catch (\Throwable $e) {
+            error_log('Store save failed: ' . $e->getMessage());
+            if ($logo !== null) {
+                try {
+                    FileUploadHelper::delete($logo);
+                } catch (\Throwable $cleanupError) {
+                    error_log('Could not delete unsaved store logo: ' . $cleanupError->getMessage());
+                }
+            }
+            Flash::set('error', 'Store could not be saved. Please try again.');
+            $this->redirect('/merchant/store');
         }
+
         $this->redirect('/merchant/store');
     }
 }

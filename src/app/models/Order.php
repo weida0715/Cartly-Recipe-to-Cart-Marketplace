@@ -12,15 +12,33 @@ class Order extends Model
     {
         (new MerchantOrder())->syncTimedStatusesForUser($userId);
         $orders = $this->query(
-            "SELECT o.*, GROUP_CONCAT(mo.status) AS merchant_statuses
+            "SELECT o.*,
+                    (
+                        SELECT GROUP_CONCAT(mo.status)
+                        FROM merchant_orders mo
+                        WHERE mo.order_id = o.order_id
+                    ) AS merchant_statuses,
+                    (
+                        SELECT COALESCE(SUM(oi.quantity), 0)
+                        FROM merchant_orders mo_items
+                        JOIN order_items oi ON oi.merchant_order_id = mo_items.merchant_order_id
+                        WHERE mo_items.order_id = o.order_id
+                    ) AS item_count
              FROM orders o
-             LEFT JOIN merchant_orders mo ON mo.order_id = o.order_id
              WHERE o.user_id = :u
-             GROUP BY o.order_id
              ORDER BY o.created_at DESC",
             [':u' => $userId]
         );
         return array_map(fn(array $order): array => $this->withDisplayStatus($order), $orders);
+    }
+
+    public function countForUser(int $userId): int
+    {
+        $rows = $this->query(
+            'SELECT COUNT(*) AS total FROM orders WHERE user_id = :u',
+            [':u' => $userId]
+        );
+        return (int) ($rows[0]['total'] ?? 0);
     }
 
     public function withDisplayStatus(array $order): array

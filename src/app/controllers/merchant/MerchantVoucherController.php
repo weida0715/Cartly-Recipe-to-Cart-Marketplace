@@ -5,6 +5,7 @@ namespace App\Controllers\Merchant;
 use App\Helpers\Controller;
 use App\Helpers\AuthHelper;
 use App\Helpers\Flash;
+use App\Helpers\VoucherDateValidator;
 use App\Models\Store;
 use App\Models\Voucher;
 
@@ -38,6 +39,7 @@ class MerchantVoucherController extends Controller
         $discountValue = (float) $this->input('discount_value', 0);
         $minimumSpend = (float) $this->input('minimum_spend', 0);
         $usageLimit = (int) $this->input('usage_limit', 0);
+        $noExpiry = $this->input('no_expiry') !== null;
         $startDate = $this->input('start_date') ?: null;
         $endDate = $this->input('end_date') ?: null;
 
@@ -71,19 +73,15 @@ class MerchantVoucherController extends Controller
             $this->redirect('/merchant/vouchers');
         }
 
-        try {
-            $startDateTime = $startDate !== null ? new \DateTimeImmutable((string) $startDate) : null;
-            $endDateTime = $endDate !== null ? new \DateTimeImmutable((string) $endDate) : null;
-        } catch (\Exception $e) {
-            Flash::set('error', 'Voucher dates are invalid.');
+        $dateError = VoucherDateValidator::error($startDate, $endDate, $noExpiry);
+        if ($dateError !== null) {
+            Flash::set('error', $dateError);
             $this->redirect('/merchant/vouchers');
         }
-
-        if ($startDateTime !== null && $endDateTime !== null && $startDateTime > $endDateTime) {
-            Flash::set('error', 'End date must be after or equal to start date.');
-            $this->redirect('/merchant/vouchers');
+        if ($noExpiry) {
+            $startDate = null;
+            $endDate = null;
         }
-
         $voucher = new Voucher();
         try {
             $voucher->insert([
@@ -116,7 +114,6 @@ class MerchantVoucherController extends Controller
         if (!$store) {
             Flash::set('error', 'Store not found.');
             $this->redirect('/merchant/vouchers');
-            return;
         }
 
         $voucherModel = new Voucher();
@@ -132,60 +129,49 @@ class MerchantVoucherController extends Controller
         $discountValue = (float) $this->input('discount_value', 0);
         $minSpend = (float) $this->input('minimum_spend', 0);
         $usageLimit = (int) $this->input('usage_limit', 0);
+        $noExpiry = $this->input('no_expiry') !== null;
         $startDate = $this->input('start_date') ?: null;
         $endDate = $this->input('end_date') ?: null;
 
         if ($code === '') {
             Flash::set('error', 'Voucher code is required.');
             $this->redirect('/merchant/vouchers');
-            return;
         }
 
         if (!in_array($discountType, ['fixed', 'percentage'], true)) {
             Flash::set('error', 'Invalid discount type.');
             $this->redirect('/merchant/vouchers');
-            return;
         }
 
         if ($discountValue <= 0) {
             Flash::set('error', 'Discount value must be greater than zero.');
             $this->redirect('/merchant/vouchers');
-            return;
         }
 
         if ($discountType === 'percentage' && $discountValue > 100) {
             Flash::set('error', 'Percentage discount cannot exceed 100%.');
             $this->redirect('/merchant/vouchers');
-            return;
         }
 
         if ($minSpend < 0) {
             Flash::set('error', 'Minimum spend cannot be negative.');
             $this->redirect('/merchant/vouchers');
-            return;
         }
 
         if ($usageLimit < 0) {
             Flash::set('error', 'Usage limit cannot be negative.');
             $this->redirect('/merchant/vouchers');
-            return;
         }
 
-        try {
-            $startDateTime = $startDate !== null ? new \DateTimeImmutable((string) $startDate) : null;
-            $endDateTime = $endDate !== null ? new \DateTimeImmutable((string) $endDate) : null;
-        } catch (\Exception $e) {
-            Flash::set('error', 'Voucher dates are invalid.');
+        $dateError = VoucherDateValidator::error($startDate, $endDate, $noExpiry);
+        if ($dateError !== null) {
+            Flash::set('error', $dateError);
             $this->redirect('/merchant/vouchers');
-            return;
         }
-
-        if ($startDateTime !== null && $endDateTime !== null && $startDateTime > $endDateTime) {
-            Flash::set('error', 'End date must be after or equal to start date.');
-            $this->redirect('/merchant/vouchers');
-            return;
+        if ($noExpiry) {
+            $startDate = null;
+            $endDate = null;
         }
-
         try {
             $voucherModel->update((int) $id, [
                 'voucher_code' => $code,
@@ -201,7 +187,6 @@ class MerchantVoucherController extends Controller
             if ((string) $e->getCode() === '23000') {
                 Flash::set('error', 'Voucher code already exists for your store.');
                 $this->redirect('/merchant/vouchers');
-                return;
             }
             throw $e;
         }

@@ -1,5 +1,7 @@
 -- Seed data for Cartly. Run AFTER schema.sql.
 USE cartly;
+INSERT INTO application_settings (setting_key, setting_value) VALUES
+  ('delivery_fee_per_store', '2.00');
 -- Users (passwords are PHP password_hash() of "password123")
 -- Hash below is bcrypt for "password123"
 INSERT INTO users (username, full_name, email, phone, password, role, status) VALUES
@@ -64,6 +66,13 @@ INSERT INTO products (store_id, category_id, ingredient_id, product_name, descri
   (3, 3, 3, 'Omega Eggs (6)',         'Pack of 6 omega eggs.',    5.60, 42, 6,    'pcs','seeded/products/egg.png',            4.6, 'active'),
   (1, 6, 11, 'Hash Brown Potatoes',   'Frozen hash brown pack.', 10.90, 16, 600,  'g',  'seeded/products/potato.png',         4.4, 'active'),
   (2, 7, 13, 'Cold Brew Coffee 500ml','Ready-to-drink coffee.',   7.90, 20, 500,  'ml', 'seeded/products/coffee.png',         4.3, 'active');
+INSERT INTO vouchers (store_id, voucher_code, discount_type, discount_value, minimum_spend, start_date, end_date, usage_limit, used_count, status) VALUES
+  (1, 'FRESH10',    'percentage', 10.00, 30.00, NULL, NULL, 0,   0, 'active'),
+  (1, 'SAVE5',      'fixed',       5.00, 20.00, NULL, NULL, 0,   0, 'active'),
+  (2, 'MART15',     'percentage', 15.00, 50.00, NULL, NULL, 0,   0, 'active'),
+  (2, 'MART3',      'fixed',       3.00, 15.00, NULL, NULL, 0,   0, 'active'),
+  (3, 'BASKET8',    'fixed',       8.00, 40.00, NULL, NULL, 0,   0, 'active'),
+  (4, 'FARMLANE12', 'percentage', 12.00, 60.00, NULL, NULL, 100, 0, 'active');
 INSERT INTO recipes (user_id, recipe_title, description, instructions, base_servings, cuisine_type, difficulty, prep_time, cook_time, image, status) VALUES
   (3, 'Chicken Fried Rice', 'Quick weeknight chicken fried rice.', '1. Cook rice. 2. Stir-fry chicken. 3. Combine with eggs and onion.', 2, 'Asian',         'easy', 10, 20, 'seeded/recipes/chicken-fried-rice.png',      'active'),
   (3, 'Tomato Egg Stir-fry', 'Simple homestyle dish.',             '1. Beat eggs. 2. Cook tomatoes. 3. Combine and season.',           2, 'Chinese',       'easy', 5,  10, 'seeded/recipes/tomato-egg-stir-fry.png',     'active'),
