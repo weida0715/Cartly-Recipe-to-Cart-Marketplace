@@ -4,8 +4,8 @@
     <h1>Fresh ingredients. Real recipes. One cart.</h1>
     <p>Discover recipes, scale servings, and Cartly fills your basket from local merchants.</p>
     <div class="hero-actions">
-      <a class="btn btn-accent" href="<?= BASE_URL ?>/recipes">Browse Recipes</a>
-      <a class="btn btn-outline hero-outline" href="<?= BASE_URL ?>/products">Shop Marketplace</a>
+      <a class="btn btn-accent" href="<?= BASE_URL ?>/recipes"><?= \App\Helpers\Icon::render('recipes', 'button-icon') ?>Browse Recipes</a>
+      <a class="btn btn-outline hero-outline" href="<?= BASE_URL ?>/products"><?= \App\Helpers\Icon::render('marketplace', 'button-icon') ?>Shop Marketplace</a>
     </div>
   </div>
   <div class="hero-panel" aria-hidden="true">
@@ -40,8 +40,8 @@
     </p>
   </div>
   <div class="promo-banner-actions">
-    <a class="btn btn-accent" href="<?= BASE_URL ?>/vouchers">View Available Vouchers</a>
-    <a class="btn btn-outline" href="<?= BASE_URL ?>/products">Shop Marketplace</a>
+    <a class="btn btn-accent" href="<?= BASE_URL ?>/vouchers"><?= \App\Helpers\Icon::render('vouchers', 'button-icon') ?>View Available Vouchers</a>
+    <a class="btn btn-outline" href="<?= BASE_URL ?>/products"><?= \App\Helpers\Icon::render('marketplace', 'button-icon') ?>Shop Marketplace</a>
   </div>
 </section>
 
@@ -54,7 +54,15 @@
     <div class="grid grid-4">
       <?php foreach (array_slice($cats, 0, 8) as $c): ?>
         <a class="category-tile" href="<?= BASE_URL ?>/products?cid=<?= (int) $c['category_id'] ?>">
-          <span class="category-mark">Cart</span>
+          <span class="category-mark">
+            <?php if (!empty($c['category_icon'])): ?>
+              <img class="category-icon-image" src="<?= htmlspecialchars(UPLOAD_URL . '/' . ltrim((string) $c['category_icon'], '/'), ENT_QUOTES, 'UTF-8') ?>"
+                alt="" aria-hidden="true">
+            <?php else: ?>
+              <?= \App\Helpers\Icon::render('marketplace', 'category-icon') ?>
+            <?php endif; ?>
+            Shop
+          </span>
           <strong><?= htmlspecialchars($c['category_name']) ?></strong>
         </a>
       <?php endforeach; ?>
@@ -69,20 +77,38 @@
   </div>
   <div class="product-grid">
     <?php foreach ($featured as $p): ?>
+      <?php $inStock = (int) ($p['stock_quantity'] ?? 0) > 0; ?>
       <div class="product-card">
-        <div class="thumb">
-          <?php if (!empty($p['image'])): ?>
-            <img src="<?= UPLOAD_URL ?>/<?= htmlspecialchars($p['image']) ?>"
-              alt="<?= htmlspecialchars($p['product_name']) ?>">
-          <?php else: ?>
-            <span class="thumb-fallback">Fresh</span>
-          <?php endif; ?>
-        </div>
+        <a class="product-thumb-link" href="<?= BASE_URL ?>/products/<?= (int) ($p['product_id'] ?? 0) ?>"
+          aria-label="View <?= htmlspecialchars($p['product_name'] ?? '') ?> details">
+          <div class="thumb">
+            <?php if (!empty($p['image'])): ?>
+              <img src="<?= htmlspecialchars(UPLOAD_URL . '/' . ltrim((string) ($p['image'] ?? ''), '/'), ENT_QUOTES, 'UTF-8') ?>"
+                alt="<?= htmlspecialchars($p['product_name'] ?? '') ?>">
+            <?php else: ?>
+              <span class="thumb-fallback">Fresh</span>
+            <?php endif; ?>
+          </div>
+        </a>
         <div class="body">
-          <div class="name"><?= htmlspecialchars($p['product_name']) ?></div>
-          <div class="meta"><?= htmlspecialchars($p['store_name']) ?></div>
-          <div class="price">RM <?= number_format((float) $p['price'], 2) ?></div>
-          <a class="btn btn-outline btn-sm" href="<?= BASE_URL ?>/products/<?= (int) $p['product_id'] ?>">View</a>
+          <div class="name"><?= htmlspecialchars($p['product_name'] ?? '') ?></div>
+          <div class="meta"><?= htmlspecialchars($p['store_name'] ?? '') ?></div>
+          <div class="price">RM <?= number_format((float) ($p['price'] ?? 0), 2) ?></div>
+          <div class="actions">
+            <a class="btn btn-outline btn-sm" href="<?= BASE_URL ?>/products/<?= (int) ($p['product_id'] ?? 0) ?>">Details</a>
+            <?php if ($inStock): ?>
+              <form method="post" action="<?= BASE_URL ?>/cart/add">
+                <?= \App\Helpers\Csrf::field() ?>
+                <input type="hidden" name="product_id" value="<?= (int) ($p['product_id'] ?? 0) ?>">
+                <input type="hidden" name="quantity" value="1">
+                <button class="btn btn-primary btn-sm" type="submit">
+                  <?= \App\Helpers\Icon::render('cart', 'button-icon') ?>Add to cart
+                </button>
+              </form>
+            <?php else: ?>
+              <button class="btn btn-primary btn-sm" type="button" disabled>Out of stock</button>
+            <?php endif; ?>
+          </div>
         </div>
       </div>
     <?php endforeach; ?>

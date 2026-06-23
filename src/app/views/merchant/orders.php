@@ -74,5 +74,47 @@
         <span class="text-muted">No merchant action available.</span>
       <?php endif; ?>
       </div>
+      <?php if (!empty($o['return_requests'])): ?>
+        <section class="merchant-return-requests" aria-label="Return and refund requests">
+          <h3>Return and refund requests</h3>
+          <?php foreach ($o['return_requests'] as $request): ?>
+            <article class="return-request-card" id="return-request-<?= (int) $request['return_request_id'] ?>">
+              <div class="flex-between">
+                <strong><?= htmlspecialchars((string) $request['product_name_snapshot']) ?></strong>
+                <span class="badge"><?= htmlspecialchars(str_replace('_', ' ', (string) $request['status'])) ?></span>
+              </div>
+              <p><?= htmlspecialchars(ucfirst((string) $request['request_type'])) ?> · <?= (int) $request['quantity'] ?> item(s) · Maximum RM <?= number_format((float) $request['requested_amount'], 2) ?></p>
+              <p><strong>Customer reason:</strong> <?= nl2br(htmlspecialchars((string) $request['reason'])) ?></p>
+              <?php if ((string) $request['status'] === 'pending'): ?>
+                <form method="post" action="<?= BASE_URL ?>/merchant/returns/<?= (int) $request['return_request_id'] ?>/decide" class="return-decision-form">
+                  <?= Csrf::field() ?>
+                  <label>Decision
+                    <select name="decision" required>
+                      <option value="refund">Approve refund</option>
+                      <option value="return">Approve return</option>
+                      <option value="reject">Reject request</option>
+                    </select>
+                  </label>
+                  <label>Refund amount
+                    <input type="number" name="refund_amount" min="0" max="<?= htmlspecialchars((string) $request['requested_amount']) ?>" step="0.01" value="<?= htmlspecialchars((string) $request['requested_amount']) ?>">
+                  </label>
+                  <label>Merchant note
+                    <textarea name="merchant_note" maxlength="1000" placeholder="Required when rejecting"></textarea>
+                  </label>
+                  <button class="btn btn-primary btn-sm">Submit decision</button>
+                </form>
+              <?php elseif ((string) $request['status'] === 'return_shipped'): ?>
+                <form method="post" action="<?= BASE_URL ?>/merchant/returns/<?= (int) $request['return_request_id'] ?>/receive" data-confirm="Confirm the returned item arrived? This records the refund.">
+                  <?= Csrf::field() ?>
+                  <button class="btn btn-primary btn-sm">Item received and refund</button>
+                </form>
+              <?php else: ?>
+                <?php if (!empty($request['merchant_note'])): ?><p><strong>Merchant note:</strong> <?= nl2br(htmlspecialchars((string) $request['merchant_note'])) ?></p><?php endif; ?>
+                <?php if (!empty($request['refund_amount'])): ?><p><strong>Refund:</strong> RM <?= number_format((float) $request['refund_amount'], 2) ?></p><?php endif; ?>
+              <?php endif; ?>
+            </article>
+          <?php endforeach; ?>
+        </section>
+      <?php endif; ?>
     </div>
   <?php endforeach; endif; ?>
