@@ -13,6 +13,7 @@ use App\Models\AppSetting;
 use App\Models\CartItem;
 use App\Models\Voucher;
 use App\Models\Product;
+use App\Models\Notification;
 
 class CheckoutController extends Controller
 {
@@ -234,6 +235,29 @@ class CheckoutController extends Controller
                 ? $error->getMessage() . ' Review your cart and try again.'
                 : 'Checkout failed. Please review your cart and try again.');
             $this->redirect('/cart');
+        }
+
+        $notificationModel = new Notification();
+        foreach ($groups as $sid => $group) {
+            $notificationModel->createForStore(
+                (int) $sid,
+                'info',
+                'New order received',
+                'A new store order was placed under order #' . $orderId . '.',
+                '/merchant/orders'
+            );
+            foreach ($group['items'] as $item) {
+                $freshProduct = $productModel->find((int) $item['product_id']);
+                if ($freshProduct && (int) $freshProduct['stock_quantity'] <= 0) {
+                    $notificationModel->createForStore(
+                        (int) $sid,
+                        'warning',
+                        'Product out of stock',
+                        $freshProduct['product_name'] . ' is now out of stock.',
+                        '/merchant/products/' . (int) $freshProduct['product_id'] . '/edit'
+                    );
+                }
+            }
         }
 
         CartVoucherSession::clear($userId, $cartId);

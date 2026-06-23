@@ -6,6 +6,7 @@ use App\Helpers\Controller;
 use App\Helpers\AuthHelper;
 use App\Helpers\Flash;
 use App\Models\Store;
+use App\Models\Notification;
 use App\Models\User;
 
 class AdminMerchantController extends Controller
@@ -31,7 +32,6 @@ class AdminMerchantController extends Controller
             Flash::set('error', 'Pending merchant request not found.');
             $this->redirect('/admin/merchants');
         }
-
         $db = db();
         try {
             $db->beginTransaction();
@@ -46,7 +46,13 @@ class AdminMerchantController extends Controller
             Flash::set('error', 'Merchant request could not be approved.');
             $this->redirect('/admin/merchants');
         }
-
+        (new Notification())->createForUser(
+            (int) $store['user_id'],
+            'success',
+            'Merchant request approved',
+            'Your store request was approved. You can now use the merchant portal.',
+            '/merchant'
+        );
         Flash::set('success', 'Merchant approved.');
         $this->redirect('/admin/merchants');
     }
@@ -67,6 +73,13 @@ class AdminMerchantController extends Controller
             $this->redirect('/admin/merchants');
         }
         $storeModel->recordReview((int) $id, 'rejected', $note);
+        (new Notification())->createForUser(
+            (int) $store['user_id'],
+            'warning',
+            'Merchant request rejected',
+            'Your store request was rejected. Reason: ' . $note,
+            '/dashboard'
+        );
         Flash::set('info', 'Merchant rejected.');
         $this->redirect('/admin/merchants');
     }

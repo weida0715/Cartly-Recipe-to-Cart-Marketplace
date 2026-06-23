@@ -238,11 +238,6 @@ All notable changes to this project will be documented in this file.
 - Added a recipe count showing how many cards are displayed on the current page out of the total filtered results.
 - Added null-safe dashboard statistics, request/order data, and recipe filter values based on review feedback.
 
-## [1.2.7] - 23rd June 2026
-- Simplified merchant voucher records into compact summaries with clear Edit and Deactivate actions.
-- Expanded pending merchant requests with owner, contact, address, operating hours, description, and request date details.
-- Added an approved merchant request history view that preserves approval timestamps when stores are later closed.
-- Restricted merchant approval actions to valid status transitions and required reasons for rejection and closure.
 ## [1.2.7] - 22nd June 2026
 
 - Added item subtotal, delivery cost, and total amount rows to the Recipe-to-Cart preview and shopping cart summaries.
@@ -293,3 +288,15 @@ All notable changes to this project will be documented in this file.
 - Resetting the summary control appearance
 - Explicitly hiding `.nav-more-menu` when the details is closed
 - Removing the browser focus outline from the summary so it doesn’t show as a stray box
+
+
+## [1.5.0] - 23rd June 2026
+- Simplified merchant voucher records into compact summaries with clear Edit and Deactivate actions.
+- Expanded pending merchant requests with owner, contact, address, operating hours, description, and request date details.
+- Added an approved merchant request history view that preserves approval timestamps when stores are later closed.
+- Restricted merchant approval actions to valid status transitions and required reasons for rejection and closure.
+- Added persistent notifications with an unread navbar indicator, eight-item dropdown, full list, and detail actions.
+- Added notifications for reports, merchant approvals, checkout and delivery updates, stock warnings, returns, and authenticated flash messages.
+- Allowed customers to cancel store orders before dispatch with atomic stock restoration.
+- Added item-level refund or return requests after order completion with merchant approval, rejection, refund amount, return shipment, and receipt workflows.
+- Added partial and full refund payment states plus migration `009_notifications_and_returns.sql` for existing databases.

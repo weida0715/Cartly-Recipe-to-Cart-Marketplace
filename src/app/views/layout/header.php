@@ -2,6 +2,17 @@
 use App\Helpers\AuthHelper;
 $user = AuthHelper::user();
 $role = AuthHelper::role();
+$notificationPreview = [];
+$unreadNotificationCount = 0;
+if ($user) {
+  try {
+    $notificationModel = new \App\Models\Notification();
+    $notificationPreview = $notificationModel->latestForUser((int) $user['user_id'], 8);
+    $unreadNotificationCount = $notificationModel->unreadCount((int) $user['user_id']);
+  } catch (\Throwable) {
+    // Keep navigation available until the notification migration is imported.
+  }
+}
 
 $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $normalizedBaseUrl = rtrim(BASE_URL, '/');
@@ -73,6 +84,35 @@ $moreActive = $isActivePath('/saved-recipes', false)
             </div>
           </details>
           <span class="user-chip">Hi, <?= htmlspecialchars($user['username']) ?></span>
+          <details class="notification-menu">
+            <summary class="notification-trigger" aria-label="Notifications">
+              <?= \App\Helpers\Icon::render('notifications', 'nav-icon') ?>
+              <?php if ($unreadNotificationCount > 0): ?>
+                <span class="notification-count"><?= min(99, $unreadNotificationCount) ?></span>
+              <?php endif; ?>
+            </summary>
+            <div class="notification-dropdown">
+              <div class="notification-dropdown-header">
+                <strong>Notifications</strong>
+                <span><?= (int) $unreadNotificationCount ?> unread</span>
+              </div>
+              <?php if (!$notificationPreview): ?>
+                <p class="notification-empty">No notifications yet.</p>
+              <?php else: ?>
+                <div class="notification-dropdown-list">
+                  <?php foreach ($notificationPreview as $notification): ?>
+                    <a class="notification-preview <?= empty($notification['is_read']) ? 'is-unread' : '' ?>"
+                      href="<?= BASE_URL ?>/notifications/<?= (int) $notification['notification_id'] ?>">
+                      <strong><?= htmlspecialchars((string) $notification['title']) ?></strong>
+                      <span><?= htmlspecialchars((string) $notification['message']) ?></span>
+                      <small><?= htmlspecialchars((string) $notification['created_at']) ?></small>
+                    </a>
+                  <?php endforeach; ?>
+                </div>
+              <?php endif; ?>
+              <a class="notification-view-all" href="<?= BASE_URL ?>/notifications">View all notifications</a>
+            </div>
+          </details>
           <a class="btn btn-ghost" href="<?= BASE_URL ?>/auth/logout"><?= \App\Helpers\Icon::render('logout', 'nav-icon') ?>Logout</a>
         <?php else: ?>
           <details class="nav-more<?= $moreActive ? ' active' : '' ?>">

@@ -9,6 +9,7 @@ use App\Models\Report;
 use App\Models\Product;
 use App\Models\Recipe;
 use App\Models\Review;
+use App\Models\Notification;
 
 class AdminReportController extends Controller
 {
@@ -40,6 +41,13 @@ class AdminReportController extends Controller
         }
         $status = $action === 'resolve' || $action === 'hide' ? 'resolved' : 'reviewed';
         (new Report())->update((int) $id, ['status' => $status, 'resolved_at' => date('Y-m-d H:i:s')]);
+        (new Notification())->createForUser(
+            (int) $report['user_id'],
+            'info',
+            'Report status updated',
+            'Your report #' . (int) $id . ' was marked as ' . $status . '.',
+            '/notifications'
+        );
         Flash::set('success', 'Report marked as ' . $status . '.');
         $this->redirect('/admin/reports');
     }

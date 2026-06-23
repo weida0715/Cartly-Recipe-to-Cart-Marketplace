@@ -10,6 +10,7 @@ use App\Models\Review;
 use App\Models\SavedRecipe;
 use App\Models\User;
 use App\Models\Store;
+use App\Models\Notification;
 use App\Helpers\Flash;
 use App\Helpers\Validator;
 
@@ -150,7 +151,14 @@ class CustomerDashboardController extends Controller
             $this->redirect('/dashboard');
         }
 
-        $storeModel->insert($data);
+        $storeId = $storeModel->insert($data);
+        (new Notification())->createForRole(
+            'admin',
+            'warning',
+            'New merchant request',
+            'A customer submitted store request #' . $storeId . '.',
+            '/admin/merchants'
+        );
         Flash::set('success', 'Store request submitted. Waiting for admin approval.');
         $this->redirect('/dashboard');
     }

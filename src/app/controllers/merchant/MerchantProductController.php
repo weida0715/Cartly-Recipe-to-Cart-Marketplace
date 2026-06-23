@@ -10,6 +10,7 @@ use App\Models\Store;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Ingredient;
+use App\Models\Notification;
 
 class MerchantProductController extends Controller
 {
@@ -50,7 +51,17 @@ class MerchantProductController extends Controller
         $store = $this->currentStore();
         $this->requireCsrf();
         try {
-            (new Product())->insert($this->payload((int) $store['store_id']));
+            $data = $this->payload((int) $store['store_id']);
+            $productId = (new Product())->insert($data);
+            if ((int) $data['stock_quantity'] === 0) {
+                (new Notification())->createForUser(
+                    (int) AuthHelper::id(),
+                    'warning',
+                    'Product out of stock',
+                    $data['product_name'] . ' was created with no available stock.',
+                    '/merchant/products/' . $productId . '/edit'
+                );
+            }
         } catch (\RuntimeException $e) {
             Flash::set('error', $e->getMessage());
             $this->redirect('/merchant/products/create');
@@ -91,6 +102,15 @@ class MerchantProductController extends Controller
             $data = $this->payload((int) $store['store_id'], false);
             $newImage = $data['image'] ?? null;
             $pm->update((int) $id, $data);
+            if ((int) ($data['stock_quantity'] ?? $p['stock_quantity']) === 0 && (int) $p['stock_quantity'] > 0) {
+                (new Notification())->createForUser(
+                    (int) AuthHelper::id(),
+                    'warning',
+                    'Product out of stock',
+                    ($data['product_name'] ?? $p['product_name']) . ' now has no available stock.',
+                    '/merchant/products/' . (int) $id . '/edit'
+                );
+            }
             if ($newImage && !empty($p['image']) && $p['image'] !== $newImage) {
                 FileUploadHelper::delete($p['image']);
             }

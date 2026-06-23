@@ -7,6 +7,7 @@ use App\Helpers\AuthHelper;
 use App\Helpers\Flash;
 use App\Models\Report;
 use App\Models\Review;
+use App\Models\Notification;
 
 class ReportController extends Controller
 {
@@ -23,7 +24,14 @@ class ReportController extends Controller
             $this->redirect('/');
         }
 
-        (new Report())->createForUser((int) AuthHelper::id(), $targetType, $targetId, $reason);
+        $reportId = (new Report())->createForUser((int) AuthHelper::id(), $targetType, $targetId, $reason);
+        (new Notification())->createForRole(
+            'admin',
+            'warning',
+            'New report received',
+            'Report #' . $reportId . ' requires moderation.',
+            '/admin/reports'
+        );
         Flash::set('success', 'Report submitted for admin review.');
 
         if ($targetType === 'review') {
