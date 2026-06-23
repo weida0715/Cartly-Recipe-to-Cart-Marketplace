@@ -22,7 +22,7 @@ CREATE TABLE payment_transactions (
 -- Existing orders predate receipt snapshots. Preserve usable fallback values.
 UPDATE orders o
 JOIN users u ON u.user_id = o.user_id
-SET o.customer_name_snapshot = u.full_name,
-    o.customer_email_snapshot = u.email,
+SET o.customer_name_snapshot = COALESCE(u.full_name, ''),
+    o.customer_email_snapshot = COALESCE(u.email, ''),
     o.receipt_number = CONCAT('RCT-', DATE_FORMAT(o.created_at, '%Y%m%d'), '-', LPAD(o.order_id, 6, '0'))
 WHERE o.receipt_number IS NULL;

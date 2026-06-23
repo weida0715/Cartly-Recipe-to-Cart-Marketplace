@@ -39,6 +39,17 @@ class MockPaymentReceiptTest extends TestCase
         ], 10.00);
     }
 
+    public function test_array_manipulated_payment_fields_are_rejected_without_warnings(): void
+    {
+        $this->expectException(RuntimeException::class);
+        (new MockPaymentGateway())->process('card', [
+            'cardholder_name' => ['Test Customer'],
+            'card_number' => ['4242424242424242'],
+            'card_expiry' => ['12/30'],
+            'card_cvv' => ['123'],
+        ], 10.00);
+    }
+
     public function test_decline_test_card_is_rejected(): void
     {
         $this->expectException(RuntimeException::class);
@@ -124,6 +135,9 @@ class MockPaymentReceiptTest extends TestCase
         $schema = file_get_contents(__DIR__ . '/../src/database/schema.sql');
         $routes = file_get_contents(__DIR__ . '/../src/routes/web.php');
         $checkout = file_get_contents(__DIR__ . '/../src/app/controllers/order/CheckoutController.php');
+        $orderController = file_get_contents(__DIR__ . '/../src/app/controllers/order/OrderController.php');
+        $receipt = file_get_contents(__DIR__ . '/../src/app/views/order/receipt.php');
+        $migration = file_get_contents(__DIR__ . '/../src/database/migrations/010_mock_payments_and_receipts.sql');
 
         $this->assertStringContainsString('CREATE TABLE payment_transactions', $schema);
         $this->assertStringContainsString('receipt_number', $schema);
@@ -133,6 +147,10 @@ class MockPaymentReceiptTest extends TestCase
         $this->assertStringContainsString('MockPaymentGateway', $checkout);
         $this->assertStringNotContainsString("'card_number' =>", $checkout);
         $this->assertStringNotContainsString("'card_cvv' =>", $checkout);
+        $this->assertStringContainsString("require dirname(__DIR__, 2) . '/views/order/receipt.php';\n        exit;", $orderController);
+        $this->assertStringContainsString('is_array($merchantOrders ?? null)', $receipt);
+        $this->assertStringContainsString("COALESCE(u.full_name, '')", $migration);
+        $this->assertStringContainsString("COALESCE(u.email, '')", $migration);
     }
 
     private function renderReceipt(array $data): string

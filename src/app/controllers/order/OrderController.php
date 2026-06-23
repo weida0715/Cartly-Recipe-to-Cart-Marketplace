@@ -64,6 +64,7 @@ class OrderController extends Controller
         extract($data, EXTR_SKIP);
         $downloadMode = true;
         require dirname(__DIR__, 2) . '/views/order/receipt.php';
+        exit;
     }
 
     public function received(string $id): void

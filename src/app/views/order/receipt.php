@@ -1,6 +1,7 @@
 <?php
 $downloadMode = $downloadMode ?? false;
 $payment = is_array($payment ?? null) ? $payment : [];
+$merchantOrders = is_array($merchantOrders ?? null) ? $merchantOrders : [];
 $customerName = (string) (($order['customer_name_snapshot'] ?? '') ?: 'Cartly customer');
 $customerEmail = (string) (($order['customer_email_snapshot'] ?? '') ?: 'Not recorded');
 $subtotal = 0.0;

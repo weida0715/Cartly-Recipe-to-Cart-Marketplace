@@ -27,10 +27,10 @@ class MockPaymentGateway
 
     private function processCard(array $input, float $amount): array
     {
-        $name = trim((string) ($input['cardholder_name'] ?? ''));
-        $number = preg_replace('/\D+/', '', (string) ($input['card_number'] ?? '')) ?? '';
-        $expiry = trim((string) ($input['card_expiry'] ?? ''));
-        $cvv = trim((string) ($input['card_cvv'] ?? ''));
+        $name = trim($this->scalarString($input, 'cardholder_name'));
+        $number = preg_replace('/\D+/', '', $this->scalarString($input, 'card_number')) ?? '';
+        $expiry = trim($this->scalarString($input, 'card_expiry'));
+        $cvv = trim($this->scalarString($input, 'card_cvv'));
 
         if ($name === '' || strlen($name) > 100) {
             throw new \RuntimeException('Enter the cardholder name.');
@@ -53,8 +53,8 @@ class MockPaymentGateway
 
     private function processBanking(array $input, float $amount): array
     {
-        $name = trim((string) ($input['bank_account_name'] ?? ''));
-        $bank = (string) ($input['bank_name'] ?? '');
+        $name = trim($this->scalarString($input, 'bank_account_name'));
+        $bank = $this->scalarString($input, 'bank_name');
         if ($name === '' || strlen($name) > 100 || !in_array($bank, self::BANKS, true)) {
             throw new \RuntimeException('Choose a supported bank and enter the account holder name.');
         }
@@ -70,9 +70,9 @@ class MockPaymentGateway
 
     private function processEwallet(array $input, float $amount): array
     {
-        $name = trim((string) ($input['ewallet_name'] ?? ''));
-        $provider = (string) ($input['ewallet_provider'] ?? '');
-        $phone = preg_replace('/\D+/', '', (string) ($input['ewallet_phone'] ?? '')) ?? '';
+        $name = trim($this->scalarString($input, 'ewallet_name'));
+        $provider = $this->scalarString($input, 'ewallet_provider');
+        $phone = preg_replace('/\D+/', '', $this->scalarString($input, 'ewallet_phone')) ?? '';
         if ($name === '' || strlen($name) > 100 || !in_array($provider, self::EWALLETS, true)
             || !preg_match('/^\d{9,12}$/', $phone)) {
             throw new \RuntimeException('Enter valid mock e-wallet details.');
@@ -127,5 +127,11 @@ class MockPaymentGateway
         $year = 2000 + (int) $matches[2];
         $expiresAt = mktime(23, 59, 59, $month + 1, 0, $year);
         return $expiresAt !== false && $expiresAt >= time();
+    }
+
+    private function scalarString(array $input, string $key): string
+    {
+        $value = $input[$key] ?? null;
+        return is_scalar($value) ? (string) $value : '';
     }
 }
