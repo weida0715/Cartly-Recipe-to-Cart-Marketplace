@@ -207,3 +207,9 @@ All notable changes to this project will be documented in this file.
 ## [1.2.6] - 22nd June 2026
 - Added a recipe count showing how many cards are displayed on the current page out of the total filtered results.
 - Added null-safe dashboard statistics, request/order data, and recipe filter values based on review feedback.
+
+## [1.2.7] - 23rd June 2026
+- Simplified merchant voucher records into compact summaries with clear Edit and Deactivate actions.
+- Expanded pending merchant requests with owner, contact, address, operating hours, description, and request date details.
+- Added an approved merchant request history view that preserves approval timestamps when stores are later closed.
+- Restricted merchant approval actions to valid status transitions and required reasons for rejection and closure.
