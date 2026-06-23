@@ -16,6 +16,10 @@ If the database was already imported before voucher codes became store-scoped,
 run `migrations/002_store_scoped_voucher_codes.sql` once instead of recreating
 the database.
 
+For an existing database, run `migrations/010_mock_payments_and_receipts.sql`
+once to add masked mock-payment transaction records and generated receipt
+details.
+
 CLI alternative:
 
 ```bash

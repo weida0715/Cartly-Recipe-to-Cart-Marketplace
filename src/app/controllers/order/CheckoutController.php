@@ -6,10 +6,12 @@ use App\Helpers\Controller;
 use App\Helpers\AuthHelper;
 use App\Helpers\Flash;
 use App\Helpers\Validator;
+use App\Helpers\MockPaymentGateway;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Voucher;
 use App\Models\Product;
+use App\Models\PaymentTransaction;
 
 class CheckoutController extends Controller
 {
@@ -61,8 +63,8 @@ class CheckoutController extends Controller
 
         $shipping = trim((string) $this->input('shipping_address', ''));
         $phone = trim((string) $this->input('contact_phone', ''));
-        $payment = (string) $this->input('payment_method', 'simulated');
-        $vouchers = $_POST['voucher'] ?? []; // [storeId => code]
+        $payment = (string) $this->input('payment_method', 'card');
+        $vouchers = is_array($_POST['voucher'] ?? null) ? $_POST['voucher'] : []; // [storeId => code]
 
         $v = new Validator([
             'shipping_address' => $shipping,
@@ -79,6 +81,9 @@ class CheckoutController extends Controller
         $db = db();
         $voucherModel = new Voucher();
         $productModel = new Product();
+        $paymentModel = new PaymentTransaction();
+        $paymentGateway = new MockPaymentGateway();
+        $user = AuthHelper::user() ?? [];
 
         // Group items by store
         $groups = [];
@@ -101,10 +106,19 @@ class CheckoutController extends Controller
 
             // Parent order placeholder; total updated after merchant order discounts
             $stmt = $db->prepare(
-                "INSERT INTO orders (user_id, total_amount, payment_method, payment_status, order_status, shipping_address, contact_phone)
-                 VALUES (:u, 0, :pm, 'paid', 'pending', :sa, :ph)"
+                "INSERT INTO orders (
+                    user_id, total_amount, payment_method, payment_status, order_status,
+                    shipping_address, contact_phone, customer_name_snapshot, customer_email_snapshot
+                 ) VALUES (:u, 0, :pm, 'pending', 'pending', :sa, :ph, :customer_name, :customer_email)"
             );
-            $stmt->execute([':u' => $userId, ':pm' => $payment, ':sa' => $shipping, ':ph' => $phone]);
+            $stmt->execute([
+                ':u' => $userId,
+                ':pm' => $payment,
+                ':sa' => $shipping,
+                ':ph' => $phone,
+                ':customer_name' => (string) ($user['full_name'] ?? ''),
+                ':customer_email' => (string) ($user['email'] ?? ''),
+            ]);
             $orderId = (int) $db->lastInsertId();
 
             $grandTotal = 0.0;
@@ -170,15 +184,35 @@ class CheckoutController extends Controller
                 $grandTotal += $finalAmount;
             }
 
-            $db->prepare("UPDATE orders SET total_amount = :t WHERE order_id = :o")
-                ->execute([':t' => $grandTotal, ':o' => $orderId]);
+            $paymentResult = $paymentGateway->process($payment, $_POST, $grandTotal);
+            $paymentModel->insert(['order_id' => $orderId] + $paymentResult);
+
+            $receiptNumber = 'RCT-' . date('Ymd') . '-' . str_pad((string) $orderId, 6, '0', STR_PAD_LEFT);
+            $db->prepare(
+                "UPDATE orders
+                 SET total_amount = :total, payment_status = 'paid', receipt_number = :receipt
+                 WHERE order_id = :order_id"
+            )->execute([
+                ':total' => $grandTotal,
+                ':receipt' => $receiptNumber,
+                ':order_id' => $orderId,
+            ]);
 
             $cartModel->clear((int) $cart['cart_id']);
 
             $db->commit();
+        } catch (\RuntimeException $e) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            Flash::set('error', $e->getMessage());
+            $this->redirect('/checkout');
         } catch (\Throwable $e) {
-            $db->rollBack();
-            Flash::set('error', 'Checkout failed: ' . $e->getMessage());
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            error_log('Checkout failed: ' . $e->getMessage());
+            Flash::set('error', 'Checkout failed. Please try again.');
             $this->redirect('/cart');
         }
 

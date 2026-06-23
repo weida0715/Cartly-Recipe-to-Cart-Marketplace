@@ -80,6 +80,8 @@ $router->get('/orders', [OrderController::class, 'history']);
 $router->get('/orders/merchant/{id}/tracking', [OrderController::class, 'trackingStatus']);
 $router->post('/orders/merchant/{id}/advance', [OrderController::class, 'advanceDelivery']);
 $router->post('/orders/merchant/{id}/received', [OrderController::class, 'received']);
+$router->get('/orders/{id}/receipt/download', [OrderController::class, 'downloadReceipt']);
+$router->get('/orders/{id}/receipt', [OrderController::class, 'receipt']);
 $router->get('/orders/{id}', [OrderController::class, 'show']);
 $router->get('/orders/{id}/confirmation', [OrderController::class, 'confirmation']);
 

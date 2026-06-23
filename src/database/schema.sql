@@ -3,6 +3,7 @@
 CREATE DATABASE IF NOT EXISTS cartly CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE cartly;
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS payment_transactions;
 DROP TABLE IF EXISTS reports;
 DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS order_items;
@@ -159,8 +160,24 @@ CREATE TABLE orders (
   order_status     ENUM('pending','processing','completed','cancelled') NOT NULL DEFAULT 'pending',
   shipping_address TEXT,
   contact_phone    VARCHAR(20),
+  customer_name_snapshot VARCHAR(100) NOT NULL,
+  customer_email_snapshot VARCHAR(100) NOT NULL,
+  receipt_number   VARCHAR(40) UNIQUE,
   created_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+CREATE TABLE payment_transactions (
+  payment_transaction_id INT AUTO_INCREMENT PRIMARY KEY,
+  order_id        INT NOT NULL UNIQUE,
+  transaction_reference VARCHAR(50) NOT NULL UNIQUE,
+  payment_method  ENUM('card','online_banking','ewallet') NOT NULL,
+  provider_name   VARCHAR(80) NOT NULL,
+  payer_name      VARCHAR(100) NOT NULL,
+  masked_account  VARCHAR(80) NOT NULL,
+  amount          DECIMAL(10,2) NOT NULL,
+  status          ENUM('approved','failed') NOT NULL,
+  processed_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
 );
 CREATE TABLE merchant_orders (
   merchant_order_id INT AUTO_INCREMENT PRIMARY KEY,

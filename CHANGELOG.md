@@ -207,3 +207,10 @@ All notable changes to this project will be documented in this file.
 ## [1.2.6] - 22nd June 2026
 - Added a recipe count showing how many cards are displayed on the current page out of the total filtered results.
 - Added null-safe dashboard statistics, request/order data, and recipe filter values based on review feedback.
+
+## [1.2.7] - 23rd June 2026
+- Added mock card, online banking, and e-wallet payment forms with server-side validation and simulated approval or decline handling.
+- Stored only generated transaction references, providers, payer names, and masked account identifiers without retaining card numbers or CVV values.
+- Added automatically generated receipt numbers and customer snapshots when checkout succeeds.
+- Added ownership-protected receipt pages with print/PDF support and downloadable HTML receipts from confirmation, order details, and order history.
+- Added migration `010_mock_payments_and_receipts.sql` for existing databases.
