@@ -25,6 +25,7 @@ use App\Controllers\Admin\AdminUserController;
 use App\Controllers\Admin\AdminMerchantController;
 use App\Controllers\Admin\AdminCategoryController;
 use App\Controllers\Admin\AdminReportController;
+use App\Controllers\Admin\AdminSettingsController;
 
 // Public
 $router->get('/', [HomeController::class, 'index']);
@@ -121,6 +122,8 @@ $router->get('/admin/categories', [AdminCategoryController::class, 'index']);
 $router->post('/admin/categories', [AdminCategoryController::class, 'store']);
 $router->post('/admin/categories/{id}/update', [AdminCategoryController::class, 'update']);
 $router->post('/admin/categories/{id}/delete', [AdminCategoryController::class, 'delete']);
+$router->get('/admin/settings', [AdminSettingsController::class, 'index']);
+$router->post('/admin/settings', [AdminSettingsController::class, 'update']);
 $router->get('/admin/reports', [AdminReportController::class, 'index']);
 $router->post('/admin/reports/{id}/resolve', [AdminReportController::class, 'resolve']);
 

@@ -4,12 +4,14 @@ namespace App\Controllers\Order;
 
 use App\Helpers\Controller;
 use App\Helpers\AuthHelper;
+use App\Helpers\CartPricing;
 use App\Helpers\Flash;
 use App\Helpers\Validator;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Voucher;
 use App\Models\Product;
+use App\Models\AppSetting;
 
 class CheckoutController extends Controller
 {
@@ -37,11 +39,16 @@ class CheckoutController extends Controller
             $group['vouchers'] = $voucherModel->availableForStoreSubtotal((int) $sid, (float) $group['subtotal']);
         }
         unset($group);
+        $deliveryFeePerStore = (new AppSetting())->deliveryFee();
+        $deliveryFee = CartPricing::deliveryFeeForGroups($groups, $deliveryFeePerStore);
         $this->view('order/checkout', [
             'title' => 'Checkout',
             'user' => AuthHelper::user(),
             'groups' => $groups,
-            'total' => $total,
+            'subtotal' => $total,
+            'deliveryFeePerStore' => $deliveryFeePerStore,
+            'deliveryFee' => $deliveryFee,
+            'total' => CartPricing::totalWithDelivery((float) $total, $deliveryFee),
         ]);
     }
 
@@ -79,6 +86,7 @@ class CheckoutController extends Controller
         $db = db();
         $voucherModel = new Voucher();
         $productModel = new Product();
+        $deliveryFeePerStore = (new AppSetting())->deliveryFee();
 
         // Group items by store
         $groups = [];
@@ -111,6 +119,7 @@ class CheckoutController extends Controller
 
             foreach ($groups as $sid => $g) {
                 $subtotal = (float) $g['subtotal'];
+                $deliveryFee = $deliveryFeePerStore;
                 $voucherId = null;
                 $discount = 0.0;
                 $code = trim((string) ($vouchers[$sid] ?? ''));
@@ -136,15 +145,16 @@ class CheckoutController extends Controller
                 }
                 $moStmt = $db->prepare(
                     "INSERT INTO merchant_orders (order_id, store_id, subtotal, voucher_id, discount_amount, delivery_fee, final_amount, status)
-                     VALUES (:o, :s, :sub, :v, :d, 0, :final, 'pending')"
+                     VALUES (:o, :s, :sub, :v, :d, :df, :final, 'pending')"
                 );
-                $finalAmount = max(0, $subtotal - $discount);
+                $finalAmount = CartPricing::merchantTotal($subtotal, $discount, $deliveryFee);
                 $moStmt->execute([
                     ':o' => $orderId,
                     ':s' => $sid,
                     ':sub' => $subtotal,
                     ':v' => $voucherId,
                     ':d' => $discount,
+                    ':df' => $deliveryFee,
                     ':final' => $finalAmount,
                 ]);
                 $moId = (int) $db->lastInsertId();

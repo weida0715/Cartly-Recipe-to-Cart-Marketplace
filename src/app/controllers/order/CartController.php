@@ -4,9 +4,11 @@ namespace App\Controllers\Order;
 
 use App\Helpers\Controller;
 use App\Helpers\AuthHelper;
+use App\Helpers\CartPricing;
 use App\Helpers\Flash;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\AppSetting;
 
 class CartController extends Controller
 {
@@ -26,11 +28,16 @@ class CartController extends Controller
             $groups[$sid]['items'][] = $it + ['line_total' => $line];
             $groups[$sid]['subtotal'] = ($groups[$sid]['subtotal'] ?? 0) + $line;
         }
+        $deliveryFeePerStore = (new AppSetting())->deliveryFee();
+        $deliveryFee = CartPricing::deliveryFeeForGroups($groups, $deliveryFeePerStore);
         $this->view('order/cart', [
-            'title'  => 'Your Cart · Cartly',
+            'title' => 'Your Cart - Cartly',
             'groups' => $groups,
-            'total'  => $total,
-            'count'  => count($items),
+            'subtotal' => $total,
+            'deliveryFeePerStore' => $deliveryFeePerStore,
+            'deliveryFee' => $deliveryFee,
+            'total' => CartPricing::totalWithDelivery($total, $deliveryFee),
+            'count' => count($items),
         ]);
     }
 

@@ -16,6 +16,9 @@ If the database was already imported before voucher codes became store-scoped,
 run `migrations/002_store_scoped_voucher_codes.sql` once instead of recreating
 the database.
 
+To add administrator-managed delivery fees to an existing database, run
+`migrations/007_application_settings.sql` once.
+
 CLI alternative:
 
 ```bash

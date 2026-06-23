@@ -207,3 +207,10 @@ All notable changes to this project will be documented in this file.
 ## [1.2.6] - 22nd June 2026
 - Added a recipe count showing how many cards are displayed on the current page out of the total filtered results.
 - Added null-safe dashboard statistics, request/order data, and recipe filter values based on review feedback.
+
+## [1.2.7] - 23rd June 2026
+- Added an admin settings page for configuring the delivery fee charged per merchant order.
+- Applied the configured delivery fee to cart estimates, checkout totals, and saved merchant orders.
+- Reworked the merchant store profile into dedicated details and operating-hours cards.
+- Added store statistics for active products, orders, product revenue, and store rating.
+- Added strict operating-hours validation with support for overnight schedules.

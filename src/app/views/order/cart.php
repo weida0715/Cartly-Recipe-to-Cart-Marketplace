@@ -56,8 +56,11 @@
     <div>
       <div class="cart-summary">
         <h3>Order summary</h3>
-        <div class="line"><span>Items</span><span><?= (int)$count ?></span></div>
-        <div class="line total"><span>Total</span><span>RM <?= number_format((float)$total, 2) ?></span></div>
+        <div class="line"><span>Items</span><span><?= (int) $count ?></span></div>
+        <div class="line"><span>Subtotal</span><span>RM <?= number_format((float) ($subtotal ?? 0), 2) ?></span></div>
+        <div class="line"><span>Delivery fee</span><span>RM <?= number_format((float) ($deliveryFee ?? 0), 2) ?></span></div>
+        <small class="text-muted">RM <?= number_format((float) ($deliveryFeePerStore ?? 0), 2) ?> per merchant</small>
+        <div class="line total"><span>Total</span><span>RM <?= number_format((float) $total, 2) ?></span></div>
         <a class="btn btn-primary btn-block mt-2" href="<?= BASE_URL ?>/checkout">Proceed to checkout</a>
       </div>
     </div>
