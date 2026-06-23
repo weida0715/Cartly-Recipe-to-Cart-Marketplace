@@ -34,7 +34,7 @@ $statusClass = static function (string $status): string {
 <div class="profile-summary-grid">
   <section class="card profile-account-card">
     <div class="profile-avatar" aria-hidden="true">
-      <?= htmlspecialchars(strtoupper(substr((string) ($user['username'] ?? 'U'), 0, 1))) ?>
+      <?= htmlspecialchars(mb_strtoupper(mb_substr((string) ($user['username'] ?? 'U'), 0, 1, 'UTF-8'), 'UTF-8')) ?>
     </div>
     <div class="profile-account-details">
       <h3><?= htmlspecialchars($user['full_name'] ?? 'Cartly user') ?></h3>

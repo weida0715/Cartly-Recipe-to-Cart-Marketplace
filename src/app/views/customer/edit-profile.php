@@ -1,4 +1,7 @@
-<?php use App\Helpers\Csrf; ?>
+<?php
+use App\Helpers\Csrf;
+$user = is_array($user ?? null) ? $user : [];
+?>
 <div class="profile-header">
   <div>
     <h2><?= \App\Helpers\Icon::render('profile', 'heading-icon') ?>Edit profile</h2>
