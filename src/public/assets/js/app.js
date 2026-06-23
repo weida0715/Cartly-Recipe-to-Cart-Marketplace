@@ -13,6 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  document.querySelectorAll('.nav-more').forEach(menu => {
+    menu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        menu.removeAttribute('open');
+      });
+    });
+  });
+
   document.querySelectorAll('[data-category-edit-open]').forEach(btn => {
     btn.addEventListener('click', () => {
       const dialog = document.getElementById(btn.dataset.dialogTarget || '');
