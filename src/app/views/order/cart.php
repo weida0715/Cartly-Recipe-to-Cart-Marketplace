@@ -110,19 +110,13 @@
     <aside>
       <div class="cart-summary">
         <h3>Order summary</h3>
-<<<<<<< HEAD
         <div class="line"><span>Items</span><span><?= (int) $count ?></span></div>
-        <div class="line"><span>Subtotal</span><span>RM <?= number_format((float) ($subtotal ?? 0), 2) ?></span></div>
+        <div class="line"><span>Estimated subtotal</span><span>RM <?= number_format((float) ($subtotal ?? 0), 2) ?></span></div>
+        <div class="line"><span>Delivery cost</span><span>RM <?= number_format((float) ($deliveryFee ?? 0), 2) ?></span></div>
         <?php if ((float) ($discountTotal ?? 0) > 0): ?>
           <div class="line discount"><span>Voucher savings</span><span>-RM <?= number_format((float) $discountTotal, 2) ?></span></div>
         <?php endif; ?>
-        <div class="line total"><span>Total</span><span>RM <?= number_format((float) ($total ?? 0), 2) ?></span></div>
-=======
-        <div class="line"><span>Items</span><span><?= (int)$count ?></span></div>
-        <div class="line"><span>Estimated subtotal</span><span>RM <?= number_format((float)$subtotal, 2) ?></span></div>
-        <div class="line"><span>Delivery cost</span><span>RM <?= number_format((float)$deliveryFee, 2) ?></span></div>
-        <div class="line total"><span>Total amount</span><span>RM <?= number_format((float)$total, 2) ?></span></div>
->>>>>>> origin
+        <div class="line total"><span>Total amount</span><span>RM <?= number_format((float) ($total ?? 0), 2) ?></span></div>
         <a class="btn btn-primary btn-block mt-2" href="<?= BASE_URL ?>/checkout">Proceed to checkout</a>
       </div>
     </aside>

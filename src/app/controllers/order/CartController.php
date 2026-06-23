@@ -4,11 +4,8 @@ namespace App\Controllers\Order;
 
 use App\Helpers\Controller;
 use App\Helpers\AuthHelper;
-<<<<<<< HEAD
 use App\Helpers\CartVoucherSession;
-=======
 use App\Helpers\CartPricing;
->>>>>>> origin
 use App\Helpers\Flash;
 use App\Models\Cart;
 use App\Models\CartItem;
@@ -55,30 +52,21 @@ class CartController extends Controller
             $subtotal += (float) $group['subtotal'];
             $discountTotal += (float) $pricing['discount_total'];
         }
-<<<<<<< HEAD
         unset($group);
 
         if ($invalidRemoved) {
             Flash::set('info', 'One or more vouchers were removed because they are no longer valid for the cart.');
         }
-
-=======
         $deliveryFee = CartPricing::estimatedDeliveryFee($groups);
->>>>>>> origin
+        $totalAfterDiscount = max(0, $subtotal - $discountTotal);
         $this->view('order/cart', [
             'title' => 'Your Cart - Cartly',
             'groups' => $groups,
-<<<<<<< HEAD
             'subtotal' => $subtotal,
             'discountTotal' => $discountTotal,
-            'total' => max(0, $subtotal - $discountTotal),
-            'count' => count($items),
-=======
-            'subtotal' => $total,
             'deliveryFee' => $deliveryFee,
-            'total'  => CartPricing::totalWithDelivery($total, $deliveryFee),
-            'count'  => count($items),
->>>>>>> origin
+            'total' => CartPricing::totalWithDelivery($totalAfterDiscount, $deliveryFee),
+            'count' => count($items),
         ]);
     }
 

@@ -4,11 +4,8 @@ namespace App\Controllers\Order;
 
 use App\Helpers\Controller;
 use App\Helpers\AuthHelper;
-<<<<<<< HEAD
 use App\Helpers\CartVoucherSession;
-=======
 use App\Helpers\CartPricing;
->>>>>>> origin
 use App\Helpers\Flash;
 use App\Helpers\Validator;
 use App\Models\Cart;
@@ -58,24 +55,16 @@ class CheckoutController extends Controller
             $discountTotal += (float) $pricing['discount_total'];
         }
         unset($group);
-<<<<<<< HEAD
-
-=======
         $deliveryFee = CartPricing::estimatedDeliveryFee($groups);
->>>>>>> origin
+        $totalAfterDiscount = max(0, $subtotal - $discountTotal);
         $this->view('order/checkout', [
             'title' => 'Checkout',
             'user' => AuthHelper::user(),
             'groups' => $groups,
-<<<<<<< HEAD
             'subtotal' => $subtotal,
             'discountTotal' => $discountTotal,
-            'total' => max(0, $subtotal - $discountTotal),
-=======
-            'subtotal' => $total,
             'deliveryFee' => $deliveryFee,
-            'total' => CartPricing::totalWithDelivery((float) $total, $deliveryFee),
->>>>>>> origin
+            'total' => CartPricing::totalWithDelivery($totalAfterDiscount, $deliveryFee),
         ]);
     }
 
@@ -151,7 +140,6 @@ class CheckoutController extends Controller
             $orderId = (int) $db->lastInsertId();
             $grandTotal = 0.0;
 
-<<<<<<< HEAD
             foreach ($groups as $storeId => $group) {
                 $transactionPricing = $voucherModel->resolveCodesForStore(
                     array_column($group['applied_vouchers'], 'voucher_code'),
@@ -165,32 +153,6 @@ class CheckoutController extends Controller
                 foreach ($appliedVouchers as $voucher) {
                     if (!$voucherModel->incrementIfAvailable((int) $voucher['voucher_id'])) {
                         throw new \DomainException('Voucher usage limit reached.');
-=======
-            foreach ($groups as $sid => $g) {
-                $subtotal = (float) $g['subtotal'];
-                $deliveryFee = CartPricing::deliveryFeePerStore();
-                $voucherId = null;
-                $discount = 0.0;
-                $code = trim((string) ($vouchers[$sid] ?? ''));
-                if ($code !== '') {
-                    $voucher = $voucherModel->findValidForStore($code, (int) $sid, $subtotal);
-                    if (!$voucher) {
-                        if ($db->inTransaction()) {
-                            $db->rollBack();
-                        }
-                        $storeName = (string) ($g['items'][0]['store_name'] ?? 'one of the stores');
-                        Flash::set('error', 'Invalid voucher code for ' . $storeName . '.');
-                        $this->redirect('/checkout');
-                    }
-                    $discount = $voucherModel->computeDiscount($voucher, $subtotal);
-                    $voucherId = (int) $voucher['voucher_id'];
-                    if (!$voucherModel->incrementIfAvailable($voucherId)) {
-                        if ($db->inTransaction()) {
-                            $db->rollBack();
-                        }
-                        Flash::set('error', 'Voucher usage limit reached. Please remove the voucher and try again.');
-                        $this->redirect('/checkout');
->>>>>>> origin
                     }
                 }
 
@@ -201,25 +163,14 @@ class CheckoutController extends Controller
                     "INSERT INTO merchant_orders (order_id, store_id, subtotal, voucher_id, discount_amount, delivery_fee, final_amount, status)
                      VALUES (:o, :s, :sub, :v, :d, :df, :final, 'pending')"
                 );
-<<<<<<< HEAD
                 $merchantOrder->execute([
                     ':o' => $orderId,
                     ':s' => $storeId,
                     ':sub' => (float) $group['subtotal'],
                     ':v' => $firstVoucherId,
                     ':d' => (float) $transactionPricing['discount_total'],
+                    ':df' => CartPricing::deliveryFeePerStore(),
                     ':final' => (float) $transactionPricing['final_total'],
-=======
-                $finalAmount = max(0, $subtotal - $discount) + $deliveryFee;
-                $moStmt->execute([
-                    ':o' => $orderId,
-                    ':s' => $sid,
-                    ':sub' => $subtotal,
-                    ':v' => $voucherId,
-                    ':d' => $discount,
-                    ':df' => $deliveryFee,
-                    ':final' => $finalAmount,
->>>>>>> origin
                 ]);
                 $merchantOrderId = (int) $db->lastInsertId();
 
