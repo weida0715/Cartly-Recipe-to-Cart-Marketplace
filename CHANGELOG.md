@@ -220,3 +220,8 @@ All notable changes to this project will be documented in this file.
 - Reworked the recipe details page with a two-column image and summary layout.
 - Added dedicated ingredient and numbered instruction cards with serving-based quantity scaling.
 - Refined instruction parsing and serving input behavior based on review feedback.
+
+## [1.2.9] - 22nd June 2026
+- Changed the customer profile page into an account overview with profile details, quick stats, shortcut actions, merchant application access, and recent orders.
+- Moved profile editing into a dedicated Edit Profile page.
+- Added account activity count helpers for orders, saved recipes, and reviews.

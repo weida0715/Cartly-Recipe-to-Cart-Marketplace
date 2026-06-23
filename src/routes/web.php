@@ -87,6 +87,7 @@ $router->get('/orders/{id}/confirmation', [OrderController::class, 'confirmation
 $router->get('/dashboard', [CustomerDashboardController::class, 'index']);
 $router->get('/saved-recipes', [CustomerDashboardController::class, 'savedRecipes']);
 $router->get('/profile', [CustomerDashboardController::class, 'profile']);
+$router->get('/profile/edit', [CustomerDashboardController::class, 'editProfile']);
 $router->post('/profile', [CustomerDashboardController::class, 'updateProfile']);
 $router->post('/merchant/request', [CustomerDashboardController::class, 'requestMerchant']);
 
