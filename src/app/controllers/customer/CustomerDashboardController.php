@@ -6,6 +6,7 @@ use App\Helpers\Controller;
 use App\Helpers\AuthHelper;
 use App\Models\Order;
 use App\Models\Recipe;
+use App\Models\Review;
 use App\Models\SavedRecipe;
 use App\Models\User;
 use App\Models\Store;
@@ -39,8 +40,29 @@ class CustomerDashboardController extends Controller
     public function profile(): void
     {
         AuthHelper::requireLogin();
+        $uid = (int) AuthHelper::id();
+        $orderModel = new Order();
+        $savedRecipeModel = new SavedRecipe();
+        $reviewModel = new Review();
+
         $this->view('customer/profile', [
             'title' => 'My Profile',
+            'user' => (new User())->find($uid),
+            'orders' => array_slice($orderModel->historyForUser($uid), 0, 5),
+            'storeRequest' => (new Store())->byUser($uid),
+            'stats' => [
+                'orders' => $orderModel->countForUser($uid),
+                'savedRecipes' => $savedRecipeModel->countForUser($uid),
+                'reviews' => $reviewModel->countForUser($uid),
+            ],
+        ]);
+    }
+
+    public function editProfile(): void
+    {
+        AuthHelper::requireLogin();
+        $this->view('customer/edit-profile', [
+            'title' => 'Edit Profile',
             'user' => (new User())->find((int) AuthHelper::id()),
         ]);
     }
@@ -62,19 +84,19 @@ class CustomerDashboardController extends Controller
             ->phone('phone');
         if ($v->fails()) {
             Flash::set('error', reset($v->errors));
-            $this->redirect('/profile');
+            $this->redirect('/profile/edit');
         }
         $userModel = new User();
         if ($userModel->emailOrUsernameTakenByAnother($data['email'], $data['username'], $userId)) {
             Flash::set('error', 'Username or email is already used by another account.');
-            $this->redirect('/profile');
+            $this->redirect('/profile/edit');
         }
         $password = (string) $this->input('password', '');
         $confirm = (string) $this->input('confirm', '');
         if ($password !== '') {
             if (strlen($password) < 6 || $password !== $confirm) {
                 Flash::set('error', 'New password must be at least 6 characters and match confirmation.');
-                $this->redirect('/profile');
+                $this->redirect('/profile/edit');
             }
             $data['password'] = password_hash($password, PASSWORD_BCRYPT);
         }

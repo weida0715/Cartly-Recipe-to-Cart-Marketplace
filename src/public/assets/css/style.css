@@ -112,13 +112,16 @@ h2 {
   display: flex;
   gap: 8px;
   align-items: center;
+  flex: 1 1 auto;
   flex-wrap: wrap;
   justify-content: flex-end;
+  overflow: visible;
 }
 .nav-links a {
   color: var(--text);
   padding: 8px 10px;
   border-radius: var(--radius);
+  flex: 0 0 auto;
 }
 .nav-links a:hover {
   background: #eef8ef;
@@ -148,6 +151,70 @@ h2 {
   gap: 7px;
   justify-content: center;
 }
+.nav-more {
+  position: relative;
+  flex: 0 0 auto;
+  z-index: 1;
+}
+.nav-more > summary {
+  -webkit-appearance: none;
+  appearance: none;
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  gap: 7px;
+  list-style: none;
+  padding: 8px 10px;
+  user-select: none;
+  position: relative;
+  z-index: 1;
+}
+.nav-more > summary:focus:not(:focus-visible) {
+  outline: none;
+}
+.nav-more > summary:focus-visible {
+  outline: 3px solid rgba(245, 124, 0, 0.28);
+  outline-offset: 2px;
+}
+.nav-more > summary::-webkit-details-marker {
+  display: none;
+}
+.nav-more:not([open]) > .nav-more-menu {
+  display: none;
+}
+.nav-more > summary:hover,
+.nav-more[open] > summary,
+.nav-more > summary.active {
+  background: #e2f3e4;
+  color: var(--green-primary-dark);
+}
+
+.nav-more-menu {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  display: grid;
+  gap: 4px;
+  min-width: 180px;
+  padding: 8px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 20;
+}
+.nav-more-menu a {
+  border-radius: 8px;
+  padding: 8px 10px;
+  white-space: nowrap;
+}
+.nav-more-menu a.btn {
+  width: 100%;
+}
 .brand-icon {
   font-size: 1.15em;
 }
@@ -170,6 +237,13 @@ h2 {
   font-size: 0.85rem;
   color: var(--muted);
   padding: 8px 0;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  position: relative;
+  z-index: 0;
+}
+.nav-links > .btn.btn-ghost {
+  flex: 0 0 auto;
 }
 .notification-menu {
   position: relative;
@@ -770,6 +844,11 @@ textarea {
   }
   .nav-links {
     justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  .nav-more-menu {
+    left: 0;
+    right: auto;
   }
 }
 @media (max-width: 768px) {
@@ -791,6 +870,10 @@ textarea {
     gap: 6px;
   }
   .nav-links a {
+    font-size: 0.92rem;
+    padding: 7px 8px;
+  }
+  .nav-more > summary {
     font-size: 0.92rem;
     padding: 7px 8px;
   }

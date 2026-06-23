@@ -22,6 +22,7 @@ class Icon
         'register' => 'user-add',
         'reports' => 'flag',
         'saved' => 'heart',
+        'settings' => 'settings',
         'store' => 'shop',
         'store-profile' => 'marker',
         'users' => 'users',

@@ -7,6 +7,7 @@ use App\Helpers\AuthHelper;
 use App\Helpers\Flash;
 use App\Helpers\FileUploadHelper;
 use App\Helpers\Validator;
+use App\Helpers\StoreHours;
 use App\Models\Store;
 
 class MerchantStoreController extends Controller
@@ -15,9 +16,13 @@ class MerchantStoreController extends Controller
     {
         AuthHelper::requireRole('merchant');
         $store = (new Store())->byUser((int) AuthHelper::id());
+        $statistics = $store
+            ? (new Store())->statistics((int) $store['store_id'])
+            : [];
         $this->view('merchant/store', [
             'title' => 'Store Profile',
             'store' => $store,
+            'statistics' => $statistics,
         ], 'layout/merchant-layout');
     }
 
@@ -33,8 +38,8 @@ class MerchantStoreController extends Controller
             'contact_email' => trim((string) $this->input('contact_email', '')),
             'contact_phone' => trim((string) $this->input('contact_phone', '')),
             'store_address' => trim((string) $this->input('store_address', '')),
-            'opening_time' => $this->input('opening_time') ?: null,
-            'closing_time' => $this->input('closing_time') ?: null,
+            'opening_time' => StoreHours::normalize((string) $this->input('opening_time', '')),
+            'closing_time' => StoreHours::normalize((string) $this->input('closing_time', '')),
         ];
         $v = new Validator($data);
         $v->required('store_name', 'Store name')
@@ -43,6 +48,14 @@ class MerchantStoreController extends Controller
             ->required('store_address', 'Address');
         if ($v->fails()) {
             Flash::set('error', reset($v->errors));
+            $this->redirect('/merchant/store');
+        }
+        $hoursError = StoreHours::error(
+            (string) $this->input('opening_time', ''),
+            (string) $this->input('closing_time', '')
+        );
+        if ($hoursError !== null) {
+            Flash::set('error', $hoursError);
             $this->redirect('/merchant/store');
         }
 
