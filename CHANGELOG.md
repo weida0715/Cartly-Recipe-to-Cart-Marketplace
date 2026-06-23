@@ -168,3 +168,8 @@ All notable changes to this project will be documented in this file.
 - Navigation links for quick access to Stores.
 - Store products section uses about 2/3 of the page width.
 - Store vouchers section uses about 1/3 of the page width.
+
+## [1.1.13] - 23rd June 2026
+- Improved cart item detail presentation with product image, package information, unit price, and clearer line-total breakdowns.
+- Reused the same uploaded product image source in the shopping cart as the marketplace and product views.
+- Updated mobile cart styling so each item reads like a standalone card while keeping the desktop table layout intact.
