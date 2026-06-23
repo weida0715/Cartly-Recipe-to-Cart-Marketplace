@@ -40,4 +40,13 @@ class SavedRecipe extends Model
             [':u' => $userId]
         );
     }
+
+    public function countForUser(int $userId): int
+    {
+        $rows = $this->query(
+            'SELECT COUNT(*) AS total FROM saved_recipes WHERE user_id = :u',
+            [':u' => $userId]
+        );
+        return (int) ($rows[0]['total'] ?? 0);
+    }
 }

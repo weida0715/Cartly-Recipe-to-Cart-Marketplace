@@ -46,29 +46,7 @@ class MerchantOrder extends Model
 
     public function updateStatusAndSyncParent(int $merchantOrderId, string $status): bool
     {
-        $row = $this->find($merchantOrderId);
-        if (!$row || !in_array($status, self::STATUSES, true)) {
-            return false;
-        }
-
-        $db = $this->db();
-        try {
-            $db->beginTransaction();
-            $updated = $this->persistStatus($merchantOrderId, $status);
-            $fresh = $this->find($merchantOrderId);
-            if (!$updated || !$fresh || (string) $fresh['status'] !== $status) {
-                $db->rollBack();
-                return false;
-            }
-            $this->syncParentStatus((int) $row['order_id']);
-            $db->commit();
-            return true;
-        } catch (\Throwable) {
-            if ($db->inTransaction()) {
-                $db->rollBack();
-            }
-            return false;
-        }
+        return $this->transitionStatus($merchantOrderId, null, $status);
     }
 
     public function syncTimedStatusesForOrder(int $orderId): void
@@ -114,12 +92,7 @@ class MerchantOrder extends Model
             return false;
         }
 
-        $row = $this->find($merchantOrderId);
-        if (!$row || !in_array((string) $row['status'], $fromStatuses, true)) {
-            return false;
-        }
-
-        return $this->updateStatusAndSyncParent($merchantOrderId, $status);
+        return $this->transitionStatus($merchantOrderId, $fromStatuses, $status);
     }
 
     public function belongsToCustomer(int $merchantOrderId, int $userId): ?array
@@ -159,6 +132,47 @@ class MerchantOrder extends Model
             $data[$column] = $value;
         }
         return $this->update($merchantOrderId, $data);
+    }
+
+    private function transitionStatus(int $merchantOrderId, ?array $fromStatuses, string $status): bool
+    {
+        if (!in_array($status, self::STATUSES, true)) {
+            return false;
+        }
+
+        $db = $this->db();
+        try {
+            $db->beginTransaction();
+            $stmt = $db->prepare('SELECT * FROM merchant_orders WHERE merchant_order_id = :id FOR UPDATE');
+            $stmt->execute([':id' => $merchantOrderId]);
+            $row = $stmt->fetch();
+            if (!$row) {
+                $db->rollBack();
+                return false;
+            }
+            $currentStatus = (string) $row['status'];
+            if ($currentStatus === $status || ($fromStatuses !== null && !in_array($currentStatus, $fromStatuses, true))) {
+                $db->rollBack();
+                return false;
+            }
+
+            if (!$this->persistStatus($merchantOrderId, $status)) {
+                $db->rollBack();
+                return false;
+            }
+            if ($status === 'cancelled') {
+                $this->restoreCancelledStock($merchantOrderId);
+            }
+            $this->syncParentStatus((int) $row['order_id']);
+            $db->commit();
+            $this->notifyCustomerOfStatus((int) $row['order_id'], $merchantOrderId, $status);
+            return true;
+        } catch (\Throwable) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            return false;
+        }
     }
 
     private function syncTimedStatusRow(array $row): void
@@ -223,6 +237,7 @@ class MerchantOrder extends Model
             }
             $this->syncParentStatus((int) $row['order_id']);
             $db->commit();
+            $this->notifyCustomerOfStatus((int) $row['order_id'], $merchantOrderId, $status);
             return true;
         } catch (\Throwable) {
             if ($db->inTransaction()) {
@@ -252,5 +267,48 @@ class MerchantOrder extends Model
 
         $stmt = $this->db()->prepare('UPDATE orders SET order_status = :s WHERE order_id = :o');
         $stmt->execute([':s' => $orderStatus, ':o' => $orderId]);
+    }
+
+    private function restoreCancelledStock(int $merchantOrderId): void
+    {
+        $stmt = $this->db()->prepare(
+            "UPDATE products p
+             JOIN order_items oi ON oi.product_id = p.product_id
+             SET p.stock_quantity = p.stock_quantity + oi.quantity,
+                 p.status = CASE WHEN p.status = 'out_of_stock' THEN 'active' ELSE p.status END
+             WHERE oi.merchant_order_id = :merchant_order_id"
+        );
+        $stmt->execute([':merchant_order_id' => $merchantOrderId]);
+    }
+
+    private function notifyCustomerOfStatus(int $orderId, int $merchantOrderId, string $status): void
+    {
+        $rows = $this->query('SELECT user_id FROM orders WHERE order_id = :order_id LIMIT 1', [':order_id' => $orderId]);
+        if (!$rows) {
+            return;
+        }
+        $labels = [
+            'accepted' => 'accepted by the merchant',
+            'preparing' => 'being prepared',
+            'ready_to_deliver' => 'ready for delivery',
+            'out_for_delivery' => 'out for delivery',
+            'delivered' => 'delivered',
+            'completed' => 'completed',
+            'cancelled' => 'cancelled',
+        ];
+        if (!isset($labels[$status])) {
+            return;
+        }
+        try {
+            (new Notification())->createForUser(
+                (int) $rows[0]['user_id'],
+                $status === 'cancelled' ? 'warning' : 'info',
+                'Order status updated',
+                'Store order #' . $merchantOrderId . ' is now ' . $labels[$status] . '.',
+                '/orders/' . $orderId
+            );
+        } catch (\Throwable) {
+            // Order updates remain available before the notification migration is applied.
+        }
     }
 }

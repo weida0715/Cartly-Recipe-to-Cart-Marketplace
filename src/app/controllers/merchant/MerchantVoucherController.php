@@ -5,6 +5,7 @@ namespace App\Controllers\Merchant;
 use App\Helpers\Controller;
 use App\Helpers\AuthHelper;
 use App\Helpers\Flash;
+use App\Helpers\VoucherDateValidator;
 use App\Models\Store;
 use App\Models\Voucher;
 
@@ -72,28 +73,15 @@ class MerchantVoucherController extends Controller
             $this->redirect('/merchant/vouchers');
         }
 
+        $dateError = VoucherDateValidator::error($startDate, $endDate, $noExpiry);
+        if ($dateError !== null) {
+            Flash::set('error', $dateError);
+            $this->redirect('/merchant/vouchers');
+        }
         if ($noExpiry) {
             $startDate = null;
             $endDate = null;
-        } else {
-            if ($startDate === null || $endDate === null) {
-                Flash::set('error', 'Start date and end date are required unless no expiry date is checked.');
-                $this->redirect('/merchant/vouchers');
-            }
-            try {
-                $startDateTime = $startDate !== null ? new \DateTimeImmutable((string) $startDate) : null;
-                $endDateTime = $endDate !== null ? new \DateTimeImmutable((string) $endDate) : null;
-            } catch (\Exception $e) {
-                Flash::set('error', 'Voucher dates are invalid.');
-                $this->redirect('/merchant/vouchers');
-            }
-
-            if ($startDateTime !== null && $endDateTime !== null && $startDateTime > $endDateTime) {
-                Flash::set('error', 'End date must be after or equal to start date.');
-                $this->redirect('/merchant/vouchers');
-            }
         }
-
         $voucher = new Voucher();
         try {
             $voucher->insert([
@@ -175,28 +163,15 @@ class MerchantVoucherController extends Controller
             $this->redirect('/merchant/vouchers');
         }
 
+        $dateError = VoucherDateValidator::error($startDate, $endDate, $noExpiry);
+        if ($dateError !== null) {
+            Flash::set('error', $dateError);
+            $this->redirect('/merchant/vouchers');
+        }
         if ($noExpiry) {
             $startDate = null;
             $endDate = null;
-        } else {
-            if ($startDate === null || $endDate === null) {
-                Flash::set('error', 'Start date and end date are required unless no expiry date is checked.');
-                $this->redirect('/merchant/vouchers');
-            }
-            try {
-                $startDateTime = $startDate !== null ? new \DateTimeImmutable((string) $startDate) : null;
-                $endDateTime = $endDate !== null ? new \DateTimeImmutable((string) $endDate) : null;
-            } catch (\Exception $e) {
-                Flash::set('error', 'Voucher dates are invalid.');
-                $this->redirect('/merchant/vouchers');
-            }
-
-            if ($startDateTime !== null && $endDateTime !== null && $startDateTime > $endDateTime) {
-                Flash::set('error', 'End date must be after or equal to start date.');
-                $this->redirect('/merchant/vouchers');
-            }
         }
-
         try {
             $voucherModel->update((int) $id, [
                 'voucher_code' => $code,

@@ -19,6 +19,16 @@ the database.
 For an existing database, run `migrations/010_mock_payments_and_receipts.sql`
 once to add masked mock-payment transaction records and generated receipt
 details.
+For an existing database, run `migrations/009_notifications_and_returns.sql`
+once to add notifications, customer cancellation support, and return/refund
+request records.
+For an existing database, run
+`migrations/008_merchant_request_reviewed_at.sql` to add the merchant request
+reviewed_at timestamp used by the admin approval history.
+To add administrator-managed delivery fees to an existing database, run
+`migrations/007_application_settings.sql`. The migration is safe to rerun and preserves an existing fee.
+For an existing database, also run `migrations/006_multiple_order_vouchers.sql` before
+testing multiple vouchers in the cart and checkout.
 
 CLI alternative:
 

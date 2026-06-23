@@ -2,6 +2,17 @@
 use App\Helpers\AuthHelper;
 $user = AuthHelper::user();
 $role = AuthHelper::role();
+$notificationPreview = [];
+$unreadNotificationCount = 0;
+if ($user) {
+  try {
+    $notificationModel = new \App\Models\Notification();
+    $notificationPreview = $notificationModel->latestForUser((int) $user['user_id'], 8);
+    $unreadNotificationCount = $notificationModel->unreadCount((int) $user['user_id']);
+  } catch (\Throwable) {
+    // Keep navigation available until the notification migration is imported.
+  }
+}
 
 $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $normalizedBaseUrl = rtrim(BASE_URL, '/');
@@ -22,6 +33,14 @@ $navAttributes = static function (string $path, bool $includeChildren = true) us
     ? ' class="active" aria-current="page"'
     : '';
 };
+
+$moreActive = $isActivePath('/saved-recipes', false)
+  || $isActivePath('/profile', false)
+  || $isActivePath('/merchant')
+  || $isActivePath('/admin')
+  || $isActivePath('/auth/login', false)
+  || $isActivePath('/auth/register', false)
+  || $isActivePath('/auth/logout', false);
 ?>
 <!doctype html>
 <html lang="en">
@@ -49,19 +68,62 @@ $navAttributes = static function (string $path, bool $includeChildren = true) us
           <a<?= $navAttributes('/dashboard', false) ?> href="<?= BASE_URL ?>/dashboard"><?= \App\Helpers\Icon::render('dashboard', 'nav-icon') ?>Dashboard</a>
           <a<?= $navAttributes('/cart') ?> href="<?= BASE_URL ?>/cart"><?= \App\Helpers\Icon::render('cart', 'nav-icon') ?>Cart</a>
           <a<?= $navAttributes('/orders') ?> href="<?= BASE_URL ?>/orders"><?= \App\Helpers\Icon::render('orders', 'nav-icon') ?>Orders</a>
-          <a<?= $navAttributes('/saved-recipes', false) ?> href="<?= BASE_URL ?>/saved-recipes"><?= \App\Helpers\Icon::render('saved', 'nav-icon') ?>Saved</a>
-          <a<?= $navAttributes('/profile', false) ?> href="<?= BASE_URL ?>/profile"><?= \App\Helpers\Icon::render('profile', 'nav-icon') ?>Profile</a>
-          <?php if ($role === 'merchant'): ?>
-            <a<?= $navAttributes('/merchant') ?> href="<?= BASE_URL ?>/merchant"><?= \App\Helpers\Icon::render('merchant', 'nav-icon') ?>Merchant</a>
-          <?php endif; ?>
-          <?php if ($role === 'admin'): ?>
-            <a<?= $navAttributes('/admin') ?> href="<?= BASE_URL ?>/admin"><?= \App\Helpers\Icon::render('admin', 'nav-icon') ?>Admin</a>
-          <?php endif; ?>
+          <details class="nav-more">
+            <summary<?= $moreActive ? ' class="active"' : '' ?>>
+              <?= \App\Helpers\Icon::render('settings', 'nav-icon') ?>More
+            </summary>
+            <div class="nav-more-menu">
+              <a<?= $navAttributes('/saved-recipes', false) ?> href="<?= BASE_URL ?>/saved-recipes"><?= \App\Helpers\Icon::render('saved', 'nav-icon') ?>Saved</a>
+              <a<?= $navAttributes('/profile', false) ?> href="<?= BASE_URL ?>/profile"><?= \App\Helpers\Icon::render('profile', 'nav-icon') ?>Profile</a>
+              <?php if ($role === 'merchant'): ?>
+                <a<?= $navAttributes('/merchant') ?> href="<?= BASE_URL ?>/merchant"><?= \App\Helpers\Icon::render('merchant', 'nav-icon') ?>Merchant</a>
+              <?php endif; ?>
+              <?php if ($role === 'admin'): ?>
+                <a<?= $navAttributes('/admin') ?> href="<?= BASE_URL ?>/admin"><?= \App\Helpers\Icon::render('admin', 'nav-icon') ?>Admin</a>
+              <?php endif; ?>
+            </div>
+          </details>
           <span class="user-chip">Hi, <?= htmlspecialchars($user['username']) ?></span>
+          <details class="notification-menu">
+            <summary class="notification-trigger" aria-label="Notifications">
+              <?= \App\Helpers\Icon::render('notifications', 'nav-icon') ?>
+              <?php if ($unreadNotificationCount > 0): ?>
+                <span class="notification-count"><?= min(99, $unreadNotificationCount) ?></span>
+              <?php endif; ?>
+            </summary>
+            <div class="notification-dropdown">
+              <div class="notification-dropdown-header">
+                <strong>Notifications</strong>
+                <span><?= (int) $unreadNotificationCount ?> unread</span>
+              </div>
+              <?php if (!$notificationPreview): ?>
+                <p class="notification-empty">No notifications yet.</p>
+              <?php else: ?>
+                <div class="notification-dropdown-list">
+                  <?php foreach ($notificationPreview as $notification): ?>
+                    <a class="notification-preview <?= empty($notification['is_read']) ? 'is-unread' : '' ?>"
+                      href="<?= BASE_URL ?>/notifications/<?= (int) $notification['notification_id'] ?>">
+                      <strong><?= htmlspecialchars((string) $notification['title']) ?></strong>
+                      <span><?= htmlspecialchars((string) $notification['message']) ?></span>
+                      <small><?= htmlspecialchars((string) $notification['created_at']) ?></small>
+                    </a>
+                  <?php endforeach; ?>
+                </div>
+              <?php endif; ?>
+              <a class="notification-view-all" href="<?= BASE_URL ?>/notifications">View all notifications</a>
+            </div>
+          </details>
           <a class="btn btn-ghost" href="<?= BASE_URL ?>/auth/logout"><?= \App\Helpers\Icon::render('logout', 'nav-icon') ?>Logout</a>
         <?php else: ?>
-          <a class="btn btn-ghost" href="<?= BASE_URL ?>/auth/login"><?= \App\Helpers\Icon::render('login', 'nav-icon') ?>Login</a>
-          <a class="btn btn-primary" href="<?= BASE_URL ?>/auth/register"><?= \App\Helpers\Icon::render('register', 'nav-icon') ?>Register</a>
+          <details class="nav-more<?= $moreActive ? ' active' : '' ?>">
+            <summary<?= $moreActive ? ' class="active"' : '' ?>>
+              <?= \App\Helpers\Icon::render('settings', 'nav-icon') ?>More
+            </summary>
+            <div class="nav-more-menu">
+              <a class="btn btn-ghost" href="<?= BASE_URL ?>/auth/login"><?= \App\Helpers\Icon::render('login', 'nav-icon') ?>Login</a>
+              <a class="btn btn-primary" href="<?= BASE_URL ?>/auth/register"><?= \App\Helpers\Icon::render('register', 'nav-icon') ?>Register</a>
+            </div>
+          </details>
         <?php endif; ?>
       </nav>
     </div>
