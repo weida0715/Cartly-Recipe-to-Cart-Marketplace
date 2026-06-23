@@ -17,10 +17,17 @@
       </div>
     </div>
     <div>
+<<<<<<< HEAD
       <?php foreach (($groups ?? []) as $group): ?>
         <section class="card checkout-merchant-summary">
           <h4><?= htmlspecialchars((string) ($group['store_name'] ?? 'Merchant')) ?></h4>
           <?php foreach (($group['items'] ?? []) as $item): ?>
+=======
+      <?php foreach ($groups as $sid => $g): ?>
+        <div class="card">
+          <h4><?= htmlspecialchars($g['store_name']) ?></h4>
+          <?php foreach ($g['items'] as $it): ?>
+>>>>>>> origin
             <div class="line flex-between">
               <span><?= htmlspecialchars((string) ($item['product_name'] ?? 'Product')) ?> x <?= (int) ($item['quantity'] ?? 0) ?></span>
               <span>RM <?= number_format((float) ($item['line_total'] ?? 0), 2) ?></span>
@@ -39,12 +46,18 @@
         </section>
       <?php endforeach; ?>
       <div class="cart-summary">
+<<<<<<< HEAD
         <div class="line"><span>Subtotal</span><span>RM <?= number_format((float) ($subtotal ?? 0), 2) ?></span></div>
         <?php if ((float) ($discountTotal ?? 0) > 0): ?>
           <div class="line discount"><span>Voucher savings</span><span>-RM <?= number_format((float) $discountTotal, 2) ?></span></div>
         <?php endif; ?>
         <div class="line total"><span>Grand total</span><span>RM <?= number_format((float) ($total ?? 0), 2) ?></span></div>
         <a class="btn btn-outline btn-block mt-2" href="<?= BASE_URL ?>/cart">Edit cart vouchers</a>
+=======
+        <div class="line"><span>Item subtotal</span><span>RM <?= number_format((float) $subtotal, 2) ?></span></div>
+        <div class="line"><span>Delivery cost</span><span>RM <?= number_format((float) $deliveryFee, 2) ?></span></div>
+        <div class="line total"><span>Total amount</span><span>RM <?= number_format((float) $total, 2) ?></span></div>
+>>>>>>> origin
         <button class="btn btn-primary btn-block mt-2">Place order</button>
       </div>
     </div>

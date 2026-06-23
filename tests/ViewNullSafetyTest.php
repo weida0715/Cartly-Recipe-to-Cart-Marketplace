@@ -71,6 +71,73 @@ class ViewNullSafetyTest extends TestCase
         $this->assertStringNotContainsString('>Reset</a>', $html);
     }
 
+    public function test_cart_order_summary_shows_subtotal_delivery_and_total(): void
+    {
+        $html = $this->render('order/cart.php', [
+            'count' => 1,
+            'groups' => [
+                1 => [
+                    'store_name' => 'Fresh Mart',
+                    'subtotal' => 12.50,
+                    'items' => [
+                        [
+                            'cart_item_id' => 10,
+                            'product_name' => 'Tomato',
+                            'added_method' => 'manual',
+                            'stock_quantity' => 5,
+                            'quantity' => 1,
+                            'line_total' => 12.50,
+                        ],
+                    ],
+                ],
+            ],
+            'subtotal' => 12.50,
+            'deliveryFee' => 2.0,
+            'total' => 14.50,
+        ]);
+
+        $this->assertStringContainsString('Estimated subtotal', $html);
+        $this->assertStringContainsString('Delivery cost', $html);
+        $this->assertStringContainsString('Total amount', $html);
+    }
+
+    public function test_recipe_cart_preview_shows_cost_summary(): void
+    {
+        $html = $this->render('recipe/cart-preview.php', [
+            'recipe' => ['recipe_id' => 7, 'recipe_title' => 'Soup'],
+            'servings' => 2,
+            'warnings' => [],
+            'grouped' => [
+                1 => [
+                    'store_name' => 'Fresh Mart',
+                    'subtotal' => 12.50,
+                    'items' => [
+                        [
+                            'product' => [
+                                'product_name' => 'Tomato',
+                                'package_quantity' => 500,
+                                'package_unit' => 'g',
+                            ],
+                            'required_packages' => 1,
+                            'scaled_quantity' => 250,
+                            'unit' => 'g',
+                            'ingredient_name' => 'tomato',
+                            'line_total' => 12.50,
+                        ],
+                    ],
+                ],
+            ],
+            'subtotal' => 12.50,
+            'deliveryFee' => 2.0,
+            'total' => 14.50,
+        ]);
+
+        $this->assertStringContainsString('Cost summary', $html);
+        $this->assertStringContainsString('Item subtotal', $html);
+        $this->assertStringContainsString('Delivery cost', $html);
+        $this->assertStringContainsString('Total amount', $html);
+    }
+
     private function render(string $view, array $data): string
     {
         $bufferLevel = ob_get_level();
