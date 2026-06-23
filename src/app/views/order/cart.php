@@ -1,4 +1,5 @@
 <?php use App\Helpers\Csrf; ?>
+<?php $count = (int) ($count ?? 0); ?>
 <h2>Your cart <span class="text-muted">(<?= (int) ($count ?? 0) ?> items)</span></h2>
 
 <?php if (empty($count)): ?>
@@ -41,7 +42,9 @@
                             <?php endif; ?>
                           </div>
                           <div class="cart-item-meta">
-                            <span>Pack: <?= htmlspecialchars($packageQuantity) ?> <?= htmlspecialchars((string) ($item['package_unit'] ?? '')) ?></span>
+                            <?php if ((float) ($item['package_quantity'] ?? 0) > 0): ?>
+                              <span>Pack: <?= htmlspecialchars($packageQuantity) ?> <?= htmlspecialchars((string) ($item['package_unit'] ?? '')) ?></span>
+                            <?php endif; ?>
                             <span>Unit price: RM <?= number_format((float) ($item['unit_price'] ?? 0), 2) ?></span>
                           </div>
                           <small class="text-muted">Stock available: <?= $stock ?><?= $stock === 0 ? ' · remove this item to continue' : '' ?></small>

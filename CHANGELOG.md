@@ -311,3 +311,8 @@ All notable changes to this project will be documented in this file.
 - Added automatically generated receipt numbers and customer snapshots when checkout succeeds.
 - Added ownership-protected receipt pages with print/PDF support and downloadable HTML receipts from confirmation, order details, and order history.
 - Added migration `010_mock_payments_and_receipts.sql` for existing databases.
+
+## [1.6.1] - 23rd June 2026
+- Expanded the admin dashboard with summary metric cards for platform users, active merchants, platform revenue, and total orders plus 30-day change indicators.
+- Added admin D3 charts for platform growth comparison, monthly revenue performance, and active product category distribution.
+- Extended the shared chart renderer to support grouped bar charts for multi-series admin analytics while reusing the existing D3 loading pattern.

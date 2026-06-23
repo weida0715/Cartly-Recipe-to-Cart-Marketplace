@@ -392,11 +392,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // D3 dashboard charts.
   if (window.d3) {
-    const colors = ['#2e7d32', '#f57c00', '#1e40af', '#d97706', '#dc2626', '#6b7280'];
+    const colors = ['#2e7d32', '#f57c00', '#1e40af', '#d97706', '#dc2626', '#6b7280', '#7c3aed', '#0891b2', '#65a30d', '#ea580c'];
 
     const parseChartData = el => {
       try {
         return JSON.parse(el.dataset.chartValues || '[]').filter(item => Number.isFinite(Number(item.value)));
+      } catch {
+        return [];
+      }
+    };
+
+    const parseChartSeries = el => {
+      try {
+        return JSON.parse(el.dataset.chartSeries || '[]').filter(series =>
+          series && typeof series.label === 'string' && Array.isArray(series.values) && series.values.some(item => Number.isFinite(Number(item.value)))
+        );
       } catch {
         return [];
       }
@@ -421,15 +431,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const legend = wrap.append('div').attr('class', 'chart-legend');
       data.forEach((item, i) => {
         const row = legend.append('span');
-        row.append('i').style('background', color(i));
-        row.append('span').text(`${item.label}: ${item.value}`);
+        row.append('i').style('background', color(item, i));
+        row.append('span').text(item.value === undefined ? item.label : `${item.label}: ${item.value}`);
       });
     };
 
     const drawPie = (el, data) => {
-      const size = 220;
-      const radius = size / 2 - 8;
-      const color = d3.scaleOrdinal(colors);
+      const tooltip = addTooltip(el);
+      const size = 260;
+      const radius = 92;
+      const total = data.reduce((sum, item) => sum + Number(item.value || 0), 0);
+      const color = d3.scaleOrdinal().domain(data.map(item => item.label)).range(colors);
       const svg = d3.select(el).append('svg')
         .attr('viewBox', `0 0 ${size} ${size}`)
         .attr('role', 'img');
@@ -437,22 +449,33 @@ document.addEventListener('DOMContentLoaded', () => {
       group.selectAll('path')
         .data(d3.pie().value(d => d.value)(data))
         .join('path')
-        .attr('d', d3.arc().innerRadius(52).outerRadius(radius))
-        .attr('fill', (_, i) => color(i))
+        .attr('d', d3.arc().innerRadius(0).outerRadius(radius))
+        .attr('fill', d => color(d.data.label))
+        .on('mousemove', (event, d) => {
+          const percent = total > 0 ? ((Number(d.data.value) / total) * 100).toFixed(1) : '0.0';
+          tooltip.show(event, `${d.data.label}: ${d.data.value} (${percent}%)`);
+        })
+        .on('mouseleave', tooltip.hide)
         .append('title')
-        .text(d => `${d.data.label}: ${d.data.value}`);
-      drawLegend(d3.select(el), data, color);
+        .text(d => {
+          const percent = total > 0 ? ((Number(d.data.value) / total) * 100).toFixed(1) : '0.0';
+          return `${d.data.label}: ${d.data.value} (${percent}%)`;
+        });
+      drawLegend(d3.select(el), data, item => color(item.label));
     };
 
     const drawBar = (el, data) => {
       const prefix = el.dataset.valuePrefix || '';
       const tooltip = addTooltip(el);
       const width = 520;
-      const height = 260;
+      const height = parseInt(el.dataset.chartHeight || '260', 10);
+      const tickStep = parseInt(el.dataset.chartStep, 10) || 0;
       const margin = { top: 18, right: 18, bottom: 54, left: 42 };
       const color = d3.scaleOrdinal(colors);
       const x = d3.scaleBand().domain(data.map(d => d.label)).range([margin.left, width - margin.right]).padding(0.24);
-      const y = d3.scaleLinear().domain([0, d3.max(data, d => d.value) || 1]).nice().range([height - margin.bottom, margin.top]);
+      const maxValue = d3.max(data, d => Number(d.value)) || 0;
+      const roundedMax = tickStep > 0 ? Math.max(tickStep, Math.ceil(maxValue / tickStep) * tickStep) : Math.max(1, maxValue);
+      const y = d3.scaleLinear().domain([0, roundedMax]).range([height - margin.bottom, margin.top]);
       const svg = d3.select(el).append('svg')
         .attr('viewBox', `0 0 ${width} ${height}`)
         .attr('role', 'img');
@@ -466,7 +489,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       svg.append('g')
         .attr('transform', `translate(${margin.left},0)`)
-        .call(d3.axisLeft(y).ticks(5));
+        .call(tickStep > 0
+          ? d3.axisLeft(y).tickValues(d3.range(0, roundedMax + tickStep, tickStep))
+          : d3.axisLeft(y).ticks(5)
+        );
 
       svg.selectAll('rect')
         .data(data)
@@ -523,7 +549,70 @@ document.addEventListener('DOMContentLoaded', () => {
         .text(d => `${d.label}: ${prefix}${d.value}`);
     };
 
+    const drawMultiLine = (el, series) => {
+      const prefix = el.dataset.valuePrefix || '';
+      const tooltip = addTooltip(el);
+      const width = 640;
+      const height = 280;
+      const margin = { top: 18, right: 24, bottom: 54, left: 48 };
+      const labels = series[0]?.values?.map(item => item.label) || [];
+      const color = d3.scaleOrdinal(colors).domain(series.map(item => item.label));
+      const maxValue = d3.max(series.flatMap(item => item.values.map(value => Number(value.value)))) || 1;
+      const x = d3.scalePoint().domain(labels).range([margin.left, width - margin.right]).padding(0.5);
+      const y = d3.scaleLinear().domain([0, maxValue]).nice().range([height - margin.bottom, margin.top]);
+      const svg = d3.select(el).append('svg')
+        .attr('viewBox', `0 0 ${width} ${height}`)
+        .attr('role', 'img');
+
+      svg.append('g')
+        .attr('transform', `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(x));
+
+      svg.append('g')
+        .attr('transform', `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y).ticks(5));
+
+      const line = d3.line().x(d => x(d.label)).y(d => y(Number(d.value)));
+
+      svg.selectAll('.chart-line')
+        .data(series)
+        .join('path')
+        .attr('class', 'chart-line')
+        .attr('fill', 'none')
+        .attr('stroke', d => color(d.label))
+        .attr('stroke-width', 3)
+        .attr('d', d => line(d.values));
+
+      series.forEach(item => {
+        const safeLabel = item.label.replace(/[^a-zA-Z0-9]/g, '-');
+        svg.selectAll(`.chart-point-${safeLabel}`)
+          .data(item.values)
+          .join('circle')
+          .attr('class', `chart-point-${safeLabel}`)
+          .attr('cx', d => x(d.label))
+          .attr('cy', d => y(Number(d.value)))
+          .attr('r', 4.5)
+          .attr('fill', color(item.label))
+          .on('mousemove', (event, d) => tooltip.show(event, `${item.label} · ${d.label}: ${prefix}${d.value}`))
+          .on('mouseleave', tooltip.hide)
+          .append('title')
+          .text(d => `${item.label} · ${d.label}: ${prefix}${d.value}`);
+      });
+
+      drawLegend(d3.select(el), series.map(item => ({ label: item.label })), item => color(item.label));
+    };
+
     document.querySelectorAll('[data-chart]').forEach(el => {
+      if (el.dataset.chart === 'multi-line') {
+        const series = parseChartSeries(el);
+        if (!series.length) {
+          el.textContent = 'No chart data available.';
+          return;
+        }
+        drawMultiLine(el, series);
+        return;
+      }
+
       const data = parseChartData(el);
       if (!data.length || (el.dataset.chart === 'pie' && !data.some(item => Number(item.value) > 0))) {
         el.textContent = 'No chart data available.';
