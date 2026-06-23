@@ -68,7 +68,7 @@ class AdminDashboardController extends Controller
             ),
         ];
 
-        $monthStart = new \DateTimeImmutable('first day of -5 months 00:00:00');
+        $monthStart = (new \DateTimeImmutable('first day of this month 00:00:00'))->modify('-5 months');
         $monthCursor = $monthStart;
         $monthKeys = [];
         $monthLabels = [];
@@ -121,7 +121,7 @@ class AdminDashboardController extends Controller
 
         $revenueByMonth = $mapMonthlyTotals(
             "SELECT DATE_FORMAT(o.created_at, '%Y-%m') AS bucket,
-                    COALESCE(SUM(mo.subtotal - mo.discount_amount), 0) AS total
+                    COALESCE(SUM(mo.subtotal - COALESCE(mo.discount_amount, 0)), 0) AS total
              FROM merchant_orders mo
              JOIN orders o ON o.order_id = mo.order_id
              WHERE o.payment_status='paid'
@@ -163,8 +163,9 @@ class AdminDashboardController extends Controller
             $activeCategories
         );
 
-        if (array_key_exists('uncategorized', $categoryCounts)) {
-            $categoryChart[] = ['label' => 'Uncategorized', 'value' => (int) $categoryCounts['uncategorized']];
+        $uncategorizedCount = (int) $db->query("SELECT COUNT(*) FROM products WHERE category_id IS NULL AND status = 'active'")->fetchColumn();
+        if ($uncategorizedCount > 0) {
+            $categoryChart[] = ['label' => 'Uncategorized', 'value' => $uncategorizedCount];
         }
 
         $this->view('admin/dashboard', [

@@ -383,7 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const tooltip = addTooltip(el);
       const width = 520;
       const height = parseInt(el.dataset.chartHeight || '260', 10);
-      const tickStep = Math.max(1, parseInt(el.dataset.chartStep || '0', 10) || 0);
+      const tickStep = parseInt(el.dataset.chartStep, 10) || 0;
       const margin = { top: 18, right: 18, bottom: 54, left: 42 };
       const color = d3.scaleOrdinal(colors);
       const x = d3.scaleBand().domain(data.map(d => d.label)).range([margin.left, width - margin.right]).padding(0.24);
@@ -498,9 +498,11 @@ document.addEventListener('DOMContentLoaded', () => {
         .attr('d', d => line(d.values));
 
       series.forEach(item => {
-        svg.selectAll(`.chart-point-${item.label.replace(/\s+/g, '-')}`)
+        const safeLabel = item.label.replace(/[^a-zA-Z0-9]/g, '-');
+        svg.selectAll(`.chart-point-${safeLabel}`)
           .data(item.values)
           .join('circle')
+          .attr('class', `chart-point-${safeLabel}`)
           .attr('cx', d => x(d.label))
           .attr('cy', d => y(Number(d.value)))
           .attr('r', 4.5)
