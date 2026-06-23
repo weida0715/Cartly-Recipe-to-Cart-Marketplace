@@ -51,8 +51,8 @@ foreach ($vouchers as $voucher) {
     </div>
     <div class="voucher-date-range-shell" data-voucher-expiry-shell>
       <div class="form-grid">
-        <div class="form-row"><label>Start date</label><input type="date" name="start_date" value="<?= htmlspecialchars($today->format('Y-m-d')) ?>" required></div>
-        <div class="form-row"><label>End date</label><input type="date" name="end_date" value="<?= htmlspecialchars($tomorrow->format('Y-m-d')) ?>" required></div>
+        <div class="form-row"><label>Start date</label><input type="date" name="start_date" value="<?= htmlspecialchars($today->format('Y-m-d')) ?>" data-voucher-start required></div>
+        <div class="form-row"><label>End date</label><input type="date" name="end_date" value="<?= htmlspecialchars($tomorrow->format('Y-m-d')) ?>" data-voucher-end required></div>
       </div>
     </div>
     <div class="form-grid">
@@ -158,8 +158,8 @@ foreach ($vouchers as $voucher) {
           </div>
           <div class="voucher-date-range-shell <?= $noExpiry ? 'is-muted' : '' ?>" data-voucher-expiry-shell>
             <div class="form-grid">
-              <div class="form-row"><label>Start date</label><input type="date" name="start_date" value="<?= htmlspecialchars((string) ($v['start_date'] ?? '')) ?>" <?= $noExpiry ? 'disabled' : 'required' ?>></div>
-              <div class="form-row"><label>End date</label><input type="date" name="end_date" value="<?= htmlspecialchars((string) ($v['end_date'] ?? '')) ?>" <?= $noExpiry ? 'disabled' : 'required' ?>></div>
+              <div class="form-row"><label>Start date</label><input type="date" name="start_date" value="<?= htmlspecialchars((string) ($v['start_date'] ?? '')) ?>" data-voucher-start <?= $noExpiry ? 'disabled' : 'required' ?>></div>
+              <div class="form-row"><label>End date</label><input type="date" name="end_date" value="<?= htmlspecialchars((string) ($v['end_date'] ?? '')) ?>" data-voucher-end <?= $noExpiry ? 'disabled' : 'required' ?>></div>
             </div>
           </div>
           <div class="form-grid">
@@ -183,6 +183,8 @@ foreach ($vouchers as $voucher) {
     const shell = form.querySelector('[data-voucher-expiry-shell]');
     if (!toggle || !shell) return;
 
+    const startInput = shell.querySelector('[data-voucher-start]');
+    const endInput = shell.querySelector('[data-voucher-end]');
     const sync = () => {
       const locked = toggle.checked;
       shell.classList.toggle('is-muted', locked);
@@ -190,9 +192,16 @@ foreach ($vouchers as $voucher) {
         input.disabled = locked;
         input.required = !locked;
       });
+
+      if (!startInput || !endInput) return;
+      endInput.min = startInput.value;
+      const invalidRange = !locked && startInput.value && endInput.value && startInput.value > endInput.value;
+      endInput.setCustomValidity(invalidRange ? 'End date must be after or equal to start date.' : '');
     };
 
     toggle.addEventListener('change', sync);
+    startInput?.addEventListener('change', sync);
+    endInput?.addEventListener('change', sync);
     sync();
   });
 })();

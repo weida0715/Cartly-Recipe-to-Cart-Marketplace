@@ -39,6 +39,35 @@ class Store extends Model
         return $rows[0] ?? null;
     }
 
+    public function statistics(int $storeId): array
+    {
+        $rows = $this->query(
+            "SELECT
+                (SELECT COUNT(*) FROM products WHERE store_id = :products_store) AS total_products,
+                (SELECT COUNT(*) FROM products WHERE store_id = :active_store AND status = 'active') AS active_products,
+                (SELECT COUNT(*) FROM merchant_orders WHERE store_id = :orders_store AND status <> 'cancelled') AS total_orders,
+                (SELECT COUNT(*) FROM merchant_orders WHERE store_id = :completed_store AND status = 'completed') AS completed_orders,
+                (SELECT COALESCE(SUM(subtotal - discount_amount), 0)
+                 FROM merchant_orders
+                 WHERE store_id = :revenue_store AND status <> 'cancelled') AS revenue",
+            [
+                ':products_store' => $storeId,
+                ':active_store' => $storeId,
+                ':orders_store' => $storeId,
+                ':completed_store' => $storeId,
+                ':revenue_store' => $storeId,
+            ]
+        );
+
+        return $rows[0] ?? [
+            'total_products' => 0,
+            'active_products' => 0,
+            'total_orders' => 0,
+            'completed_orders' => 0,
+            'revenue' => 0,
+        ];
+    }
+
     public function pending(): array
     {
         return $this->query(

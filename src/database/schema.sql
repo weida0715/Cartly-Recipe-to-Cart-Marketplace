@@ -4,8 +4,10 @@ CREATE DATABASE IF NOT EXISTS cartly CHARACTER SET utf8mb4 COLLATE utf8mb4_unico
 USE cartly;
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS reports;
+DROP TABLE IF EXISTS application_settings;
 DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS merchant_order_vouchers;
 DROP TABLE IF EXISTS merchant_orders;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS vouchers;
@@ -20,6 +22,11 @@ DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS stores;
 DROP TABLE IF EXISTS users;
 SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE application_settings (
+  setting_key   VARCHAR(100) PRIMARY KEY,
+  setting_value VARCHAR(255) NOT NULL,
+  updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
 CREATE TABLE users (
   user_id    INT AUTO_INCREMENT PRIMARY KEY,
   username   VARCHAR(50) UNIQUE NOT NULL,
@@ -183,6 +190,16 @@ CREATE TABLE merchant_orders (
   FOREIGN KEY (order_id)   REFERENCES orders(order_id) ON DELETE CASCADE,
   FOREIGN KEY (store_id)   REFERENCES stores(store_id) ON DELETE CASCADE,
   FOREIGN KEY (voucher_id) REFERENCES vouchers(voucher_id) ON DELETE SET NULL
+);
+CREATE TABLE merchant_order_vouchers (
+  merchant_order_voucher_id INT AUTO_INCREMENT PRIMARY KEY,
+  merchant_order_id         INT NOT NULL,
+  voucher_id                INT NULL,
+  discount_amount           DECIMAL(10,2) NOT NULL DEFAULT 0,
+  created_at                DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uniq_merchant_order_voucher (merchant_order_id, voucher_id),
+  FOREIGN KEY (merchant_order_id) REFERENCES merchant_orders(merchant_order_id) ON DELETE CASCADE,
+  FOREIGN KEY (voucher_id)        REFERENCES vouchers(voucher_id) ON DELETE SET NULL
 );
 CREATE TABLE order_items (
   order_item_id          INT AUTO_INCREMENT PRIMARY KEY,

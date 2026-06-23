@@ -25,6 +25,7 @@ use App\Controllers\Admin\AdminUserController;
 use App\Controllers\Admin\AdminMerchantController;
 use App\Controllers\Admin\AdminCategoryController;
 use App\Controllers\Admin\AdminReportController;
+use App\Controllers\Admin\AdminSettingsController;
 
 // Public
 $router->get('/', [HomeController::class, 'index']);
@@ -65,6 +66,8 @@ $router->post('/recipes/{id}/confirm-cart', [RecipeCartController::class, 'confi
 // Cart
 $router->get('/cart', [CartController::class, 'index']);
 $router->post('/cart/add', [CartController::class, 'add']);
+$router->post('/cart/vouchers/apply', [CartController::class, 'applyVoucher']);
+$router->post('/cart/vouchers/remove', [CartController::class, 'removeVoucher']);
 $router->post('/cart/update', [CartController::class, 'update']);
 $router->post('/cart/remove', [CartController::class, 'remove']);
 $router->post('/cart/clear', [CartController::class, 'clear']);
@@ -87,6 +90,7 @@ $router->get('/orders/{id}/confirmation', [OrderController::class, 'confirmation
 $router->get('/dashboard', [CustomerDashboardController::class, 'index']);
 $router->get('/saved-recipes', [CustomerDashboardController::class, 'savedRecipes']);
 $router->get('/profile', [CustomerDashboardController::class, 'profile']);
+$router->get('/profile/edit', [CustomerDashboardController::class, 'editProfile']);
 $router->post('/profile', [CustomerDashboardController::class, 'updateProfile']);
 $router->post('/merchant/request', [CustomerDashboardController::class, 'requestMerchant']);
 
@@ -121,6 +125,8 @@ $router->get('/admin/categories', [AdminCategoryController::class, 'index']);
 $router->post('/admin/categories', [AdminCategoryController::class, 'store']);
 $router->post('/admin/categories/{id}/update', [AdminCategoryController::class, 'update']);
 $router->post('/admin/categories/{id}/delete', [AdminCategoryController::class, 'delete']);
+$router->get('/admin/settings', [AdminSettingsController::class, 'index']);
+$router->post('/admin/settings', [AdminSettingsController::class, 'update']);
 $router->get('/admin/reports', [AdminReportController::class, 'index']);
 $router->post('/admin/reports/{id}/resolve', [AdminReportController::class, 'resolve']);
 

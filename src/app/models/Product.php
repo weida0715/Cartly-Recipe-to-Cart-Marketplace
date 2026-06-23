@@ -140,11 +140,20 @@ class Product extends Model
         );
     }
 
-    public function decrementStock(int $productId, int $qty): void
+    public function decrementStockIfAvailable(int $productId, int $qty): bool
     {
         $stmt = $this->db()->prepare(
-            'UPDATE products SET stock_quantity = GREATEST(0, stock_quantity - :q) WHERE product_id = :id'
+            "UPDATE products
+             SET stock_quantity = stock_quantity - :decrement_qty
+             WHERE product_id = :id
+               AND status = 'active'
+               AND stock_quantity >= :available_qty"
         );
-        $stmt->execute([':q' => $qty, ':id' => $productId]);
+        $stmt->execute([
+            ':decrement_qty' => $qty,
+            ':available_qty' => $qty,
+            ':id' => $productId,
+        ]);
+        return $stmt->rowCount() === 1;
     }
 }

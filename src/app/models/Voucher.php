@@ -92,6 +92,40 @@ class Voucher extends Model
         );
     }
 
+    public function resolveCodesForStore(array $codes, int $storeId, float $subtotal): array
+    {
+        $applied = [];
+        $invalid = [];
+        $remaining = max(0, $subtotal);
+        $normalizedCodes = array_values(array_unique(array_filter(array_map(
+            static fn($code): string => strtoupper(trim((string) $code)),
+            $codes
+        ), static fn(string $code): bool => $code !== '')));
+
+        foreach ($normalizedCodes as $code) {
+            $voucher = $this->findValidForStore($code, $storeId, $subtotal);
+            if (!$voucher || $remaining <= 0) {
+                $invalid[] = $code;
+                continue;
+            }
+
+            $discount = $this->computeDiscount($voucher, $remaining);
+            if ($discount <= 0) {
+                $invalid[] = $code;
+                continue;
+            }
+            $remaining = max(0, round($remaining - $discount, 2));
+            $voucher['discount_amount'] = $discount;
+            $applied[] = $voucher;
+        }
+
+        return [
+            'applied' => $applied,
+            'invalid' => $invalid,
+            'discount_total' => round($subtotal - $remaining, 2),
+            'final_total' => $remaining,
+        ];
+    }
     public function computeDiscount(array $voucher, float $subtotal): float
     {
         if ($voucher['discount_type'] === 'fixed') {
@@ -109,9 +143,13 @@ class Voucher extends Model
     public function incrementIfAvailable(int $voucherId): bool
     {
         $stmt = $this->db()->prepare(
-            'UPDATE vouchers
+            "UPDATE vouchers
              SET used_count = used_count + 1
-             WHERE voucher_id = :v AND (usage_limit = 0 OR used_count < usage_limit)'
+             WHERE voucher_id = :v
+               AND status = 'active'
+               AND (start_date IS NULL OR start_date <= CURDATE())
+               AND (end_date IS NULL OR end_date >= CURDATE())
+               AND (usage_limit = 0 OR used_count < usage_limit)"
         );
         $stmt->execute([':v' => $voucherId]);
         return $stmt->rowCount() === 1;
