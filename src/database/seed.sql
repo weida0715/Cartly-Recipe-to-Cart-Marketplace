@@ -1,5 +1,7 @@
 -- Seed data for Cartly. Run AFTER schema.sql.
 USE cartly;
+INSERT INTO application_settings (setting_key, setting_value) VALUES
+  ('delivery_fee_per_store', '2.00');
 -- Users (passwords are PHP password_hash() of "password123")
 -- Hash below is bcrypt for "password123"
 INSERT INTO users (username, full_name, email, phone, password, role, status) VALUES

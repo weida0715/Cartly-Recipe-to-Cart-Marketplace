@@ -1310,6 +1310,83 @@
     text-align: left;
   }
 }
+.settings-heading {
+  margin-bottom: 20px;
+}
+.settings-heading h2,
+.settings-heading p {
+  margin-top: 0;
+}
+.admin-setting-card {
+  align-items: end;
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+}
+.admin-setting-copy h3,
+.admin-setting-copy p {
+  margin-top: 0;
+}
+.admin-setting-form .form-row {
+  margin-top: 0;
+}
+@media (max-width: 760px) {
+  .admin-setting-card {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+}
+.store-profile-heading,
+.store-card-heading {
+  align-items: flex-start;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+}
+.store-profile-heading {
+  margin-bottom: 22px;
+}
+.store-profile-heading h2,
+.store-profile-heading p,
+.store-card-heading h3,
+.store-card-heading p {
+  margin-top: 0;
+}
+.store-profile-stats {
+  margin-bottom: 24px;
+}
+.store-profile-form {
+  display: grid;
+  gap: 20px;
+}
+.store-profile-card {
+  margin: 0;
+}
+.operation-hours-summary {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--green-primary-dark);
+  font-weight: 800;
+  padding: 9px 12px;
+  white-space: nowrap;
+}
+.store-profile-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+@media (max-width: 680px) {
+  .store-profile-heading,
+  .store-card-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .operation-hours-summary {
+    white-space: normal;
+  }
+  .store-profile-actions .btn {
+    width: 100%;
+  }
 .recipe-detail-hero {
   align-items: stretch;
   display: grid;

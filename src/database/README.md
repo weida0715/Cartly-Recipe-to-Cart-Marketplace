@@ -16,6 +16,8 @@ If the database was already imported before voucher codes became store-scoped,
 run `migrations/002_store_scoped_voucher_codes.sql` once instead of recreating
 the database.
 
+To add administrator-managed delivery fees to an existing database, run
+`migrations/007_application_settings.sql`. The migration is safe to rerun and preserves an existing fee.
 For an existing database, also run `migrations/006_multiple_order_vouchers.sql` before
 testing multiple vouchers in the cart and checkout.
 
