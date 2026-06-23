@@ -6,6 +6,7 @@ use App\Helpers\Controller;
 use App\Helpers\AuthHelper;
 use App\Helpers\Flash;
 use App\Models\Store;
+use App\Models\Notification;
 
 class AdminMerchantController extends Controller
 {
@@ -27,6 +28,15 @@ class AdminMerchantController extends Controller
             (new \App\Models\User())->update((int) $store['user_id'], ['role' => 'merchant']);
         }
         (new Store())->update((int) $id, ['store_status' => 'approved', 'admin_note' => '']);
+        if ($store) {
+            (new Notification())->createForUser(
+                (int) $store['user_id'],
+                'success',
+                'Merchant request approved',
+                'Your store request was approved. You can now use the merchant portal.',
+                '/merchant'
+            );
+        }
         Flash::set('success', 'Merchant approved.');
         $this->redirect('/admin/merchants');
     }
@@ -36,7 +46,17 @@ class AdminMerchantController extends Controller
         AuthHelper::requireRole('admin');
         $this->requireCsrf();
         $note = (string) $this->input('admin_note', '');
+        $store = (new Store())->find((int) $id);
         (new Store())->update((int) $id, ['store_status' => 'rejected', 'admin_note' => $note]);
+        if ($store) {
+            (new Notification())->createForUser(
+                (int) $store['user_id'],
+                'warning',
+                'Merchant request rejected',
+                'Your store request was rejected.' . ($note !== '' ? ' Reason: ' . $note : ''),
+                '/dashboard'
+            );
+        }
         Flash::set('info', 'Merchant rejected.');
         $this->redirect('/admin/merchants');
     }

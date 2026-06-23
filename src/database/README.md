@@ -16,6 +16,10 @@ If the database was already imported before voucher codes became store-scoped,
 run `migrations/002_store_scoped_voucher_codes.sql` once instead of recreating
 the database.
 
+For an existing database, run `migrations/009_notifications_and_returns.sql`
+once to add notifications, customer cancellation support, and return/refund
+request records.
+
 CLI alternative:
 
 ```bash

@@ -17,6 +17,19 @@
       };
     ?>
     <h3><?= htmlspecialchars($mo['store_name']) ?> <span class="badge" data-tracking-badge><?= htmlspecialchars(str_replace('_', ' ', $displayStatus)) ?></span></h3>
+      <?php if (in_array($displayStatus, ['pending', 'accepted', 'preparing', 'ready_to_deliver'], true)): ?>
+        <form method="post" action="<?= BASE_URL ?>/orders/merchant/<?= (int) $mo['merchant_order_id'] ?>/cancel"
+          class="order-cancel-form" data-confirm="Cancel this store order before dispatch? Stock will be restored.">
+          <?= Csrf::field() ?>
+          <button class="btn btn-danger btn-sm">Cancel order</button>
+        </form>
+      <?php elseif (in_array($displayStatus, ['out_for_delivery', 'delivered', 'completed'], true)): ?>
+        <div class="order-cancel-form">
+          <button class="btn btn-danger btn-sm" type="button" disabled
+            title="Orders cannot be cancelled after dispatch">Cancel order</button>
+          <small class="text-muted">Cancellation is unavailable after dispatch.</small>
+        </div>
+      <?php endif; ?>
       <div class="tracking-card <?= $displayStatus === 'cancelled' ? 'is-cancelled' : '' ?>"
         data-tracking-status="<?= htmlspecialchars($displayStatus) ?>"
         data-tracking-step="<?= $trackingStep ?>"
@@ -62,6 +75,7 @@
           <th>Unit</th>
           <th>Qty</th>
           <th>Total</th>
+          <th>After-sale</th>
         </tr>
       </thead>
       <tbody>
@@ -71,6 +85,47 @@
             <td>RM <?= number_format((float) $it['unit_price'], 2) ?></td>
             <td><?= (int) $it['quantity'] ?></td>
             <td>RM <?= number_format((float) ($it['subtotal'] ?? ((float) $it['unit_price'] * (int) $it['quantity'])), 2) ?>
+            </td>
+            <td>
+              <?php $returnRequest = $it['return_request'] ?? null; ?>
+              <?php if ($returnRequest): ?>
+                <div class="return-status-summary">
+                  <span class="badge"><?= htmlspecialchars(str_replace('_', ' ', (string) $returnRequest['status'])) ?></span>
+                  <small><?= htmlspecialchars(ucfirst((string) $returnRequest['request_type'])) ?> request for <?= (int) $returnRequest['quantity'] ?> item(s)</small>
+                  <?php if (!empty($returnRequest['refund_amount'])): ?>
+                    <strong>RM <?= number_format((float) $returnRequest['refund_amount'], 2) ?></strong>
+                  <?php endif; ?>
+                  <?php if ((string) $returnRequest['status'] === 'return_approved'): ?>
+                    <form method="post" action="<?= BASE_URL ?>/orders/returns/<?= (int) $returnRequest['return_request_id'] ?>/ship"
+                      data-confirm="Confirm that you arranged and shipped this return?">
+                      <?= Csrf::field() ?>
+                      <button class="btn btn-primary btn-sm">Mark return shipped</button>
+                    </form>
+                  <?php endif; ?>
+                </div>
+              <?php elseif ($displayStatus === 'completed'): ?>
+                <details class="return-request-form">
+                  <summary>Request return/refund</summary>
+                  <form method="post" action="<?= BASE_URL ?>/orders/items/<?= (int) $it['order_item_id'] ?>/return-request">
+                    <?= Csrf::field() ?>
+                    <label>Request type
+                      <select name="request_type" required>
+                        <option value="refund">Refund only</option>
+                        <option value="return">Return and refund</option>
+                      </select>
+                    </label>
+                    <label>Quantity
+                      <input type="number" name="quantity" min="1" max="<?= (int) $it['quantity'] ?>" value="1" required>
+                    </label>
+                    <label>Reason
+                      <textarea name="reason" maxlength="1000" required></textarea>
+                    </label>
+                    <button class="btn btn-outline btn-sm">Submit request</button>
+                  </form>
+                </details>
+              <?php else: ?>
+                <span class="text-muted">Available after completion</span>
+              <?php endif; ?>
             </td>
           </tr>
         <?php endforeach; ?>

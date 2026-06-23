@@ -4,6 +4,7 @@ declare(strict_types=1);
 /** @var \App\Helpers\Router $router */
 
 use App\Controllers\HomeController;
+use App\Controllers\NotificationController;
 use App\Controllers\Auth\AuthController;
 use App\Controllers\Product\ProductController;
 use App\Controllers\Store\StoreController;
@@ -12,6 +13,7 @@ use App\Controllers\Recipe\RecipeCartController;
 use App\Controllers\Order\CartController;
 use App\Controllers\Order\CheckoutController;
 use App\Controllers\Order\OrderController;
+use App\Controllers\Order\ReturnRequestController;
 use App\Controllers\Customer\CustomerDashboardController;
 use App\Controllers\Customer\ReviewController;
 use App\Controllers\Customer\ReportController;
@@ -39,6 +41,11 @@ $router->post('/auth/forgot-password', [AuthController::class, 'forgot']);
 $router->get('/auth/reset-password', [AuthController::class, 'resetForm']);
 $router->post('/auth/reset-password', [AuthController::class, 'reset']);
 $router->get('/auth/logout', [AuthController::class, 'logout']);
+
+// Notifications
+$router->get('/notifications', [NotificationController::class, 'index']);
+$router->get('/notifications/{id}', [NotificationController::class, 'show']);
+$router->post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
 
 // Marketplace / products
 $router->get('/vouchers', [ProductController::class, 'vouchers']);
@@ -80,6 +87,9 @@ $router->get('/orders', [OrderController::class, 'history']);
 $router->get('/orders/merchant/{id}/tracking', [OrderController::class, 'trackingStatus']);
 $router->post('/orders/merchant/{id}/advance', [OrderController::class, 'advanceDelivery']);
 $router->post('/orders/merchant/{id}/received', [OrderController::class, 'received']);
+$router->post('/orders/merchant/{id}/cancel', [OrderController::class, 'cancel']);
+$router->post('/orders/items/{id}/return-request', [ReturnRequestController::class, 'store']);
+$router->post('/orders/returns/{id}/ship', [ReturnRequestController::class, 'ship']);
 $router->get('/orders/{id}', [OrderController::class, 'show']);
 $router->get('/orders/{id}/confirmation', [OrderController::class, 'confirmation']);
 
@@ -101,6 +111,8 @@ $router->post('/merchant/products/{id}/delete', [MerchantProductController::clas
 $router->get('/merchant/orders', [MerchantOrderController::class, 'index']);
 $router->post('/merchant/orders/{id}/status', [MerchantOrderController::class, 'updateStatus']);
 $router->get('/merchant/orders/{id}/tracking', [MerchantOrderController::class, 'trackingStatus']);
+$router->post('/merchant/returns/{id}/decide', [ReturnRequestController::class, 'decide']);
+$router->post('/merchant/returns/{id}/receive', [ReturnRequestController::class, 'receive']);
 $router->get('/merchant/vouchers', [MerchantVoucherController::class, 'index']);
 $router->post('/merchant/vouchers', [MerchantVoucherController::class, 'store']);
 $router->post('/merchant/vouchers/{id}/update', [MerchantVoucherController::class, 'update']);

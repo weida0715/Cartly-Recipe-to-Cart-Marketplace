@@ -5,9 +5,28 @@ namespace App\Helpers;
 
 class Flash
 {
-    public static function set(string $type, string $message): void
+    public static function set(string $type, string $message, bool $persistNotification = true): void
     {
         $_SESSION['_flash'][] = ['type' => $type, 'message' => $message];
+        if (!$persistNotification || empty($_SESSION['user']['user_id'])) {
+            return;
+        }
+
+        try {
+            (new \App\Models\Notification())->createForUser(
+                (int) $_SESSION['user']['user_id'],
+                $type,
+                match ($type) {
+                    'success' => 'Action completed',
+                    'warning' => 'Action required',
+                    'error' => 'Something went wrong',
+                    default => 'Cartly update',
+                },
+                $message
+            );
+        } catch (\Throwable) {
+            // Flash messages must still work before the notification migration is applied.
+        }
     }
 
     /** @return array<int, array{type:string, message:string}> */

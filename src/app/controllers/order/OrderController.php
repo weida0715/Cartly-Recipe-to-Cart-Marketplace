@@ -8,6 +8,8 @@ use App\Helpers\Flash;
 use App\Models\Order;
 use App\Models\MerchantOrder;
 use App\Models\OrderItem;
+use App\Models\Notification;
+use App\Models\ReturnRequest;
 
 class OrderController extends Controller
 {
@@ -55,6 +57,32 @@ class OrderController extends Controller
         } else {
             Flash::set('error', 'Failed to mark order as received.');
         }
+        $this->redirect('/orders/' . (int) $row['order_id']);
+    }
+
+    public function cancel(string $id): void
+    {
+        AuthHelper::requireLogin();
+        $this->requireCsrf();
+        $model = new MerchantOrder();
+        $row = $model->belongsToCustomer((int) $id, (int) AuthHelper::id());
+        $cancellable = ['pending', 'accepted', 'preparing', 'ready_to_deliver'];
+        if (!$row || !in_array((string) $row['status'], $cancellable, true)) {
+            Flash::set('error', 'This order can no longer be cancelled.');
+            $this->redirect('/orders');
+        }
+        if (!$model->updateStatusIfCurrentAndSyncParent((int) $id, $cancellable, 'cancelled')) {
+            Flash::set('error', 'The order status changed before cancellation could be completed.');
+            $this->redirect('/orders/' . (int) $row['order_id']);
+        }
+        (new Notification())->createForStore(
+            (int) $row['store_id'],
+            'warning',
+            'Customer cancelled an order',
+            'Store order #' . (int) $id . ' was cancelled before dispatch.',
+            '/merchant/orders'
+        );
+        Flash::set('success', 'Order cancelled and stock restored.');
         $this->redirect('/orders/' . (int) $row['order_id']);
     }
 
@@ -120,9 +148,19 @@ class OrderController extends Controller
         $merchantOrders = (new MerchantOrder())->forOrder($id);
         $order['display_order_status'] = (new Order())->displayStatusFromMerchantStatuses(array_column($merchantOrders, 'status'));
         $oi = new OrderItem();
+        $returnRequestModel = new ReturnRequest();
         foreach ($merchantOrders as &$mo) {
             $mo['persisted_tracking_status'] = (string) $mo['status'];
             $mo['items'] = $oi->forMerchantOrder((int) $mo['merchant_order_id']);
+            $requests = $returnRequestModel->forMerchantOrder((int) $mo['merchant_order_id']);
+            $requestsByItem = [];
+            foreach ($requests as $request) {
+                $requestsByItem[(int) $request['order_item_id']] = $request;
+            }
+            foreach ($mo['items'] as &$item) {
+                $item['return_request'] = $requestsByItem[(int) $item['order_item_id']] ?? null;
+            }
+            unset($item);
         }
         unset($mo);
         $this->view($view, [
