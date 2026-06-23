@@ -8,7 +8,7 @@
 <?php if (!$grouped): ?>
   <div class="card text-center text-muted">No items could be generated. Adjust the recipe or stock.</div>
 <?php else: ?>
-  <?php $grand = 0; foreach ($grouped as $sid => $g): $grand += $g['subtotal']; ?>
+  <?php foreach ($grouped as $sid => $g): ?>
     <div class="preview-store card">
       <h4><?= htmlspecialchars($g['store_name']) ?></h4>
       <?php foreach ($g['items'] as $it): ?>
@@ -28,7 +28,10 @@
   <?php endforeach; ?>
 
   <div class="cart-summary">
-    <div class="line total"><span>Grand total</span><span>RM <?= number_format($grand, 2) ?></span></div>
+    <h3>Cost summary</h3>
+    <div class="line"><span>Item subtotal</span><span>RM <?= number_format((float) $subtotal, 2) ?></span></div>
+    <div class="line"><span>Delivery cost</span><span>RM <?= number_format((float) $deliveryFee, 2) ?></span></div>
+    <div class="line total"><span>Total amount</span><span>RM <?= number_format((float) $total, 2) ?></span></div>
     <form method="post" action="<?= BASE_URL ?>/recipes/<?= (int)$recipe['recipe_id'] ?>/confirm-cart" class="mt-2">
       <?= Csrf::field() ?>
       <input type="hidden" name="servings" value="<?= (int)$servings ?>">
