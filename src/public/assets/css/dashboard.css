@@ -44,6 +44,32 @@
 .portal-content {
   min-width: 0;
 }
+.dashboard-hero {
+  align-items: start;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 22px;
+  background: linear-gradient(135deg, #fff 0%, #f7fcf8 72%, #fff4e5 100%);
+  border-left: 5px solid var(--orange-accent);
+}
+.dashboard-eyebrow,
+.chart-kicker {
+  color: var(--orange-accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  margin: 0 0 6px;
+  text-transform: uppercase;
+}
+.dashboard-hero h2 {
+  margin: 0 0 8px;
+}
+.dashboard-intro {
+  margin: 0;
+  max-width: 720px;
+}
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -82,18 +108,67 @@
 .indicator.down {
   color: #dc2626;
 }
+.indicator.neutral {
+  color: var(--muted);
+}
 .chart-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
   margin-bottom: 24px;
+  align-items: stretch;
+}
+.admin-detail-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+.chart-card-span-2 {
+  grid-column: span 2;
+}
+.chart-card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+.chart-card-header {
+  margin-bottom: 14px;
 }
 .chart-card h3 {
-  margin-top: 0;
+  margin: 0 0 6px;
+}
+.chart-card-header .text-muted {
+  margin: 0;
+}
+.chart-card-pie .d3-chart {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 260px;
+}
+.chart-card-pie .chart-legend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 10px;
+  width: 100%;
+  margin-top: 6px;
+}
+.chart-card-pie .chart-legend span {
+  min-width: 0;
+  font-size: 0.8rem;
+}
+.chart-card-pie .d3-chart svg {
+  max-width: 240px;
+  margin-inline: auto;
+  margin-top: 4px;
+}
+.chart-card-bar .d3-chart {
+  flex: 0 0 auto;
+  min-height: 300px;
 }
 .d3-chart {
   min-height: 240px;
   position: relative;
+  flex: 1;
 }
 .d3-chart svg {
   display: block;
@@ -206,12 +281,24 @@
   .stat-grid {
     grid-template-columns: 1fr;
   }
+  .dashboard-hero {
+    padding: 18px;
+  }
   .sidebar {
     position: static;
   }
 }
 @media (max-width: 768px) {
+  .admin-detail-grid {
+    grid-template-columns: 1fr;
+  }
   .chart-grid {
     grid-template-columns: 1fr;
+  }
+  .chart-card-pie .chart-legend {
+    grid-template-columns: 1fr;
+  }
+  .chart-card-span-2 {
+    grid-column: auto;
   }
 }

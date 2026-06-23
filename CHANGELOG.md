@@ -173,3 +173,8 @@ All notable changes to this project will be documented in this file.
 - Improved cart item detail presentation with product image, package information, unit price, and clearer line-total breakdowns.
 - Reused the same uploaded product image source in the shopping cart as the marketplace and product views.
 - Updated mobile cart styling so each item reads like a standalone card while keeping the desktop table layout intact.
+
+## [1.1.14] - 23rd June 2026
+- Expanded the admin dashboard with summary metric cards for platform users, active merchants, platform revenue, and total orders plus 30-day change indicators.
+- Added admin D3 charts for platform growth comparison, monthly revenue performance, and active product category distribution.
+- Extended the shared chart renderer to support grouped bar charts for multi-series admin analytics while reusing the existing D3 loading pattern.
