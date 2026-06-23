@@ -81,7 +81,7 @@
       <span>Discount: RM <?= number_format((float) $mo['discount_amount'], 2) ?></span>
       <span>Delivery: RM <?= number_format((float) ($mo['delivery_fee'] ?? 0), 2) ?></span>
       <strong>Total: RM
-        <?= number_format((float) ($mo['final_amount'] ?? ((float) $mo['subtotal'] - (float) $mo['discount_amount'] + (float) ($mo['delivery_fee'] ?? 0))), 2) ?></strong>
+        <?= number_format((float) ($mo['final_amount'] ?? (max(0.0, (float) $mo['subtotal'] - (float) $mo['discount_amount']) + (float) ($mo['delivery_fee'] ?? 0))), 2) ?></strong>
     </div>
   </div>
 <?php endforeach; ?>
