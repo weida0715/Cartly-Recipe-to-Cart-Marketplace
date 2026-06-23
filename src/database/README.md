@@ -16,6 +16,9 @@ If the database was already imported before voucher codes became store-scoped,
 run `migrations/002_store_scoped_voucher_codes.sql` once instead of recreating
 the database.
 
+For an existing database, also run `migrations/006_multiple_order_vouchers.sql` before
+testing multiple vouchers in the cart and checkout.
+
 CLI alternative:
 
 ```bash

@@ -208,7 +208,33 @@ All notable changes to this project will be documented in this file.
 - Added a recipe count showing how many cards are displayed on the current page out of the total filtered results.
 - Added null-safe dashboard statistics, request/order data, and recipe filter values based on review feedback.
 
-## [1.2.7] - 23rd June 2026
+## [1.2.7] - 22nd June 2026
+- Added item subtotal, delivery cost, and total amount rows to the Recipe-to-Cart preview and shopping cart summaries.
+- Added a fixed per-store delivery fee calculation so carts with multiple merchant stores charge delivery once per store.
+- Included delivery fees in checkout totals, saved merchant order totals, and order detail displays.
+- Added tests for delivery fee calculation and summary display coverage.
+
+## [1.2.8] - 22nd June 2026
+- Added average user ratings and review counts to recipe listing cards.
+- Added a clear unrated state for recipes that do not have any visible reviews yet.
+- Reworked the recipe details page with a two-column image and summary layout.
+- Added dedicated ingredient and numbered instruction cards with serving-based quantity scaling.
+- Refined instruction parsing and serving input behavior based on review feedback.
+
+## [1.2.9] - 22nd June 2026
+- Changed the customer profile page into an account overview with profile details, quick stats, shortcut actions, merchant application access, and recent orders.
+- Moved profile editing into a dedicated Edit Profile page.
+- Added account activity count helpers for orders, saved recipes, and reviews.
+
+## [1.3.0] - 22nd June 2026
+- Moved voucher application from checkout to each merchant section of the shopping cart.
+- Added support for applying and removing multiple vouchers with server-calculated discounts and totals.
+- Revalidated voucher status, dates, minimum spend, and usage limits during checkout.
+- Added order-level voucher history through the `merchant_order_vouchers` migration.
+- Prevented invalid merchant voucher date ranges with strict server validation and linked browser date constraints.
+- Hardened stacked voucher validation, blank date handling, and transactional stock updates based on review feedback.
+
+## [1.3.1] - 22nd June 2026
 - Expanded the cart order summary with estimated subtotal, delivery cost, and total amount.
 - Added a continue-shopping action to the cart so customers can return to browsing products.
 - Reworked customer order history into responsive order cards with status badges, item counts, dates, totals, payment status, and view-detail actions.
