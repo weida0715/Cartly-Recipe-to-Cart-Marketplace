@@ -808,10 +808,6 @@
   .cart-qty-form {
     flex-wrap: wrap;
   }
-  .cart-price-cell,
-  .cart-action-cell {
-    white-space: normal;
-  }
   .cart-action-cell form {
     justify-content: flex-start;
   }

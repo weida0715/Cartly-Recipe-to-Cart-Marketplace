@@ -38,7 +38,7 @@
                           <?php endif; ?>
                         </div>
                         <div class="cart-item-meta">
-                          <span>Pack: <?= htmlspecialchars($packageQuantity) ?> <?= htmlspecialchars($it['package_unit']) ?></span>
+                          <span>Pack: <?= htmlspecialchars($packageQuantity) ?> <?= htmlspecialchars($it['package_unit'] ?? '') ?></span>
                           <span>Unit price: RM <?= number_format((float)$it['unit_price'], 2) ?></span>
                         </div>
                         <small class="text-muted">Stock available: <?= $stock ?><?= $stock === 0 ? ' · remove this item to continue' : '' ?></small>
