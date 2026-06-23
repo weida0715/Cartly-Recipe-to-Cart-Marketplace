@@ -772,6 +772,26 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 18px;
 }
+.mock-payment {
+  border-top: 1px solid var(--border);
+  margin-top: 18px;
+  padding-top: 18px;
+}
+.payment-fields {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 14px;
+}
+.payment-fields[hidden] {
+  display: none;
+}
+.receipt-actions {
+  margin-bottom: 18px;
+}
 @media (max-width: 900px) {
   .store-grid {
     grid-template-columns: 1fr;

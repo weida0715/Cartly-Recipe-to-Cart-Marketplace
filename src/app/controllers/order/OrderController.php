@@ -8,6 +8,7 @@ use App\Helpers\Flash;
 use App\Models\Order;
 use App\Models\MerchantOrder;
 use App\Models\OrderItem;
+use App\Models\PaymentTransaction;
 use App\Models\Notification;
 use App\Models\ReturnRequest;
 
@@ -28,7 +29,7 @@ class OrderController extends Controller
     {
         AuthHelper::requireLogin();
         $this->view('order/history', [
-            'title'  => 'Order History',
+            'title' => 'Order History',
             'orders' => (new Order())->historyForUser((int) AuthHelper::id()),
         ]);
     }
@@ -43,6 +44,31 @@ class OrderController extends Controller
         $this->renderOrder((int) $id, 'order/confirmation', 'Order Confirmed');
     }
 
+    public function receipt(string $id): void
+    {
+        $data = $this->receiptData((int) $id);
+        if ($data === null) {
+            return;
+        }
+        $this->view('order/receipt', ['title' => 'Receipt ' . $data['receiptNumber']] + $data);
+    }
+
+    public function downloadReceipt(string $id): void
+    {
+        $data = $this->receiptData((int) $id);
+        if ($data === null) {
+            return;
+        }
+        $safeReceiptNumber = preg_replace('/[^a-zA-Z0-9_-]/', '', $data['receiptNumber']) ?: 'receipt';
+        header('Content-Type: text/html; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="cartly-' . strtolower($safeReceiptNumber) . '.html"');
+        header('X-Content-Type-Options: nosniff');
+        extract($data, EXTR_SKIP);
+        $downloadMode = true;
+        require dirname(__DIR__, 2) . '/views/order/receipt.php';
+        exit;
+    }
+
     public function received(string $id): void
     {
         AuthHelper::requireLogin();
@@ -50,7 +76,9 @@ class OrderController extends Controller
         $mo = new MerchantOrder();
         $row = $mo->belongsToCustomer((int) $id, (int) AuthHelper::id());
         if (!$row || (string) $row['status'] !== 'delivered') {
-            http_response_code(403); echo 'Forbidden'; return;
+            http_response_code(403);
+            echo 'Forbidden';
+            return;
         }
         if ($mo->updateStatusAndSyncParent((int) $id, 'completed')) {
             Flash::set('success', 'Order marked as received.');
@@ -98,7 +126,9 @@ class OrderController extends Controller
         $mo = new MerchantOrder();
         $row = $mo->belongsToCustomer((int) $id, (int) AuthHelper::id());
         if (!$row || !isset($allowed[$target]) || !in_array((string) $row['status'], $allowed[$target], true)) {
-            http_response_code(403); echo 'Forbidden'; return;
+            http_response_code(403);
+            echo 'Forbidden';
+            return;
         }
         if (!$mo->updateStatusAndSyncParent((int) $id, $target)) {
             if (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'fetch') {
@@ -142,7 +172,9 @@ class OrderController extends Controller
         AuthHelper::requireLogin();
         $order = (new Order())->find($id);
         if (!$order || (int) $order['user_id'] !== (int) AuthHelper::id()) {
-            http_response_code(404); echo 'Order not found'; return;
+            http_response_code(404);
+            echo 'Order not found';
+            return;
         }
         (new MerchantOrder())->syncTimedStatusesForOrder($id);
         $merchantOrders = (new MerchantOrder())->forOrder($id);
@@ -168,6 +200,34 @@ class OrderController extends Controller
             'order' => $order,
             'merchantOrders' => $merchantOrders,
         ]);
+    }
+
+    private function receiptData(int $orderId): ?array
+    {
+        AuthHelper::requireLogin();
+        $order = (new Order())->find($orderId);
+        if (!$order || (int) $order['user_id'] !== (int) AuthHelper::id()) {
+            http_response_code(404);
+            echo 'Receipt not found';
+            return null;
+        }
+
+        $merchantOrders = (new MerchantOrder())->forOrder($orderId);
+        $itemModel = new OrderItem();
+        foreach ($merchantOrders as &$merchantOrder) {
+            $merchantOrder['items'] = $itemModel->forMerchantOrder((int) $merchantOrder['merchant_order_id']);
+        }
+        unset($merchantOrder);
+
+        $createdAt = strtotime((string) ($order['created_at'] ?? ''));
+        $receiptDate = $createdAt === false ? date('Ymd') : date('Ymd', $createdAt);
+        return [
+            'order' => $order,
+            'merchantOrders' => $merchantOrders,
+            'payment' => (new PaymentTransaction())->forOrder($orderId),
+            'receiptNumber' => (string) (($order['receipt_number'] ?? '')
+                ?: 'RCT-' . $receiptDate . '-' . str_pad((string) $orderId, 6, '0', STR_PAD_LEFT)),
+        ];
     }
 
     private function trackingPayload(array $row): array

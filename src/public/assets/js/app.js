@@ -200,6 +200,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  document.querySelectorAll('[data-mock-payment]').forEach(payment => {
+    const method = payment.querySelector('[data-payment-method]');
+    const groups = [...payment.querySelectorAll('[data-payment-fields]')];
+    if (!method) return;
+
+    const sync = () => {
+      groups.forEach(group => {
+        const active = group.dataset.paymentFields === method.value;
+        group.hidden = !active;
+        group.querySelectorAll('input, select').forEach(field => {
+          field.disabled = !active;
+          field.required = active;
+        });
+      });
+    };
+
+    method.addEventListener('change', sync);
+    sync();
+  });
+
   // Mock delivery tracking: persist delivery leg transitions after short demo delays.
   document.querySelectorAll('[data-tracking-status]').forEach(card => {
     const labelsByStatus = {

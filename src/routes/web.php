@@ -93,6 +93,8 @@ $router->post('/orders/merchant/{id}/received', [OrderController::class, 'receiv
 $router->post('/orders/merchant/{id}/cancel', [OrderController::class, 'cancel']);
 $router->post('/orders/items/{id}/return-request', [ReturnRequestController::class, 'store']);
 $router->post('/orders/returns/{id}/ship', [ReturnRequestController::class, 'ship']);
+$router->get('/orders/{id}/receipt/download', [OrderController::class, 'downloadReceipt']);
+$router->get('/orders/{id}/receipt', [OrderController::class, 'receipt']);
 $router->get('/orders/{id}', [OrderController::class, 'show']);
 $router->get('/orders/{id}/confirmation', [OrderController::class, 'confirmation']);
 

@@ -8,12 +8,14 @@ use App\Helpers\CartVoucherSession;
 use App\Helpers\CartPricing;
 use App\Helpers\Flash;
 use App\Helpers\Validator;
+use App\Helpers\MockPaymentGateway;
 use App\Models\Cart;
 use App\Models\AppSetting;
 use App\Models\CartItem;
+use App\Models\Notification;
+use App\Models\PaymentTransaction;
 use App\Models\Voucher;
 use App\Models\Product;
-use App\Models\Notification;
 
 class CheckoutController extends Controller
 {
@@ -87,7 +89,7 @@ class CheckoutController extends Controller
 
         $shipping = trim((string) $this->input('shipping_address', ''));
         $phone = trim((string) $this->input('contact_phone', ''));
-        $payment = (string) $this->input('payment_method', 'simulated');
+        $payment = (string) $this->input('payment_method', 'card');
 
         $validator = new Validator([
             'shipping_address' => $shipping,
@@ -100,7 +102,7 @@ class CheckoutController extends Controller
             Flash::set('error', reset($validator->errors));
             $this->redirect('/checkout');
         }
-        if (!in_array($payment, ['simulated_card', 'simulated_cod'], true)) {
+        if (!in_array($payment, ['card', 'online_banking', 'ewallet'], true)) {
             Flash::set('error', 'Payment method is invalid.');
             $this->redirect('/checkout');
         }
@@ -108,6 +110,19 @@ class CheckoutController extends Controller
         $groups = $this->groupItems($items);
         $selected = CartVoucherSession::all($userId, $cartId);
         $voucherModel = new Voucher();
+        $productModel = new Product();
+        $paymentModel = new PaymentTransaction();
+        $paymentGateway = new MockPaymentGateway();
+        $user = AuthHelper::user() ?? [];
+
+        // Stock sanity.
+        foreach ($items as $it) {
+            if ((int) $it['stock_quantity'] < (int) $it['quantity']) {
+                Flash::set('error', 'Insufficient stock for ' . $it['product_name'] . '.');
+                $this->redirect('/cart');
+            }
+        }
+
         $deliveryFee = round(count($groups) * (new AppSetting())->deliveryFee(), 2);
         foreach ($groups as $storeId => &$group) {
             $pricing = $voucherModel->resolveCodesForStore(
@@ -132,14 +147,22 @@ class CheckoutController extends Controller
         unset($group);
 
         $db = db();
-        $productModel = new Product();
         try {
             $db->beginTransaction();
             $stmt = $db->prepare(
-                "INSERT INTO orders (user_id, total_amount, payment_method, payment_status, order_status, shipping_address, contact_phone)
-                 VALUES (:u, 0, :pm, 'paid', 'pending', :sa, :ph)"
+                "INSERT INTO orders (
+                    user_id, total_amount, payment_method, payment_status, order_status,
+                    shipping_address, contact_phone, customer_name_snapshot, customer_email_snapshot
+                 ) VALUES (:u, 0, :pm, 'pending', 'pending', :sa, :ph, :customer_name, :customer_email)"
             );
-            $stmt->execute([':u' => $userId, ':pm' => $payment, ':sa' => $shipping, ':ph' => $phone]);
+            $stmt->execute([
+                ':u' => $userId,
+                ':pm' => $payment,
+                ':sa' => $shipping,
+                ':ph' => $phone,
+                ':customer_name' => (string) ($user['full_name'] ?? ''),
+                ':customer_email' => (string) ($user['email'] ?? ''),
+            ]);
             $orderId = (int) $db->lastInsertId();
             $grandTotal = 0.0;
 
@@ -159,9 +182,7 @@ class CheckoutController extends Controller
                     }
                 }
 
-                $firstVoucherId = $appliedVouchers
-                    ? (int) $appliedVouchers[0]['voucher_id']
-                    : null;
+                $firstVoucherId = $appliedVouchers ? (int) $appliedVouchers[0]['voucher_id'] : null;
                 $merchantTotal = CartPricing::merchantTotal(
                     (float) $group['subtotal'],
                     (float) $transactionPricing['discount_total'],
@@ -222,18 +243,34 @@ class CheckoutController extends Controller
                 $grandTotal += $merchantTotal;
             }
 
-            $db->prepare('UPDATE orders SET total_amount = :t WHERE order_id = :o')
-                ->execute([':t' => $grandTotal, ':o' => $orderId]);
+            $paymentResult = $paymentGateway->process($payment, $_POST, $grandTotal);
+            $paymentModel->insert(['order_id' => $orderId] + $paymentResult);
+
+            $receiptNumber = 'RCT-' . date('Ymd') . '-' . str_pad((string) $orderId, 6, '0', STR_PAD_LEFT);
+            $db->prepare(
+                "UPDATE orders
+                 SET total_amount = :total, payment_status = 'paid', receipt_number = :receipt
+                 WHERE order_id = :order_id"
+            )->execute([
+                ':total' => $grandTotal,
+                ':receipt' => $receiptNumber,
+                ':order_id' => $orderId,
+            ]);
+
             $cartModel->clear($cartId);
             $db->commit();
-        } catch (\Throwable $error) {
+        } catch (\RuntimeException $e) {
             if ($db->inTransaction()) {
                 $db->rollBack();
             }
-            error_log('Checkout failed: ' . $error->getMessage());
-            Flash::set('error', $error instanceof \DomainException
-                ? $error->getMessage() . ' Review your cart and try again.'
-                : 'Checkout failed. Please review your cart and try again.');
+            Flash::set('error', $e->getMessage());
+            $this->redirect('/checkout');
+        } catch (\Throwable $e) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            error_log('Checkout failed: ' . $e->getMessage());
+            Flash::set('error', 'Checkout failed. Please try again.');
             $this->redirect('/cart');
         }
 

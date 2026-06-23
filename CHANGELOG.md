@@ -304,3 +304,10 @@ All notable changes to this project will be documented in this file.
 - Improved cart item detail presentation with product image, package information, unit price, and clearer line-total breakdowns.
 - Reused the same uploaded product image source in the shopping cart as the marketplace and product views.
 - Updated mobile cart styling so each item reads like a standalone card while keeping the desktop table layout intact.
+
+## [1.6.0] - 23rd June 2026
+- Added mock card, online banking, and e-wallet payment forms with server-side validation and simulated approval or decline handling.
+- Stored only generated transaction references, providers, payer names, and masked account identifiers without retaining card numbers or CVV values.
+- Added automatically generated receipt numbers and customer snapshots when checkout succeeds.
+- Added ownership-protected receipt pages with print/PDF support and downloadable HTML receipts from confirmation, order details, and order history.
+- Added migration `010_mock_payments_and_receipts.sql` for existing databases.

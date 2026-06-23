@@ -41,7 +41,10 @@
 
         <div class="order-card-footer">
           <span class="text-muted">Payment: <?= htmlspecialchars((string) ($o['payment_status'] ?? '')) ?></span>
-          <a class="btn btn-outline btn-sm" href="<?= BASE_URL ?>/orders/<?= (int) ($o['order_id'] ?? 0) ?>">View details</a>
+          <div class="flex">
+            <a class="btn btn-outline btn-sm" href="<?= BASE_URL ?>/orders/<?= (int) ($o['order_id'] ?? 0) ?>">View details</a>
+            <a class="btn btn-outline btn-sm" href="<?= BASE_URL ?>/orders/<?= (int) ($o['order_id'] ?? 0) ?>/receipt">Receipt</a>
+          </div>
         </div>
       </article>
     <?php endforeach; ?>
