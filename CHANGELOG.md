@@ -282,3 +282,9 @@ All notable changes to this project will be documented in this file.
 - Added store statistics for active products, orders, product revenue, and store rating.
 - Added strict operating-hours validation with support for overnight schedules.
 - Made the application settings migration safe to rerun without overwriting the configured delivery fee.
+
+## [1.4.1] - 22nd June 2026
+
+- Resetting the summary control appearance
+- Explicitly hiding .nav-more-menu when the details is closed
+- Removing the browser focus outline from the summary so it doesn’t show as a stray box
