@@ -61,4 +61,21 @@ class Store extends Model
              ORDER BY COALESCE(s.reviewed_at, s.created_at) DESC, s.store_id DESC"
         );
     }
+
+    public function recordReview(int $storeId, string $status, string $adminNote): bool
+    {
+        $stmt = $this->db()->prepare(
+            "UPDATE stores
+             SET store_status = :status,
+                 admin_note = :admin_note,
+                 reviewed_at = CURRENT_TIMESTAMP
+             WHERE store_id = :store_id"
+        );
+
+        return $stmt->execute([
+            ':status' => $status,
+            ':admin_note' => $adminNote,
+            ':store_id' => $storeId,
+        ]);
+    }
 }

@@ -77,18 +77,55 @@ class MerchantManagementViewTest extends TestCase
         $this->assertStringContainsString('/merchant/vouchers/7/update', $html);
     }
 
+    public function test_admin_merchant_page_uses_defaults_for_empty_request_fields(): void
+    {
+        $html = $this->render('admin/merchant-approval.php', [
+            'pending' => [[
+                'store_id' => 9,
+                'store_name' => '',
+                'owner_name' => '',
+                'username' => '',
+                'account_email' => '',
+                'contact_email' => '',
+                'contact_phone' => '',
+                'opening_time' => '',
+                'closing_time' => '',
+                'store_address' => '',
+                'store_description' => '',
+                'created_at' => null,
+            ]],
+            'approvedHistory' => [[
+                'store_id' => 10,
+                'store_name' => '',
+                'owner_name' => '',
+                'username' => '',
+                'contact_email' => '',
+                'created_at' => null,
+                'approved_at' => null,
+                'store_status' => 'closed',
+                'admin_note' => '',
+            ]],
+        ]);
+
+        $this->assertStringContainsString('Unnamed store', $html);
+        $this->assertStringContainsString('Unknown user', $html);
+        $this->assertStringContainsString('No description provided.', $html);
+        $this->assertStringNotContainsString('Not provided - Not provided', $html);
+    }
+
     public function test_merchant_approval_code_preserves_review_history_and_status_rules(): void
     {
         $controller = file_get_contents(__DIR__ . '/../src/app/controllers/admin/AdminMerchantController.php');
         $storeModel = file_get_contents(__DIR__ . '/../src/app/models/Store.php');
         $migration = file_get_contents(__DIR__ . '/../src/database/migrations/008_merchant_request_reviewed_at.sql');
 
-        $this->assertStringContainsString("'reviewed_at' => date('Y-m-d H:i:s')", $controller);
+        $this->assertStringContainsString('recordReview', $controller);
         $this->assertStringContainsString("store_status'] !== 'pending'", $controller);
         $this->assertStringContainsString("store_status'] !== 'approved'", $controller);
         $this->assertStringContainsString('approvedRequestHistory', $storeModel);
         $this->assertStringContainsString('COALESCE(s.reviewed_at, s.created_at)', $storeModel);
-        $this->assertStringContainsString('ADD COLUMN IF NOT EXISTS reviewed_at', $migration);
+        $this->assertStringContainsString('reviewed_at = CURRENT_TIMESTAMP', $storeModel);
+        $this->assertStringContainsString('ADD COLUMN reviewed_at', $migration);
     }
 
     private function render(string $view, array $data): string

@@ -41,21 +41,30 @@ $formatTime = static function ($value): string {
                 <span class="badge badge-warning">pending</span>
                 <span class="badge">Requested <?= htmlspecialchars($formatDate($store['created_at'] ?? null)) ?></span>
               </div>
-              <h3><?= htmlspecialchars((string) ($store['store_name'] ?? 'Unnamed store')) ?></h3>
-              <p class="text-muted">Submitted by <?= htmlspecialchars((string) ($store['owner_name'] ?? $store['username'] ?? 'Unknown user')) ?></p>
+              <h3><?= htmlspecialchars((string) (($store['store_name'] ?? '') ?: 'Unnamed store')) ?></h3>
+              <p class="text-muted">Submitted by <?= htmlspecialchars((string) (($store['owner_name'] ?? '') ?: ($store['username'] ?? '') ?: 'Unknown user')) ?></p>
             </div>
           </header>
 
           <div class="merchant-request-details">
-            <div><span>Account</span><strong><?= htmlspecialchars((string) ($store['username'] ?? '')) ?></strong><small><?= htmlspecialchars((string) ($store['account_email'] ?? '')) ?></small></div>
-            <div><span>Store contact</span><strong><?= htmlspecialchars((string) ($store['contact_email'] ?? 'Not provided')) ?></strong><small><?= htmlspecialchars((string) ($store['contact_phone'] ?? 'Not provided')) ?></small></div>
-            <div><span>Operating hours</span><strong><?= htmlspecialchars($formatTime($store['opening_time'] ?? null)) ?> - <?= htmlspecialchars($formatTime($store['closing_time'] ?? null)) ?></strong></div>
-            <div><span>Store address</span><strong><?= nl2br(htmlspecialchars((string) ($store['store_address'] ?? 'Not provided'))) ?></strong></div>
+            <div><span>Account</span><strong><?= htmlspecialchars((string) (($store['username'] ?? '') ?: '')) ?></strong><small><?= htmlspecialchars((string) (($store['account_email'] ?? '') ?: '')) ?></small></div>
+            <div><span>Store contact</span><strong><?= htmlspecialchars((string) (($store['contact_email'] ?? '') ?: 'Not provided')) ?></strong><small><?= htmlspecialchars((string) (($store['contact_phone'] ?? '') ?: 'Not provided')) ?></small></div>
+            <div>
+              <span>Operating hours</span>
+              <strong>
+                <?php if (!empty($store['opening_time']) && !empty($store['closing_time'])): ?>
+                  <?= htmlspecialchars($formatTime($store['opening_time'])) ?> - <?= htmlspecialchars($formatTime($store['closing_time'])) ?>
+                <?php else: ?>
+                  Not provided
+                <?php endif; ?>
+              </strong>
+            </div>
+            <div><span>Store address</span><strong><?= nl2br(htmlspecialchars((string) (($store['store_address'] ?? '') ?: 'Not provided'))) ?></strong></div>
           </div>
 
           <div class="merchant-request-description">
             <span>Description</span>
-            <p><?= nl2br(htmlspecialchars((string) ($store['store_description'] ?? 'No description provided.'))) ?></p>
+            <p><?= nl2br(htmlspecialchars((string) (($store['store_description'] ?? '') ?: 'No description provided.'))) ?></p>
           </div>
 
           <div class="merchant-request-actions">
@@ -104,8 +113,8 @@ $formatTime = static function ($value): string {
           <?php foreach ($approvedHistory as $store): ?>
             <?php $status = (string) ($store['store_status'] ?? 'approved'); ?>
             <tr>
-              <td><strong><?= htmlspecialchars((string) ($store['store_name'] ?? 'Unnamed store')) ?></strong><small><?= htmlspecialchars((string) ($store['contact_email'] ?? '')) ?></small></td>
-              <td><?= htmlspecialchars((string) ($store['owner_name'] ?? $store['username'] ?? 'Unknown')) ?><small>@<?= htmlspecialchars((string) ($store['username'] ?? '')) ?></small></td>
+              <td><strong><?= htmlspecialchars((string) (($store['store_name'] ?? '') ?: 'Unnamed store')) ?></strong><small><?= htmlspecialchars((string) (($store['contact_email'] ?? '') ?: '')) ?></small></td>
+              <td><?= htmlspecialchars((string) (($store['owner_name'] ?? '') ?: ($store['username'] ?? '') ?: 'Unknown')) ?><small>@<?= htmlspecialchars((string) (($store['username'] ?? '') ?: '')) ?></small></td>
               <td><?= htmlspecialchars($formatDate($store['created_at'] ?? null)) ?></td>
               <td><?= htmlspecialchars($formatDate($store['approved_at'] ?? null)) ?></td>
               <td><span class="badge <?= $status === 'approved' ? 'badge-success' : 'badge-danger' ?>"><?= htmlspecialchars($status) ?></span></td>

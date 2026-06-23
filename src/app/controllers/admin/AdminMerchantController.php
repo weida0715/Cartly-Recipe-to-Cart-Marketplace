@@ -36,11 +36,7 @@ class AdminMerchantController extends Controller
         try {
             $db->beginTransaction();
             (new User())->update((int) $store['user_id'], ['role' => 'merchant']);
-            $storeModel->update((int) $id, [
-                'store_status' => 'approved',
-                'admin_note' => '',
-                'reviewed_at' => date('Y-m-d H:i:s'),
-            ]);
+            $storeModel->recordReview((int) $id, 'approved', '');
             $db->commit();
         } catch (\Throwable $error) {
             if ($db->inTransaction()) {
@@ -70,11 +66,7 @@ class AdminMerchantController extends Controller
             Flash::set('error', 'A rejection reason is required.');
             $this->redirect('/admin/merchants');
         }
-        $storeModel->update((int) $id, [
-            'store_status' => 'rejected',
-            'admin_note' => $note,
-            'reviewed_at' => date('Y-m-d H:i:s'),
-        ]);
+        $storeModel->recordReview((int) $id, 'rejected', $note);
         Flash::set('info', 'Merchant rejected.');
         $this->redirect('/admin/merchants');
     }
