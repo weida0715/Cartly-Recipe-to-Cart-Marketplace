@@ -214,3 +214,4 @@ All notable changes to this project will be documented in this file.
 - Reworked the merchant store profile into dedicated details and operating-hours cards.
 - Added store statistics for active products, orders, product revenue, and store rating.
 - Added strict operating-hours validation with support for overnight schedules.
+- Made the application settings migration safe to rerun without overwriting the configured delivery fee.

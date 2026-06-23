@@ -17,7 +17,7 @@ run `migrations/002_store_scoped_voucher_codes.sql` once instead of recreating
 the database.
 
 To add administrator-managed delivery fees to an existing database, run
-`migrations/007_application_settings.sql` once.
+`migrations/007_application_settings.sql`. The migration is safe to rerun and preserves an existing fee.
 
 CLI alternative:
 

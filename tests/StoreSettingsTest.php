@@ -99,6 +99,16 @@ class StoreSettingsTest extends TestCase
         $this->assertStringContainsString(");\nCREATE TABLE users (", str_replace("\r\n", "\n", $schema));
         $this->assertStringContainsString("'delivery_fee'", $orderDetails);
     }
+
+    public function test_application_settings_migration_is_idempotent(): void
+    {
+        $migration = file_get_contents(__DIR__ . '/../src/database/migrations/007_application_settings.sql');
+
+        $this->assertIsString($migration);
+        $this->assertStringContainsString('CREATE TABLE IF NOT EXISTS application_settings', $migration);
+        $this->assertStringContainsString('INSERT IGNORE INTO application_settings', $migration);
+    }
+
     private function render(string $view, array $data): string
     {
         extract($data, EXTR_SKIP);
