@@ -289,7 +289,6 @@ All notable changes to this project will be documented in this file.
 - Explicitly hiding `.nav-more-menu` when the details is closed
 - Removing the browser focus outline from the summary so it doesn’t show as a stray box
 
-
 ## [1.5.0] - 23rd June 2026
 - Simplified merchant voucher records into compact summaries with clear Edit and Deactivate actions.
 - Expanded pending merchant requests with owner, contact, address, operating hours, description, and request date details.
@@ -300,3 +299,8 @@ All notable changes to this project will be documented in this file.
 - Allowed customers to cancel store orders before dispatch with atomic stock restoration.
 - Added item-level refund or return requests after order completion with merchant approval, rejection, refund amount, return shipment, and receipt workflows.
 - Added partial and full refund payment states plus migration `009_notifications_and_returns.sql` for existing databases.
+
+## [1.5.1] - 23rd June 2026
+- Improved cart item detail presentation with product image, package information, unit price, and clearer line-total breakdowns.
+- Reused the same uploaded product image source in the shopping cart as the marketplace and product views.
+- Updated mobile cart styling so each item reads like a standalone card while keeping the desktop table layout intact.

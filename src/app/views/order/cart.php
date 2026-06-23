@@ -14,28 +14,57 @@
           <h3><?= htmlspecialchars((string) ($group['store_name'] ?? 'Merchant')) ?></h3>
           <div class="cart-table-wrap">
             <table class="table cart-table">
-              <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th></th></tr></thead>
+              <thead>
+                <tr><th>Item</th><th>Qty</th><th>Price</th><th></th></tr>
+              </thead>
               <tbody>
                 <?php foreach (($group['items'] ?? []) as $item): ?>
-                  <?php $stock = (int) ($item['stock_quantity'] ?? 0); ?>
-                  <tr>
-                    <td>
-                      <?= htmlspecialchars((string) ($item['product_name'] ?? 'Product')) ?>
-                      <?php if (($item['added_method'] ?? '') === 'recipe'): ?>
-                        <span class="badge badge-success">recipe</span>
-                      <?php endif; ?>
+                  <?php
+                    $stock = (int) ($item['stock_quantity'] ?? 0);
+                    $packageQuantity = rtrim(rtrim(number_format((float) ($item['package_quantity'] ?? 0), 2, '.', ''), '0'), '.');
+                  ?>
+                  <tr class="cart-row">
+                    <td class="cart-item-cell">
+                      <div class="cart-item">
+                        <div class="cart-item-thumb" aria-hidden="true">
+                          <?php if (!empty($item['image'])): ?>
+                            <img src="<?= UPLOAD_URL ?>/<?= htmlspecialchars((string) $item['image']) ?>" alt="<?= htmlspecialchars((string) ($item['product_name'] ?? 'Product')) ?>">
+                          <?php else: ?>
+                            <span class="thumb-fallback">Item</span>
+                          <?php endif; ?>
+                        </div>
+                        <div class="cart-item-copy">
+                          <div class="cart-item-title-row">
+                            <strong class="cart-item-title"><?= htmlspecialchars((string) ($item['product_name'] ?? 'Product')) ?></strong>
+                            <?php if (($item['added_method'] ?? '') === 'recipe'): ?>
+                              <span class="badge badge-success">recipe</span>
+                            <?php endif; ?>
+                          </div>
+                          <div class="cart-item-meta">
+                            <span>Pack: <?= htmlspecialchars($packageQuantity) ?> <?= htmlspecialchars((string) ($item['package_unit'] ?? '')) ?></span>
+                            <span>Unit price: RM <?= number_format((float) ($item['unit_price'] ?? 0), 2) ?></span>
+                          </div>
+                          <small class="text-muted">Stock available: <?= $stock ?><?= $stock === 0 ? ' · remove this item to continue' : '' ?></small>
+                        </div>
+                      </div>
                     </td>
-                    <td>
-                      <form method="post" action="<?= BASE_URL ?>/cart/update" class="flex">
+                    <td class="cart-qty-cell">
+                      <span class="cart-mobile-label">Qty</span>
+                      <form method="post" action="<?= BASE_URL ?>/cart/update" class="cart-qty-form">
                         <?= Csrf::field() ?>
                         <input type="hidden" name="cart_item_id" value="<?= (int) ($item['cart_item_id'] ?? 0) ?>">
                         <input class="qty" type="number" name="quantity" value="<?= (int) ($item['quantity'] ?? 1) ?>" min="1" max="<?= max(1, $stock) ?>" <?= $stock === 0 ? 'disabled' : '' ?>>
                         <button class="btn btn-outline btn-sm" <?= $stock === 0 ? 'disabled' : '' ?>>Update</button>
                       </form>
-                      <small class="text-muted">Stock: <?= $stock ?><?= $stock === 0 ? ' - remove this item to continue' : '' ?></small>
+                      <small class="text-muted">Quantity in cart</small>
                     </td>
-                    <td>RM <?= number_format((float) ($item['line_total'] ?? 0), 2) ?></td>
-                    <td>
+                    <td class="cart-price-cell">
+                      <span class="cart-mobile-label">Total</span>
+                      <strong>RM <?= number_format((float) ($item['line_total'] ?? 0), 2) ?></strong>
+                      <small class="text-muted"><?= (int) ($item['quantity'] ?? 0) ?> × RM <?= number_format((float) ($item['unit_price'] ?? 0), 2) ?></small>
+                    </td>
+                    <td class="cart-action-cell">
+                      <span class="cart-mobile-label">Action</span>
                       <form method="post" action="<?= BASE_URL ?>/cart/remove" data-confirm="Remove this item?">
                         <?= Csrf::field() ?>
                         <input type="hidden" name="cart_item_id" value="<?= (int) ($item['cart_item_id'] ?? 0) ?>">
@@ -44,6 +73,10 @@
                     </td>
                   </tr>
                 <?php endforeach; ?>
+                <tr class="cart-subtotal-row">
+                  <td colspan="3" class="text-right"><strong>Subtotal</strong></td>
+                  <td><strong>RM <?= number_format((float) ($group['subtotal'] ?? 0), 2) ?></strong></td>
+                </tr>
               </tbody>
             </table>
           </div>
