@@ -19,7 +19,7 @@
         <div class="order-card-header">
           <div>
             <span class="order-card-label">Order identifier</span>
-            <h3>#<?= (int)$o['order_id'] ?></h3>
+            <h3>#<?= (int) ($o['order_id'] ?? 0) ?></h3>
           </div>
           <span class="badge <?= $statusClass ?>"><?= htmlspecialchars($statusLabel) ?></span>
         </div>
@@ -27,7 +27,7 @@
         <div class="order-card-details">
           <div>
             <span>Order date</span>
-            <strong><?= htmlspecialchars($o['created_at']) ?></strong>
+            <strong><?= htmlspecialchars((string) ($o['created_at'] ?? '')) ?></strong>
           </div>
           <div>
             <span>Items</span>
@@ -35,13 +35,13 @@
           </div>
           <div>
             <span>Total amount</span>
-            <strong>RM <?= number_format((float)$o['total_amount'], 2) ?></strong>
+            <strong>RM <?= number_format((float) ($o['total_amount'] ?? 0), 2) ?></strong>
           </div>
         </div>
 
         <div class="order-card-footer">
-          <span class="text-muted">Payment: <?= htmlspecialchars($o['payment_status']) ?></span>
-          <a class="btn btn-outline btn-sm" href="<?= BASE_URL ?>/orders/<?= (int)$o['order_id'] ?>">View details</a>
+          <span class="text-muted">Payment: <?= htmlspecialchars((string) ($o['payment_status'] ?? '')) ?></span>
+          <a class="btn btn-outline btn-sm" href="<?= BASE_URL ?>/orders/<?= (int) ($o['order_id'] ?? 0) ?>">View details</a>
         </div>
       </article>
     <?php endforeach; ?>
