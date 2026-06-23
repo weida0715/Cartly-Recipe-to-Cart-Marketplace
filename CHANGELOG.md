@@ -225,3 +225,11 @@ All notable changes to this project will be documented in this file.
 - Changed the customer profile page into an account overview with profile details, quick stats, shortcut actions, merchant application access, and recent orders.
 - Moved profile editing into a dedicated Edit Profile page.
 - Added account activity count helpers for orders, saved recipes, and reviews.
+
+## [1.3.0] - 22nd June 2026
+- Moved voucher application from checkout to each merchant section of the shopping cart.
+- Added support for applying and removing multiple vouchers with server-calculated discounts and totals.
+- Revalidated voucher status, dates, minimum spend, and usage limits during checkout.
+- Added order-level voucher history through the `merchant_order_vouchers` migration.
+- Prevented invalid merchant voucher date ranges with strict server validation and linked browser date constraints.
+- Hardened stacked voucher validation, blank date handling, and transactional stock updates based on review feedback.

@@ -838,6 +838,85 @@
   color: var(--muted);
 }
 
+.sr-only {
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+.cart-layout {
+  align-items: start;
+}
+.cart-table-wrap {
+  overflow-x: auto;
+}
+.cart-voucher-panel {
+  border-top: 1px solid var(--border);
+  margin-top: 18px;
+  padding-top: 18px;
+}
+.cart-voucher-heading h4,
+.cart-voucher-heading p {
+  margin: 0;
+}
+.cart-voucher-heading p {
+  margin-top: 4px;
+}
+.cart-voucher-form {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin-top: 14px;
+}
+.applied-voucher-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+.applied-voucher {
+  align-items: center;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--green-primary);
+  border-radius: var(--radius);
+  display: flex;
+  justify-content: space-between;
+  padding: 9px 10px;
+}
+.applied-voucher strong,
+.applied-voucher span {
+  display: block;
+}
+.applied-voucher span,
+.merchant-total-lines .discount,
+.cart-summary .discount {
+  color: var(--green-primary-dark);
+}
+.merchant-total-lines {
+  border-top: 1px dashed var(--border);
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+}
+.merchant-total-lines .line {
+  display: flex;
+  justify-content: space-between;
+}
+.merchant-total-lines .total {
+  font-weight: 800;
+}
+@media (max-width: 560px) {
+  .cart-voucher-form {
+    grid-template-columns: 1fr;
+  }
+  .cart-voucher-form .btn {
+    width: 100%;
+  }
+}
 .cart-table .qty {
   width: 80px;
 }
@@ -848,6 +927,17 @@
   color: var(--green-primary);
   border-bottom: 2px solid var(--green-primary);
   padding-bottom: 6px;
+}
+.checkout-merchant-summary .line {
+  margin-top: 10px;
+}
+.checkout-voucher-line,
+.checkout-merchant-summary .checkout-voucher-line {
+  color: var(--green-primary-dark);
+}
+.checkout-merchant-total {
+  border-top: 1px dashed var(--border);
+  padding-top: 12px;
 }
 .cart-summary {
   background: #fff;
