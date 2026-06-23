@@ -81,13 +81,15 @@ class ReturnRequestController extends Controller
 
         $decision = (string) $this->input('decision', '');
         $note = trim((string) $this->input('merchant_note', ''));
-        $refundAmount = round((float) $this->input('refund_amount', 0), 2);
         $status = match ($decision) {
             'refund' => 'refunded',
             'return' => 'return_approved',
             'reject' => 'rejected',
             default => '',
         };
+        $refundAmount = $status === 'rejected'
+            ? 0.0
+            : round((float) $this->input('refund_amount', 0), 2);
         if (strlen($note) > 1000 || $status === ''
             || ($status !== 'rejected' && ($refundAmount <= 0 || $refundAmount > (float) $request['requested_amount']))) {
             Flash::set('error', 'Enter a valid decision and refund amount within the item total.');

@@ -5,7 +5,7 @@ namespace App\Helpers;
 
 class Flash
 {
-    public static function set(string $type, string $message, bool $persistNotification = true): void
+    public static function set(string $type, string $message, bool $persistNotification = false): void
     {
         $_SESSION['_flash'][] = ['type' => $type, 'message' => $message];
         if (!$persistNotification || empty($_SESSION['user']['user_id'])) {

@@ -118,6 +118,9 @@ class NotificationReturnTest extends TestCase
         $schema = file_get_contents(__DIR__ . '/../src/database/schema.sql');
         $routes = file_get_contents(__DIR__ . '/../src/routes/web.php');
         $merchantOrder = file_get_contents(__DIR__ . '/../src/app/models/MerchantOrder.php');
+        $returnRequest = file_get_contents(__DIR__ . '/../src/app/models/ReturnRequest.php');
+        $returnController = file_get_contents(__DIR__ . '/../src/app/controllers/order/ReturnRequestController.php');
+        $flash = file_get_contents(__DIR__ . '/../src/app/helper/Flash.php');
 
         $this->assertStringContainsString('CREATE TABLE notifications', $schema);
         $this->assertStringContainsString('CREATE TABLE return_requests', $schema);
@@ -127,6 +130,11 @@ class NotificationReturnTest extends TestCase
         $this->assertStringContainsString('/merchant/returns/{id}/decide', $routes);
         $this->assertStringContainsString('restoreCancelledStock', $merchantOrder);
         $this->assertStringContainsString('FOR UPDATE', $merchantOrder);
+        $this->assertStringContainsString('$status === \'rejected\'', $returnController);
+        $this->assertStringContainsString('? 0.0', $returnController);
+        $this->assertStringContainsString('$updated = $ok && $stmt->rowCount() === 1', $returnRequest);
+        $this->assertStringContainsString('FOR UPDATE', $returnRequest);
+        $this->assertStringContainsString('bool $persistNotification = false', $flash);
     }
 
     private function render(string $view, array $data): string

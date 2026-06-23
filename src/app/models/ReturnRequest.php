@@ -70,10 +70,11 @@ class ReturnRequest extends Model
             ':resolved' => in_array($status, ['refunded', 'rejected'], true) ? 1 : 0,
             ':id' => $requestId,
         ]);
-        if ($ok && $status === 'refunded') {
+        $updated = $ok && $stmt->rowCount() === 1;
+        if ($updated && $status === 'refunded') {
             $this->syncOrderPaymentStatus($requestId);
         }
-        return $ok && $stmt->rowCount() === 1;
+        return $updated;
     }
 
     public function markReturnShipped(int $requestId, int $userId): bool
@@ -121,24 +122,45 @@ class ReturnRequest extends Model
 
     private function syncOrderPaymentStatus(int $requestId): void
     {
-        $rows = $this->query(
-            "SELECT o.order_id, o.total_amount, COALESCE(SUM(rr.refund_amount), 0) AS refunded_total
-             FROM return_requests source
-             JOIN merchant_orders source_mo ON source_mo.merchant_order_id = source.merchant_order_id
-             JOIN orders o ON o.order_id = source_mo.order_id
-             LEFT JOIN merchant_orders mo ON mo.order_id = o.order_id
-             LEFT JOIN return_requests rr ON rr.merchant_order_id = mo.merchant_order_id AND rr.status = 'refunded'
-             WHERE source.return_request_id = :id
-             GROUP BY o.order_id, o.total_amount",
-            [':id' => $requestId]
-        );
-        if (!$rows) {
-            return;
+        $db = $this->db();
+        try {
+            $db->beginTransaction();
+            $orderStmt = $db->prepare(
+                "SELECT o.order_id, o.total_amount
+                 FROM return_requests rr
+                 JOIN merchant_orders mo ON mo.merchant_order_id = rr.merchant_order_id
+                 JOIN orders o ON o.order_id = mo.order_id
+                 WHERE rr.return_request_id = :id
+                 FOR UPDATE"
+            );
+            $orderStmt->execute([':id' => $requestId]);
+            $order = $orderStmt->fetch();
+            if (!$order) {
+                $db->rollBack();
+                return;
+            }
+
+            $sumStmt = $db->prepare(
+                "SELECT COALESCE(SUM(rr.refund_amount), 0) AS refunded_total
+                 FROM merchant_orders mo
+                 JOIN return_requests rr ON rr.merchant_order_id = mo.merchant_order_id
+                    AND rr.status = 'refunded'
+                 WHERE mo.order_id = :order_id"
+            );
+            $sumStmt->execute([':order_id' => (int) $order['order_id']]);
+            $sumRow = $sumStmt->fetch();
+            $status = (float) ($sumRow['refunded_total'] ?? 0) >= (float) $order['total_amount']
+                ? 'refunded'
+                : 'partially_refunded';
+
+            $updateStmt = $db->prepare('UPDATE orders SET payment_status = :status WHERE order_id = :order_id');
+            $updateStmt->execute([':status' => $status, ':order_id' => (int) $order['order_id']]);
+            $db->commit();
+        } catch (\Throwable $error) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            throw $error;
         }
-        $status = (float) $rows[0]['refunded_total'] >= (float) $rows[0]['total_amount']
-            ? 'refunded'
-            : 'partially_refunded';
-        $stmt = $this->db()->prepare('UPDATE orders SET payment_status = :status WHERE order_id = :order_id');
-        $stmt->execute([':status' => $status, ':order_id' => (int) $rows[0]['order_id']]);
     }
 }
