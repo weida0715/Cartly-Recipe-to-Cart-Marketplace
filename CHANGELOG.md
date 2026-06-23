@@ -233,3 +233,8 @@ All notable changes to this project will be documented in this file.
 - Added order-level voucher history through the `merchant_order_vouchers` migration.
 - Prevented invalid merchant voucher date ranges with strict server validation and linked browser date constraints.
 - Hardened stacked voucher validation, blank date handling, and transactional stock updates based on review feedback.
+
+## [1.3.1] - 22nd June 2026
+- Expanded the cart order summary with estimated subtotal, delivery cost, and total amount.
+- Added a continue-shopping action to the cart so customers can return to browsing products.
+- Reworked customer order history into responsive order cards with status badges, item counts, dates, totals, payment status, and view-detail actions.
